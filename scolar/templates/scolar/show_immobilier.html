@@ -1,0 +1,180 @@
+
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+{% load dictionary %}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+<form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+ 
+ 	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+    
+   <div class="content-wrapper">
+      <div class="row">
+         <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+               <div class="card-body">
+                  <h3>Suivi des immobilisations </h3>
+                   <p class="lead font-italic">Listes des immobiliers </p>
+                     <hr class="my-4">
+                     
+                       <form method="get" >
+	                      <div class="row">
+	
+								<div class="col-sm-4">
+									<div class="form-group row">
+										<label class="col-sm-4 col-form-label">Numéro de facture</label>
+										<div class="col-sm-5">
+											<input type="text" class="form-control" name="Num_facture" />
+										</div>
+										<input type="submit" class="btn btn-outline-success d-inline btn-sm" value="Rechercher">
+									</div>
+								</div>
+								
+						</div> 
+	        
+				      </form> 
+
+                     <table class="table table-striped" >
+                         <thead class="border-bottom font-weight-bold">
+                         <tr>
+                             <th>Code barre</th>
+                             <th>Numéro d'inventaire</th>
+                             <th>Désingnation</th>     
+                             <th>Famille</th>
+                             <th>Fournisseur</th>
+                             <th>Numéro de facture</th>        
+                             <th>Marque</th>
+                             <th>Valeur</th>         
+                             <th>Affecté à</th>
+                                <th>Date Facture</th>
+                                <th>Durée Garantie</th>
+                                <th>Sous Garantie?</th>
+                             <th>Facture</th>                     
+                             <th>
+                                 <a href="{% url 'ImmobilierCreate' %}"
+                                              class="btn btn-outline-success d-inline btn-lg">
+                                     <i class="fa fa-plus"> Immobilier</i>
+                                 </a>
+                             </th>
+                         </tr>
+                         </thead>
+                         <tbody>
+                         {% for immo in immobilier_page_obj %}
+                         <tr>
+                             <td>{{immo.code_barre}}</td>
+                             <td>{{immo.num_inventaire}}</td>
+                             <td>{{immo.deseingnation}}</td>
+                             <td>{{immo.get_famille_display}}</td>
+                             
+                             <td>{{immo.fournisseur}}</td>
+                             <td>{{immo.Num_facture}}</td>
+                             <td>{{immo.marque}}</td>
+                             <td>{{immo.valeur}} DZD</td>
+                             <td>{{immo.benificaire.nom}}  {{immo.benificaire.prenom}}</td>     
+                                  <td>{{immo.date_facture}}</td>
+		                          <td>{{immo.duree_garantie}}</td>
+		                          <td>
+		                          
+		                          
+		                           <script>
+		                                 var today = new Date();
+								         var dt =new Date("{{immo.date_facture}}");
+								         dt.setMonth( dt.getMonth() + {{immo.duree_garantie}});
+								         
+								         if(today>dt)
+								         {
+								        	  document.write("<font color=\"red\">NON</font>" );
+								         }
+								         else
+								         {
+								        	 document.write( "<font color=\"green\">OUI</font>" );
+								         }
+								 
+								   </script>
+								   
+										                          
+		                          </td>
+
+                             <td>
+                             {% if immo.facture == None %}  
+                             
+                                   <a style="padding-left:30px;" href="{% url 'ImmobilierEdit' immo.id %}" data-toggle="tooltip" data-placement="bottom" title="Cliquer ici pour jointer la facture.">
+                                     <i class="fas fa-link fa-lg" style="color:red"></i>
+                                 </a>
+                             {% else %}  
+					    
+					         
+					             
+					         <a style="padding-left:30px;" href="../media/{{immo.facture}}" data-toggle="tooltip" data-placement="bottom" title="Cliquer ici pour consulter la facture.">
+                                     <i class="fas fa-link fa-lg " style="color:green"></i>
+                                 </a>
+					         {% endif %}
+					    
+                         
+                           </td>                          
+                                       <td>
+                                 <a style="padding-left:30px;" href="{% url 'ImmobilierDelete' immo.id %}" class="d-inline" >
+                                     <i class="fa fa-trash-alt fa-lg "></i>
+                                 </a>
+                                   <a style="padding-left:30px;" href="{% url 'ImmobilierEdit' immo.id %}" class="d-inline" >
+                                     <i class="fas fa-edit fa-lg"></i>
+                                 </a>
+                          
+                             </td>              
+                         </tr>
+                         {% endfor %}
+                         </tbody>
+            
+                     </table>
+           
+                     <div class="pagination">
+					    <span class="step-links">
+					        {% if immobilier_page_obj.has_previous %}      
+					            <a  href="{% relative_url 1 'page' request.GET.urlencode %}" >&laquo; Première</a>
+					            <a  href="{% relative_url immobilier_page_obj.previous_page_number 'page' request.GET.urlencode %}" >Précédente</a>
+					        {% endif %}
+					
+					        <span class="current">
+					            Page {{ immobilier_page_obj.number }} / {{ immobilier_page_obj.paginator.num_pages }}.
+					        </span>
+					
+					        {% if immobilier_page_obj.has_next %}
+					     
+					        <a  href="{% relative_url immobilier_page_obj.next_page_number 'page' request.GET.urlencode %}" >Suivante</a>
+					        <a  href="{% relative_url immobilier_page_obj.paginator.num_pages 'page' request.GET.urlencode %}" >Dernière &raquo;</a>
+					   
+					        {% endif %}
+					    </span>
+					</div>     
+      
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+           
+        <script>
+     
+     $(function () {
+    	  $('[data-toggle="tooltip"]').tooltip()
+    	})
+     
+     </script>   
+</form>
+</html>
+
+{% endblock %}

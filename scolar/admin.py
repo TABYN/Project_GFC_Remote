@@ -56,3 +56,10 @@ admin.site.register(Credit)
 admin.site.register(Article)
 admin.site.register(Chapitre)
 admin.site.register(Piece)
+admin.site.register(Exercice)
+admin.site.register(Avance)
+
+
+admin.site.register(Bloc)
+admin.site.register(Bureau)
+admin.site.register(Immobilier)

@@ -1,0 +1,376 @@
+
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+{% load dictionary %}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+
+ {% block content %}
+<form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+ 
+ 
+ 	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+.modal {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  top: 0; right: 0;
+  bottom: 0; left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(77, 77, 77, .7);
+  transition: all .4s;
+}
+.modal:target {
+  visibility: visible;
+  opacity: 1;
+}
+.modal_content {
+  border-radius: 4px;
+  position: relative;
+  width: 700px;
+  max-width: 90%;
+  background: Azure;
+  padding: 1.5em 2em;
+}
+
+.modal_close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: grey;
+  text-decoration: none;
+}
+
+    </style>
+ 
+ 
+      <div class="row">  
+		        
+		             
+   <div class="content-wrapper">
+      <div class="row">
+         <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+               <div class="card-body">
+                  <h3>Suivi des immobilisations </h3>
+                   <p class="lead font-italic">Consultation des Factures</p>         
+                     <hr class="my-4">
+       
+	                 
+	                  <form method="get" >
+	                      <div class="row">
+								<div class="col">
+									<div class="form-group row">
+										<label class="col col-form-label" for="number1" >Code barre</label>
+										<div class="col">
+											<input type="text" class="form-control" name="code_barre" id="number1"  />
+										</div>
+									</div>
+									
+								</div>
+								<div class="col">
+									<div class="form-group row">
+										<label class="col col-form-label" for="number1" >Numéro d'inventaire</label>
+										<div class="col">
+											<input type="text" class="form-control" name="num_inventaire" id="number1"  />
+										</div>
+									</div>
+				
+								</div>
+								<div class="col">
+									<div class="form-group row">
+										<label class="col col-form-label">Numéro de facture</label>
+										<div class="col">
+											<input type="text" class="form-control" name="Num_facture" />
+										</div>
+										<input type="submit" class="btn btn-outline-success d-inline btn-sm" value="Rechercher">
+									</div>
+								</div>
+								
+						</div> 
+	                   <!-- {{filtred_immobiliers.form|crispy}}
+				       <input type="submit"   class="btn btn-outline-success d-inline btn-lg" value="Rechercher"> -->
+				      </form>	
+				       
+				       <table class="table table-striped" id="dataTable">
+				         <thead class="border-bottom font-weight-bold">
+                         <tr>
+                             <th>Code barre</th>
+                             <th>Numéro d'inventaire</th>
+                             <th>Désingnation</th>     
+                             <th>Famille</th>
+                             <th>Fournisseur</th>       
+                             <th>Marque</th>
+                             <th>Valeur</th>         
+                             <th>Affecté à</th>
+                                 <th>Date Facture</th>
+                                <th>Durée Garantie</th>
+                                <th>Sous Garantie?</th>
+                             <th>Numéro Facture</th>  
+                             <th>Observation</th> 
+                             <th>Voir Facture</th>                     
+                          
+                         </tr>
+                         </thead>              
+                     {% for immo in immobilier_page_obj %}
+                     <tr>
+                             <td>{{immo.code_barre}}</td>
+                             <td>{{immo.num_inventaire}}</td>
+                             <td>{{immo.deseingnation}}</td>
+                             <td>{{immo.get_famille_display}}</td>
+                             
+                             <td>{{immo.fournisseur}}</td>
+                          
+                             <td>{{immo.marque}}</td>
+                             <td>{{immo.valeur}} DZD</td>
+                             <td>{{immo.benificaire.nom}}  {{immo.benificaire.prenom}}</td>
+                             
+                               <td>{{immo.date_facture}}</td>
+		                          <td>{{immo.duree_garantie}}</td>
+		                          <td>		                                
+		                           <script>
+		                                 var today = new Date();
+								         var dt =new Date("{{immo.date_facture}}");
+								         dt.setMonth( dt.getMonth() + {{immo.duree_garantie}});
+								         
+								         if(today>dt)
+								         { 
+								        	 
+								        	 var str = "NON";
+								           
+								        	 
+								        	  document.write("<font color=\"red\">" +str.bold()+ "</font>" );
+								         }
+								         else
+								         { 
+								        	 var str = "OUI";
+								        	 document.write("<font color=\"green\">" +str.bold()+ "</font>" );
+								         }
+								 
+								   </script>								  										                          
+		                          </td>
+
+                              <td>{{immo.Num_facture}}</td>
+                              <td>{{immo.observation}}</td>
+                             <td>             
+                             
+                             
+                             {% if immo.facture == None %}  
+                             
+                                   <a style="padding-left:30px;" data-toggle="tooltip" data-placement="bottom" title="Facture n'est pas encore jointée !.">
+                                     <i class="fas fa-link fa-lg" style="color:grey"></i>
+                                 </a>
+                             {% else %}  
+					    
+					         
+					             
+					         <a style="padding-left:30px;" href="../media/{{immo.facture}}" data-toggle="tooltip" data-placement="bottom" title="Cliquer ici pour consulter la facture.">
+                                     <i class="fas fa-link fa-lg" style="color:green"></i>
+                                 </a>
+					         {% endif %}                                                     
+                           </td>   
+             <td>
+             
+             <a href="#{{immo.code_barre}}">Plus de détails</a>
+
+					<div id="{{immo.code_barre}}" class="modal">
+					  <div class="modal_content">
+					    <h1>Détails de l'immobilier</h1>
+					    
+					    <table class="table table-hover" >
+				      
+                         <tr>
+                             <td><h5>Code barre</td>
+                             <td>{{immo.code_barre}}</td>
+                             
+                            </tr>
+                            <tr>
+                             <td><h5>Numéro d'inventaire</td>
+                              <td>{{immo.num_inventaire}}</td>
+                               </tr>
+                             <tr>
+                             <td><h5>Désingnation</td>
+                              <td>{{immo.deseingnation}}</td>
+                               </tr>   
+                               <tr> 
+                             <td><h5>Famille</td>
+                              <td>{{immo.get_famille_display}}</td>
+                               </tr>
+                               <tr>
+                             <td><h5>Fournisseur</td>
+                              <td>{{immo.fournisseur}}</td>
+                               </tr>  
+                               <tr>  
+                             <td><h5>Marque</td>
+                             <td>{{immo.marque}}</td>
+                               </tr>
+                               <tr>
+                             <td><h5>Valeur</td> 
+                              <td>{{immo.valeur}} DZD</td>
+                               </tr>
+                               <tr>      
+                             <td><h5>Affecté à</td>
+                              <td>{{immo.benificaire.nom}}  {{immo.benificaire.prenom}}</td>
+                               </tr>
+                               
+                               <td><h5>Localisation</td>
+                              <td>{{immo.bureau.code_bur}}{{immo.bureau.libelle_bureau}} / {{immo.bureau.bloc.libelle_blc}}</td>
+                               </tr>
+                               
+                               
+                               
+                               <tr>
+                             <td><h5>Date Facture</td>
+                               <td>{{immo.date_facture}}</td>
+                               </tr>
+                               <tr>
+                             <td><h5>Durée Garantie</td>
+                              <td>{{immo.duree_garantie}} Mois</td>
+                               </tr>
+                               <tr>
+                             <td><h5>Sous Garantie?</td>
+                                   
+		                          <td>
+		                           <script>
+		                                 var today = new Date();
+
+								         var dt =new Date("{{immo.date_facture}}");					     
+								         dt.setMonth( dt.getMonth() + {{immo.duree_garantie}});
+								      
+								         
+								         if(today>dt)
+								         { 								        	 
+								        	 var str = "NON";
+ 	 
+								        	  document.write("<font color=\"red\">" +str.bold()+ "</font>" );
+								         }
+								         else
+								         { 
+								        	 var str = "OUI";
+
+								        	 document.write("<font color=\"green\">" +str.bold()+ " </font>" );
+								         }
+								 
+								   </script>															                          
+		                          </td>
+      
+                               </tr>
+                               <tr>
+                            <td><h5>Numéro Facture</td>
+                             <td>{{immo.Num_facture}}</td>
+                               </tr>
+                               <tr>
+                             <td><h5>Observation</td>
+                              <td>{{immo.observation}}</td>
+                               </tr>           
+					    <a href="#" class="modal_close">&times;</a>
+					  </div>
+					</div>                              
+             </td>
+                                                                   
+                 </table>
+                      
+                         {% endfor %}
+                         </table> 
+                   
+                                   
+               <div class="pagination">
+					    <span class="step-links">
+					        {% if immobilier_page_obj.has_previous %}      
+					            <a  href="{% relative_url 1 'page' request.GET.urlencode %}" >&laquo; Première</a>
+					            <a  href="{% relative_url immobilier_page_obj.previous_page_number 'page' request.GET.urlencode %}" >Précédente</a>
+					        {% endif %}
+					
+					        <span class="current">
+					            Page {{ immobilier_page_obj.number }} / {{ immobilier_page_obj.paginator.num_pages }}.
+					        </span>
+					
+					        {% if immobilier_page_obj.has_next %}
+					     
+					        <a  href="{% relative_url immobilier_page_obj.next_page_number 'page' request.GET.urlencode %}" >Suivante</a>
+					        <a  href="{% relative_url immobilier_page_obj.paginator.num_pages 'page' request.GET.urlencode %}" >Dernière &raquo;</a>
+					   
+					        {% endif %}
+					    </span>
+					</div>   
+               <div/>           
+				 </div> 
+            </div>
+         </div>
+      </div>
+   </div>
+ 
+
+<!-- <form>
+    <fieldset>
+        <legend>Lets switch</legend>
+        Mode 1<input type="radio" class="modeClass" name="change_mode" value="Text box" />
+        Mode 2<input type="radio" class="modeClass" name="change_mode" value="Radio buttons" />
+        <br />
+        <div id="text_form" class="hidden">
+            <label>Name:</label>
+            <input type="text" />
+            <br />
+            <label>Email:</label>
+            <input type="text" />
+            <br />
+            <label>Date of birth:</label>
+            <input type="text" />
+        </div>
+        <div id="radio_form" class="hidden">
+            <input type="radio" name="sex" value="male" />
+            <label>Male</label>
+            <input type="radio" name="sex" value="female" />
+            <label>Female</label>
+        </div>
+    </fieldset>
+</form> -->
+  
+
+ 
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script> 
+ 
+ 
+ 
+ 
+     <script>
+     
+     $(function () {
+    	  $('[data-toggle="tooltip"]').tooltip()
+    	})
+     
+     </script>     
+     
+</form>
+</html>
+
+{% endblock %}

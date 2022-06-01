@@ -292,28 +292,42 @@ urlpatterns = [
     path('residenceuniv_create', views.ResidenceUnivCreateView.as_view(), name='residenceuniv_create'),
 
 ################################################# URLS Reget
+    path('ExerciceCreate', views.ExerciceCreate, name="ExerciceCreate"),
+    path('ExerciceShow', views.ExerciceShow, name='ExerciceShow'),
+    path('AvanceCreate/<int:exe>/', views.AvanceCreate, name="AvanceCreate"),
 
     path('ChapitreCreate', views.ChapitreCreate, name='ChapitreCreate'),
     path('ChapitreShow', views.ChapitreShow, name='ChapitreShow'),
     path('ChapitreDelete/<int:id>/', views.ChapitreDelete, name='ChapitreDelete'),
 
-    path('ArticleCreate/<int:art>/', views.ArticleCreate, name="ArticleCreate"),
+    path('ArticleCreate/<int:chap>/', views.ArticleCreate, name="ArticleCreate"),
     path('ArticleDelete/<int:art>/', views.ArticleDelete, name="ArticleDelete"),
 
-    path('CreditCreate/', views.CreditCreate, name="CreditCreate"),
-    path('CreditAssociate/<int:art>/', views.CreditAssociate, name="CreditAssociate"),
-    path('CreditDelete/<int:art>/', views.CreditDelete, name="CreditDelete"),
+    path('CreditCreate/<int:avc>/',views.CreditCreate, name="CreditCreate"),
+    path('CreditAssociate/<int:avc>/<int:art>/', views.CreditAssociate, name="CreditAssociate"),
+    path('CreditDelete/<int:avc>/<int:art>/',views.CreditDelete, name="CreditDelete"),
    
-    path('aa_pdf', views.aa_PDFView.as_view(), name='aa_pdf'),
+    path('aa_avance_PDFView/<avance_pk>/', views.aa_avance_PDFView.as_view(), name='aa_avance_PDFView'),
     path('BordereauCreate/<int:crdt>/', views.BordereauCreate, name="BordereauCreate"),
-    path('LitImput', views.LitImput, name='LitImput'),
+    path('LitImput/<int:avc>/', views.LitImput, name='LitImput'),
     path('PieceCreate/<int:brdr>/', views.PieceCreate, name='PieceCreate'),
     path('PieceDelete/<int:pc>/', views.PieceDelete, name="PieceDelete"),
     path('aa_bordereau_pdf/<bordereau_pk>/', views.aa_bordereau_PDFView.as_view(), name='aa_bordereau_pdf'),
-
+    path('AvanceChartView', views.AvanceChartView.as_view(), name='AvanceChart'),
+    path('LitImput_for_exercice/<int:exe>/', views.LitImput_for_exercice, name='LitImput_for_exercice'),
+       
+    
+    
     
 
-
-
-
-]
+    
+   ################################################# URLS Inventaire 
+   
+    path('ImmobilierCreate', views.ImmobilierCreate, name='ImmobilierCreate'),
+    path('ImmobilierShow', views.ImmobilierShow, name='ImmobilierShow'),
+    path('ImmobilierShowFilter', views.ImmobilierShowFilter, name='ImmobilierShowFilter'),
+    path('ImmobilierDelete/<int:id>/', views.ImmobilierDelete, name='ImmobilierDelete'),
+    path('ImmobilierEdit/<int:id>/', views.ImmobilierEdit, name='ImmobilierEdit'),
+ 
+    
+    ]

@@ -1,5 +1,10 @@
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
+from .filters import ImmobilierFilter 
 import locale
 import babel.numbers
 from num2words import num2words
@@ -127,7 +132,7 @@ def assure_module_groupe(enseignant_, module_, groupe_):
 
 def get_groupe_list_from_str(student_set):
     """
-        Cette fonction est utilisée dans l'import des activités à partir de FET export.
+        Cette fonction est utilisأ©e dans l'import des activitأ©s أ  partir de FET export.
     """
     groupe_list = []
     str_groupe_list = student_set.split('+')
@@ -150,15 +155,15 @@ def get_groupe_list_from_str(student_set):
 
 def get_enseignant_list_from_str(teacher_set):
     """
-        Cette fonction est utilisée pour retrouver la liste des enseignants de la base de Talents
-        qui correspondent à la liste des enseignants générée dans les activités importées de l'export de FET.
+        Cette fonction est utilisأ©e pour retrouver la liste des enseignants de la base de Talents
+        qui correspondent أ  la liste des enseignants gأ©nأ©rأ©e dans les activitأ©s importأ©es de l'export de FET.
         Attention, il faut que les noms de enseignants dans FET correspondent aux noms dans la base de Talents
     """
     enseignant_list = []
     str_enseignant_list = teacher_set.split('+')
     for str_enseignant in str_enseignant_list:
         enseignant_elements = str_enseignant.split()
-        # traiter les noms composés
+        # traiter les noms composأ©s
         prenom_initial = enseignant_elements[len(enseignant_elements) - 1]
         nom_ = enseignant_elements[0]
         for i in range(1, len(enseignant_elements) - 1):
@@ -171,9 +176,9 @@ def get_enseignant_list_from_str(teacher_set):
 
 def get_type_activite_from_str(activity_tag):
     """
-        Cette fonction est utilisée pour traduire les types d'activités dans l'export de FET vers le type d'activités dans la base
+        Cette fonction est utilisأ©e pour traduire les types d'activitأ©s dans l'export de FET vers le type d'activitأ©s dans la base
         de Talents.
-        Attention, il faut uniformiser les notations avant la génération des EDT avec FET
+        Attention, il faut uniformiser les notations avant la gأ©nأ©ration des EDT avec FET
     """
     TAG_TRANS = {
         'Cours': 'C',
@@ -205,7 +210,7 @@ def planning_import_from_fet(request):
                 dataset = Dataset(headers=['Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration'])
                 imported_data = dataset.load(activite_file.read().decode('utf-8'), format='csv')
                 periode_ = form.cleaned_data['periode']
-                # supprimer toutes les activités du semestre avant d'importer les nouvelles
+                # supprimer toutes les activitأ©s du semestre avant d'importer les nouvelles
                 Activite.objects.filter(module__formation__annee_univ__encours=True,
                                         module__periode__periode=periode_).delete()
                 # insert imported_data in Activite table
@@ -241,15 +246,15 @@ def planning_import_from_fet(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'import des activités n'a pas réussit. Il doit y avoir un problème dans le format du fichier")
+                                   "L'import des activitأ©s n'a pas rأ©ussit. Il doit y avoir un problأ¨me dans le format du fichier")
                     messages.info(request,
-                                  "Merci de renseigner le semestre pour lequel vous voulez importer les activités pédagogiques.")
+                                  "Merci de renseigner le semestre pour lequel vous voulez importer les activitأ©s pأ©dagogiques.")
                     messages.info(request,
-                                  "Le fichier doit être au format csv (généré par FET) avec les colonnes: 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration'")
+                                  "Le fichier doit أھtre au format csv (gأ©nأ©rأ© par FET) avec les colonnes: 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration'")
                     return render(request, 'scolar/import.html',
-                                  {'form': form, 'titre': 'Importer Planning à partir de FET'})
+                                  {'form': form, 'titre': 'Importer Planning أ  partir de FET'})
                     # redirect to a new URL:
-            messages.success(request, "Les activités ont été importées avec succès")
+            messages.success(request, "Les activitأ©s ont أ©tأ© importأ©es avec succأ¨s")
             if len(ligne_problem) != 0:
                 messages.warning(request, "Lignes avec erreurs:\n" + ligne_problem)
             return HttpResponseRedirect(reverse('planification_list'))
@@ -257,10 +262,10 @@ def planning_import_from_fet(request):
     else:
         form = PlanificationImportFileForm()
     messages.info(request,
-                  "Merci de renseigner le semestre pour lequel vous voulez importer les activités pédagogiques.")
+                  "Merci de renseigner le semestre pour lequel vous voulez importer les activitأ©s pأ©dagogiques.")
     messages.info(request,
-                  "Le fichier doit être au format csv (généré par FET) avec les colonnes: 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration'")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer Planning à partir de FET'})
+                  "Le fichier doit أھtre au format csv (gأ©nأ©rأ© par FET) avec les colonnes: 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration'")
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer Planning أ  partir de FET'})
 
 
 JOUR_NUM = {
@@ -317,14 +322,14 @@ def from_fet_to_google_agenda(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'insertion des EDT n'a pas réussit. Il doit y avoir un problème dans le format du fichier")
+                                   "L'insertion des EDT n'a pas rأ©ussit. Il doit y avoir un problأ¨me dans le format du fichier")
                     messages.info(request,
-                                  "Le fichier doit être au format csv (généré par FET) avec les colonnes: 'Activity Id', 'Day', 'Hour', 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration', Room'")
+                                  "Le fichier doit أھtre au format csv (gأ©nأ©rأ© par FET) avec les colonnes: 'Activity Id', 'Day', 'Hour', 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration', Room'")
                     return render(request, 'scolar/import.html',
-                                  {'form': form, 'titre': 'Insertion des EDT à partir de FET', 'btn_list': btn_list})
+                                  {'form': form, 'titre': 'Insertion des EDT أ  partir de FET', 'btn_list': btn_list})
                     # redirect to a new URL:
             messages.success(request,
-                             "L'insertion des EDT dans Google Agenda a été lancée. Une notification vous sera transmise aussitôt terminée.")
+                             "L'insertion des EDT dans Google Agenda a أ©tأ© lancأ©e. Une notification vous sera transmise aussitأ´t terminأ©e.")
             return HttpResponseRedirect(reverse('home'))
             # if a GET (or any other method) we'll create a blank form
     else:
@@ -332,9 +337,9 @@ def from_fet_to_google_agenda(request):
                          "Cliquez sur le bouton Demander Code Autorisation pour avoir le code d'autorisation Google.")
         form = EDTImportFileForm()
     messages.info(request,
-                  "Le fichier doit être au format csv (généré par FET) avec les colonnes: 'Activity Id', 'Day', 'Hour', 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration', Room'")
+                  "Le fichier doit أھtre au format csv (gأ©nأ©rأ© par FET) avec les colonnes: 'Activity Id', 'Day', 'Hour', 'Students Sets', 'Subject', 'Teachers', 'Activity Tags', 'Total Duration', Room'")
     return render(request, 'scolar/import.html',
-                  {'form': form, 'titre': 'Insérer les EDT dans Google Agenda à partir de FET', 'btn_list': btn_list})
+                  {'form': form, 'titre': 'Insأ©rer les EDT dans Google Agenda أ  partir de FET', 'btn_list': btn_list})
 
 
 def task_from_fet_to_google_agenda(cleaned_data, imported_data, service, user):
@@ -342,17 +347,17 @@ def task_from_fet_to_google_agenda(cleaned_data, imported_data, service, user):
         start_date = cleaned_data['date_debut']
         end_date = cleaned_data['date_fin']
 
-        # TODO : supprimer toutes les activités avant d'importer les nouvelles
+        # TODO : supprimer toutes les activitأ©s avant d'importer les nouvelles
 
         # insert imported_data in Google Agenda
         index_ = 0
         while index_ < len(imported_data.dict):
             try:
-                # pour chque slot time une ligne portant le même activity id est créée dans le fichier
-                # il faut donc isoler la 1ère et dernière ligne d'une même activité pour retrouver l'heure début et l'heure fin d'une activité
+                # pour chque slot time une ligne portant le mأھme activity id est crأ©أ©e dans le fichier
+                # il faut donc isoler la 1أ¨re et derniأ¨re ligne d'une mأھme activitأ© pour retrouver l'heure dأ©but et l'heure fin d'une activitأ©
                 first_ = index_
                 last_ = index_
-                # avancer jusqu'une nouvelle activité ou fin du fichier
+                # avancer jusqu'une nouvelle activitأ© ou fin du fichier
                 while last_ < len(imported_data.dict):
                     if imported_data.dict[last_].get("Activity Id") == imported_data.dict[first_].get("Activity Id"):
                         last_ += 1
@@ -374,7 +379,7 @@ def task_from_fet_to_google_agenda(cleaned_data, imported_data, service, user):
 
                 week_day = JOUR_NUM[imported_data.dict[first_].get("Day")]
 
-                # insérer un event dans l'agenda de chaque groupe cible de l'activité
+                # insأ©rer un event dans l'agenda de chaque groupe cible de l'activitأ©
                 groupe_list = get_groupe_list_from_str(first_activity_row['Students Sets'])
                 try:
                     enseignant_list = get_enseignant_list_from_str(first_activity_row['Teachers'])
@@ -384,7 +389,7 @@ def task_from_fet_to_google_agenda(cleaned_data, imported_data, service, user):
                                          'Une erreur s\'est produite lors de l\'insertion des EDT dans Google Agenda' + '\n' +
                                          '==>  ' + first_activity_row['Teachers'] + '\n'
                                                                                     'Bien cordialement.\n' +
-                                         'Département', to=[user.email])
+                                         'Dأ©partement', to=[user.email])
                     if settings.EMAIL_ENABLED:
                         email.send(fail_silently=True)
 
@@ -462,14 +467,14 @@ def task_from_fet_to_google_agenda(cleaned_data, imported_data, service, user):
                             service.events().insert(calendarId=groupe_.gCal().calendarId, body=groupe_event,
                                                     conferenceDataVersion=1).execute()
             except Exception:
-                print('ERREUR A LA LIGNE N°' + str(index_) + ': ' + str(imported_data.dict[index_]))
+                print('ERREUR A LA LIGNE Nآ°' + str(index_) + ': ' + str(imported_data.dict[index_]))
                 continue
 
         email = EmailMessage('[Talents] Insertion des EDT dans Google Agenda',
                              'Bonjour,\n' +
-                             "L'insertion des EDT dans Google Agenda est terminée avec succès \n" +
+                             "L'insertion des EDT dans Google Agenda est terminأ©e avec succأ¨s \n" +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email]
+                             'Dأ©partement', to=[user.email]
                              )
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
@@ -481,7 +486,7 @@ def task_from_fet_to_google_agenda(cleaned_data, imported_data, service, user):
                                  'Bonjour,\n' +
                                  'Une erreur s\'est produite lors de l\'insertion des EDT dans Google Agenda' + '\n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[user.email])
+                                 'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -529,7 +534,7 @@ def clear_google_agenda(request):
                                   {'form': form, 'titre': 'Suppression des EDT de Google Agenda', "btn_list": btn_list})
                     # redirect to a new URL:
             messages.success(request,
-                             "La suppression des EDT de Google Agenda est en cours. Une notification vous sera transmise aussitôt terminée.")
+                             "La suppression des EDT de Google Agenda est en cours. Une notification vous sera transmise aussitأ´t terminأ©e.")
             return HttpResponseRedirect(reverse('home'))
             # if a GET (or any other method) we'll create a blank form
     else:
@@ -566,9 +571,9 @@ def task_clear_google_agenda(cleaned_data, service, user):
                     break
         email = EmailMessage('[Talents] Suppression des EDT de Google Agenda',
                              'Bonjour,\n' +
-                             "La suppression des EDT de Google Agenda est terminée avec succès \n" +
+                             "La suppression des EDT de Google Agenda est terminأ©e avec succأ¨s \n" +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email]
+                             'Dأ©partement', to=[user.email]
                              )
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
@@ -580,7 +585,7 @@ def task_clear_google_agenda(cleaned_data, service, user):
                                  'Bonjour,\n' +
                                  'Une erreur s\'est produite lors de la suppression des EDT de Google Agenda' + '\n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[user.email])
+                                 'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -610,13 +615,13 @@ def edt_list_view(request):
 
     context['form'] = form
     context['titre'] = 'EDT Finder'
-    messages.info(request, "Choisir un critère de recherche d'un EDT.")
+    messages.info(request, "Choisir un critأ¨re de recherche d'un EDT.")
     return render(request, 'scolar/edt_finder.html', context)
 
 
 def releve_notes_update_view(request, inscription_pk):
     """
-        Cette vue permet de modifier les notes post_delib et décision du jury pendant les délibérations
+        Cette vue permet de modifier les notes post_delib et dأ©cision du jury pendant les dأ©libأ©rations
     """
     if not request.user.is_direction():
         return redirect('/accounts/login/?next=%s' % request.path)
@@ -647,11 +652,11 @@ def releve_notes_update_view(request, inscription_pk):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "Erreur lors de la modification des notes post délibération et/ou décision du conseil")
-                    messages.info(request, "Merci d'utiliser ce formulaire pour le rachat (note post délibération)")
-                    messages.info(request, "Ne pas oublier de renseigner la nouvelle décision du conseil.")
+                                   "Erreur lors de la modification des notes post dأ©libأ©ration et/ou dأ©cision du conseil")
+                    messages.info(request, "Merci d'utiliser ce formulaire pour le rachat (note post dأ©libأ©ration)")
+                    messages.info(request, "Ne pas oublier de renseigner la nouvelle dأ©cision du conseil.")
                     return render(request, 'scolar/releve_notes_update.html', {'form': form})
-            messages.success(request, "Les modifications ont bien été enregistrées")
+            messages.success(request, "Les modifications ont bien أ©tأ© enregistrأ©es")
             return HttpResponseRedirect(
                 reverse('deliberation_detail', kwargs={'formation_pk': inscription_.formation.id, }))
             # if a GET (or any other method) we'll create a blank form
@@ -659,8 +664,8 @@ def releve_notes_update_view(request, inscription_pk):
 
         form = ReleveNotesUpdateForm(inscription_pk)
         context['form'] = form
-        messages.info(request, "Merci d'utiliser ce formulaire pour le rachat (note post délibération)")
-        messages.info(request, "Ne pas oublier de renseigner la nouvelle décision du conseil.")
+        messages.info(request, "Merci d'utiliser ce formulaire pour le rachat (note post dأ©libأ©ration)")
+        messages.info(request, "Ne pas oublier de renseigner la nouvelle dأ©cision du conseil.")
     return render(request, 'scolar/releve_notes_update.html', context)
 
 
@@ -679,8 +684,8 @@ class ReleveNotesView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         context['decision_jury'] = dict(DECISIONS_JURY)
         context['categorie_ue'] = dict(CAT_UE)
         context['date'] = datetime.date.today()
-        # afficher les crédits uniquement pour CP
-        # c'est ridicule mais a priori ça vient de la tutelle
+        # afficher les crأ©dits uniquement pour CP
+        # c'est ridicule mais a priori أ§a vient de la tutelle
         context['credits'] = 1 if inscription_.formation.programme.ordre <= 2 else None
 
         return context
@@ -707,8 +712,8 @@ class ReleveNotesPDFView(LoginRequiredMixin, UserPassesTestMixin, PDFTemplateVie
         context['categorie_ue'] = dict(CAT_UE)
         context['decision_jury'] = dict(DECISIONS_JURY)
         context['pdf'] = 1
-        # afficher les crédits uniquement pour CP
-        # c'est ridicule mais a priori ça vient de la tutelle
+        # afficher les crأ©dits uniquement pour CP
+        # c'est ridicule mais a priori أ§a vient de la tutelle
         context['credits'] = 1 if inscription_.formation.programme.ordre <= 2 else None
         return context
 
@@ -732,29 +737,29 @@ class ReleveNotesPDFView(LoginRequiredMixin, UserPassesTestMixin, PDFTemplateVie
 #         context['categorie_ue']=dict(CAT_UE)
 #         context['decision_jury']=dict(DECISIONS_JURY)
 #         context['pdf']=1
-#         # afficher les crédits uniquement pour CP
-#         # c'est ridicule mais a priori ça vient de la tutelle
+#         # afficher les crأ©dits uniquement pour CP
+#         # c'est ridicule mais a priori أ§a vient de la tutelle
 #         context['credits'] = 1 if formation_.programme.ordre <=2 else None
 #         return context
 
 @login_required
 def releve_notes_list_pdf_view(request, formation_pk, periode_pk):
     if not (request.user.is_scolarite() or request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas la permission d'exécution de cette opération")
+        messages.error(request, "Vous n'avez pas la permission d'exأ©cution de cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     try:
         t = threading.Thread(target=task_releves_notes_pdf, args=[formation_pk, request.user])
         t.setDaemon(True)
         t.start()
-        messages.success(request, "Votre demande de génération des relevés de notes est prise en compte.")
-        messages.success(request, "Une notification vous sera transmise une fois la tâche terminée.")
+        messages.success(request, "Votre demande de gأ©nأ©ration des relevأ©s de notes est prise en compte.")
+        messages.success(request, "Une notification vous sera transmise une fois la tأ¢che terminأ©e.")
 
     except Exception:
         if settings.DEBUG:
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de génération des relevés de notes. Merci de le signaler à l'administrateur.")
+                           "ERREUR: lors de gأ©nأ©ration des relevأ©s de notes. Merci de le signaler أ  l'administrateur.")
     return HttpResponseRedirect(reverse('document_list'))
 
 
@@ -774,8 +779,8 @@ def task_releves_notes_pdf(formation_pk, user):
         context['categorie_ue'] = dict(CAT_UE)
         context['decision_jury'] = dict(DECISIONS_JURY)
         context['pdf'] = 1
-        # afficher les crédits uniquement pour CP
-        # c'est ridicule mais a priori ça vient de la tutelle
+        # afficher les crأ©dits uniquement pour CP
+        # c'est ridicule mais a priori أ§a vient de la tutelle
         context['credits'] = 1 if formation_.programme.ordre <= 2 else None
         context['institution'] = user.institution()
 
@@ -784,12 +789,12 @@ def task_releves_notes_pdf(formation_pk, user):
                                         footer_template=None,
                                         context=context,
                                         cmd_options=cmd_options)
-        email = EmailMessage('[Talents] Génération des relevés de notes de ' + str(formation_),
+        email = EmailMessage('[Talents] Gأ©nأ©ration des relevأ©s de notes de ' + str(formation_),
                              'Bonjour,\n' +
-                             'La génération des relevés de notes de ' + str(formation_) + ' est terminée \n' +
-                             'Veuillez trouver ci-joints les relevés\n' +
+                             'La gأ©nأ©ration des relevأ©s de notes de ' + str(formation_) + ' est terminأ©e \n' +
+                             'Veuillez trouver ci-joints les relevأ©s\n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email]  # +
+                             'Dأ©partement', to=[user.email]  # +
                              # settings.STAFF_EMAILS['scolarite']+
                              # settings.STAFF_EMAILS['direction']
                              )
@@ -801,12 +806,12 @@ def task_releves_notes_pdf(formation_pk, user):
             raise Exception
         else:
             email = EmailMessage(
-                '[Talents] Erreur lors de la génération des relevés de notes de  la formation ' + str(formation_),
+                '[Talents] Erreur lors de la gأ©nأ©ration des relevأ©s de notes de  la formation ' + str(formation_),
                 'Bonjour,\n' +
-                'Une erreur s\'est produite lors de la génération des relevés de notes de la formation ' + str(
+                'Une erreur s\'est produite lors de la gأ©nأ©ration des relevأ©s de notes de la formation ' + str(
                     formation_) + '\n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -915,21 +920,21 @@ class FicheInscriptionPDFView(LoginRequiredMixin, UserPassesTestMixin, PDFTempla
 @login_required
 def certificat_3l_list_pdf_view(request, formation_pk, periode_pk):
     if not (request.user.is_scolarite() or request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas la permission d'exécution de cette opération")
+        messages.error(request, "Vous n'avez pas la permission d'exأ©cution de cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     try:
         t = threading.Thread(target=task_certificat_3l_list_pdf, args=[formation_pk, request.user])
         t.setDaemon(True)
         t.start()
-        messages.success(request, "Votre demande de génération des certificats de scolarité est prise en compte.")
-        messages.success(request, "Une notification vous sera transmise une fois la tâche terminée.")
+        messages.success(request, "Votre demande de gأ©nأ©ration des certificats de scolaritأ© est prise en compte.")
+        messages.success(request, "Une notification vous sera transmise une fois la tأ¢che terminأ©e.")
 
     except Exception:
         if settings.DEBUG:
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de génération des certificats de scolarité. Merci de le signaler à l'administrateur.")
+                           "ERREUR: lors de gأ©nأ©ration des certificats de scolaritأ©. Merci de le signaler أ  l'administrateur.")
     return HttpResponseRedirect(reverse('document_list'))
 
 
@@ -954,13 +959,13 @@ def task_certificat_3l_list_pdf(formation_pk, user):
                                         footer_template=None,
                                         context=context,
                                         cmd_options=cmd_options)
-        email = EmailMessage('[Talents] Génération des certificats de scolarité 3L de ' + str(formation_),
+        email = EmailMessage('[Talents] Gأ©nأ©ration des certificats de scolaritأ© 3L de ' + str(formation_),
                              'Bonjour,\n' +
-                             'La génération des certificats de scolarité 3L de ' + str(
-                                 formation_) + ' est terminée \n' +
+                             'La gأ©nأ©ration des certificats de scolaritأ© 3L de ' + str(
+                                 formation_) + ' est terminأ©e \n' +
                              'Veuillez trouver ci-joints les certifictas\n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email]  # +
+                             'Dأ©partement', to=[user.email]  # +
                              # settings.STAFF_EMAILS['scolarite']+
                              # settings.STAFF_EMAILS['direction']
                              )
@@ -972,13 +977,13 @@ def task_certificat_3l_list_pdf(formation_pk, user):
             raise Exception
         else:
             email = EmailMessage(
-                '[Talents] Erreur lors de la génération des certificats de scolarité de la formation ' + str(
+                '[Talents] Erreur lors de la gأ©nأ©ration des certificats de scolaritأ© de la formation ' + str(
                     formation_),
                 'Bonjour,\n' +
-                'Une erreur s\'est produite lors de la génération des certificats de scolarité de la formation ' + str(
+                'Une erreur s\'est produite lors de la gأ©nأ©ration des certificats de scolaritأ© de la formation ' + str(
                     formation_) + '\n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -1046,21 +1051,21 @@ class CertificatOldPDFView(LoginRequiredMixin, UserPassesTestMixin, PDFTemplateV
 @login_required
 def certificat_2l_list_pdf_view(request, formation_pk, periode_pk):
     if not (request.user.is_scolarite() or request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas la permission d'exécution de cette opération")
+        messages.error(request, "Vous n'avez pas la permission d'exأ©cution de cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     try:
         t = threading.Thread(target=task_certificat_2l_list_pdf, args=[formation_pk, request.user])
         t.setDaemon(True)
         t.start()
-        messages.success(request, "Votre demande de génération des certificats de scolarité est prise en compte.")
-        messages.success(request, "Une notification vous sera transmise une fois la tâche terminée.")
+        messages.success(request, "Votre demande de gأ©nأ©ration des certificats de scolaritأ© est prise en compte.")
+        messages.success(request, "Une notification vous sera transmise une fois la tأ¢che terminأ©e.")
 
     except Exception:
         if settings.DEBUG:
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de génération des certificats de scolarité. Merci de le signaler à l'administrateur.")
+                           "ERREUR: lors de gأ©nأ©ration des certificats de scolaritأ©. Merci de le signaler أ  l'administrateur.")
     return HttpResponseRedirect(reverse('document_list'))
 
 
@@ -1084,13 +1089,13 @@ def task_certificat_2l_list_pdf(formation_pk, user):
                                         footer_template=None,
                                         context=context,
                                         cmd_options=cmd_options)
-        email = EmailMessage('[Talents] Génération des certificats de scolarité 2L de ' + str(formation_),
+        email = EmailMessage('[Talents] Gأ©nأ©ration des certificats de scolaritأ© 2L de ' + str(formation_),
                              'Bonjour,\n' +
-                             'La génération des certificats de scolarité 3L de ' + str(
-                                 formation_) + ' est terminée \n' +
+                             'La gأ©nأ©ration des certificats de scolaritأ© 3L de ' + str(
+                                 formation_) + ' est terminأ©e \n' +
                              'Veuillez trouver ci-joints les certifictas\n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email]  # +
+                             'Dأ©partement', to=[user.email]  # +
                              # settings.STAFF_EMAILS['scolarite']+
                              # settings.STAFF_EMAILS['direction']
                              )
@@ -1102,13 +1107,13 @@ def task_certificat_2l_list_pdf(formation_pk, user):
             raise Exception
         else:
             email = EmailMessage(
-                '[Talents] Erreur lors de la génération des certificats de scolarité de la formation ' + str(
+                '[Talents] Erreur lors de la gأ©nأ©ration des certificats de scolaritأ© de la formation ' + str(
                     formation_),
                 'Bonjour,\n' +
-                'Une erreur s\'est produite lors de la génération des certificats de scolarité de la formation ' + str(
+                'Une erreur s\'est produite lors de la gأ©nأ©ration des certificats de scolaritأ© de la formation ' + str(
                     formation_) + '\n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -1146,7 +1151,7 @@ TYPE_DOC_URL = {
 
 def document_list_view(request):
     if not (request.user.is_scolarite() or request.user.is_direction() or request.user.is_stage()):
-        messages.error(request, "Vous n'avez pas la permission d'exécution de cette opération")
+        messages.error(request, "Vous n'avez pas la permission d'exأ©cution de cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -1166,25 +1171,25 @@ def document_list_view(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: La génération de la liste de documents demandés s'est arrêtée avec des erreurs. Merci de le signaler à l'administrateur.")
-                    render(request, 'scolar/import.html', {'form': form, 'titre': 'Génération de documents groupés.'})
-            messages.success(request, "La génération des documents s'est terminée avec succès!")
+                                   "ERREUR: La gأ©nأ©ration de la liste de documents demandأ©s s'est arrأھtأ©e avec des erreurs. Merci de le signaler أ  l'administrateur.")
+                    render(request, 'scolar/import.html', {'form': form, 'titre': 'Gأ©nأ©ration de documents groupأ©s.'})
+            messages.success(request, "La gأ©nأ©ration des documents s'est terminأ©e avec succأ¨s!")
             # redirect to a new URL:
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = SelectionFormationForm()
-        messages.info(request, "Merci de renseigner les critères de choix des documents à générer.")
+        messages.info(request, "Merci de renseigner les critأ¨res de choix des documents أ  gأ©nأ©rer.")
         messages.warning(request,
-                         "Attention! Assurez vous que les données sont bien présentes dans la base (inscriptions pour les certificats, délibérations pour les relevés.")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Génération de documents groupés'})
+                         "Attention! Assurez vous que les donnأ©es sont bien prأ©sentes dans la base (inscriptions pour les certificats, dأ©libأ©rations pour les relevأ©s.")
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Gأ©nأ©ration de documents groupأ©s'})
 
 
 class ResidenceUnivCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, CreateView):
     model = ResidenceUniv
     fields = ['nom', 'adresse', 'tel', 'wilaya', 'commune']
     template_name = 'scolar/create.html'
-    success_message = "La résidence universitaire a été créée avec succès!"
+    success_message = "La rأ©sidence universitaire a أ©tأ© crأ©أ©e avec succأ¨s!"
 
     def test_func(self):
         return self.request.user.is_staff_only()
@@ -1225,7 +1230,7 @@ class ResidenceUnivCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPasse
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la création d'une résidence universitaire.")
+                messages.error(self.request, "ERREUR: lors de la crأ©ation d'une rأ©sidence universitaire.")
 
         return form
 
@@ -1243,11 +1248,11 @@ class ResidenceUnivListView(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
         context = super(ResidenceUnivListView, self).get_context_data(**kwargs)
         table = ResidenceUnivTable(self.get_queryset(**kwargs), exclude=exclude_columns(self.request.user))
         RequestConfig(self.request).configure(table)
-        context['titre'] = "Liste des résidence universitaire"
+        context['titre'] = "Liste des rأ©sidence universitaire"
         context['table'] = table
         context['back'] = reverse('settings')
         btn_list = {}
-        btn_list['Créer Résidence'] = reverse('residenceuniv_create')
+        btn_list['Crأ©er Rأ©sidence'] = reverse('residenceuniv_create')
         context['btn_list'] = btn_list
 
         return context
@@ -1259,7 +1264,7 @@ class PreinscriptionCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPass
     fields = ['inscription', 'wilaya_residence', 'commune_residence', 'interne', 'residence_univ', 'adresse_principale',
               'photo', 'tel', 'numero_securite_sociale', 'quittance']
     template_name = 'scolar/preinscription_create.html'
-    success_message = "Votre pré-inscription est enregsitrée avec succès!"
+    success_message = "Votre prأ©-inscription est enregsitrأ©e avec succأ¨s!"
 
     def test_func(self):
         return self.request.user.is_etudiant()
@@ -1275,15 +1280,15 @@ class PreinscriptionCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPass
                                                                 initial=0,
                                                                 required=True)
             form.fields[
-                'photo'].help_text = "Si vous voulez changer de photo, merci de déposer ici un scan d'une photo d'identité. Taille maximale 1M."
+                'photo'].help_text = "Si vous voulez changer de photo, merci de dأ©poser ici un scan d'une photo d'identitأ©. Taille maximale 1M."
             form.fields['quittance'].required = True
             form.fields[
-                'quittance'].help_text = "Merci de déposer ici un scan ou une photo de la quittance de payement des frais d'inscription. Taille maximale 1M."
+                'quittance'].help_text = "Merci de dأ©poser ici un scan ou une photo de la quittance de payement des frais d'inscription. Taille maximale 1M."
             form.fields[
-                'numero_securite_sociale'].help_text = "Merci d'indiquer le numéro figurant sur l'ATS ou carte CHIFA."
+                'numero_securite_sociale'].help_text = "Merci d'indiquer le numأ©ro figurant sur l'ATS ou carte CHIFA."
             form.fields['wilaya_residence'] = forms.ModelChoiceField(
                 queryset=Wilaya.objects.all().order_by('nom'),
-                label=u"Wilaya de résidence principale",
+                label=u"Wilaya de rأ©sidence principale",
                 initial=self.request.user.etudiant.wilaya_residence,
                 widget=ModelSelect2Widget(
                     model=Wilaya,
@@ -1295,7 +1300,7 @@ class PreinscriptionCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPass
             )
             form.fields['commune_residence'] = forms.ModelChoiceField(
                 queryset=Commune.objects.all().order_by('nom'),
-                label=u"Commune de résidence principale",
+                label=u"Commune de rأ©sidence principale",
                 initial=self.request.user.etudiant.commune_residence,
                 widget=ModelSelect2Widget(
                     model=Commune,
@@ -1316,7 +1321,7 @@ class PreinscriptionCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPass
             form.fields['adresse_principale'].initial = self.request.user.etudiant.addresse_principale
             form.fields['adresse_principale'].required = True
             form.fields['tel'].initial = self.request.user.etudiant.tel
-            form.fields['tel'].help_text = "Composé de 10 chiffres sans espaces ou autre caratères."
+            form.fields['tel'].help_text = "Composأ© de 10 chiffres sans espaces ou autre caratأ¨res."
             form.fields['tel'].required = True
             urls_reglement = ''
             for inscription_ in inscription_list:
@@ -1325,7 +1330,7 @@ class PreinscriptionCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPass
             form.fields['engagement'] = forms.BooleanField(required=True,
                                                            initial=False,
                                                            label=mark_safe(
-                                                               'J\'ai lu et j\'approuve le réglement intérieur des études (disponible ici: ' + urls_reglement + ')')
+                                                               'J\'ai lu et j\'approuve le rأ©glement intأ©rieur des أ©tudes (disponible ici: ' + urls_reglement + ')')
                                                            )
             form.helper.add_input(Submit('submit', 'Envoyer', css_class='btn-primary'))
             form.helper.add_input(
@@ -1336,7 +1341,7 @@ class PreinscriptionCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPass
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: Vous n'êtes pas sur une liste de pré-inscription. Merci de le signaler à l'administrateur si vous devez vous pré-inscrire à une formation.")
+                               "ERREUR: Vous n'أھtes pas sur une liste de prأ©-inscription. Merci de le signaler أ  l'administrateur si vous devez vous prأ©-inscrire أ  une formation.")
 
         return form
 
@@ -1347,15 +1352,15 @@ def email_preinscription_surveillance(sender, update_fields, instance, created, 
         email = EmailMessage(
             'Inscription de ' + str(instance.inscription.etudiant) + ' en ' + str(instance.inscription.formation),
             'Bonjour,\n' +
-            "Une nouvelle demande d'inscription a été déposée: " + '\n'
+            "Une nouvelle demande d'inscription a أ©tأ© dأ©posأ©e: " + '\n'
                                                                    "Candidat : " + str(
                 instance.inscription.etudiant) + '\n'
-                                                 "Année d'étude: " + str(instance.inscription.formation) + '\n'
-                                                                                                           'Veuillez traiter cette demande d\'inscription en effectuant les vérifications nécessaires.\n' +
-            'La demande est accessible à partir de votre compte sous le menu Pré-Inscriptions, ou en suivant ce lien:' + '\n' +
+                                                 "Annأ©e d'أ©tude: " + str(instance.inscription.formation) + '\n'
+                                                                                                           'Veuillez traiter cette demande d\'inscription en effectuant les vأ©rifications nأ©cessaires.\n' +
+            'La demande est accessible أ  partir de votre compte sous le menu Prأ©-Inscriptions, ou en suivant ce lien:' + '\n' +
             settings.PROTOCOLE_HOST + reverse('preinscription_list') + '\n' +
             'Bien cordialement.\n' +
-            'Département',
+            'Dأ©partement',
             to=[instance.inscription.formation.programme.assistant.user.email] if not settings.DEBUG else [
                 'y_challal@esi.dz'])
         if settings.EMAIL_ENABLED:
@@ -1386,7 +1391,7 @@ class PreinscriptionListView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
 
 def validation_preinscription_view(request, inscription_pk):
     if not (request.user.is_surveillance() or request.user.is_scolarite() or request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas la permission d'exécution de cette opération")
+        messages.error(request, "Vous n'avez pas la permission d'exأ©cution de cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     inscription_ = get_object_or_404(Inscription, id=inscription_pk)
     inscription_annee_precedente_ = Inscription.objects.filter(etudiant=inscription_.etudiant,
@@ -1440,17 +1445,17 @@ def validation_preinscription_view(request, inscription_pk):
                     inscription_.preinscription.quittance.delete()
                     Preinscription.objects.filter(inscription=inscription_).delete()
 
-                    # Envoie de notification, relevé et certificat à l'étudiant
+                    # Envoie de notification, relevأ© et certificat أ  l'أ©tudiant
                     email = EmailMessage('Votre Inscription en ' + str(inscription_.formation),
                                          'Bonjour ' + inscription_.etudiant.prenom + ',\n' +
-                                         "Votre inscription en : " + str(inscription_.formation) + ' est confirmée.\n'
-                                                                                                   'Veuillez trouver ci-joints votre certificat de scolarité et votre relevé de notes de l\'année passée s\'il y a lieu.\n' +
+                                         "Votre inscription en : " + str(inscription_.formation) + ' est confirmأ©e.\n'
+                                                                                                   'Veuillez trouver ci-joints votre certificat de scolaritأ© et votre relevأ© de notes de l\'annأ©e passأ©e s\'il y a lieu.\n' +
                                          'Ces documents sont une copie, seuls les originaux font foi.\n' +
-                                         "Pour récupérer les originaux, merci de vous rapprocher de la surveillance et remettre:\n" +
+                                         "Pour rأ©cupأ©rer les originaux, merci de vous rapprocher de la surveillance et remettre:\n" +
                                          "1- l'original de la quittance de payement des frais d'inscription.\n" +
-                                         "2- la fiche d'inscription ci-jointe signée.\n" +
+                                         "2- la fiche d'inscription ci-jointe signأ©e.\n" +
                                          'Bien cordialement.\n' +
-                                         'Département', to=[inscription_.etudiant.user.email,
+                                         'Dأ©partement', to=[inscription_.etudiant.user.email,
                                                             request.user.email] if not settings.DEBUG else [
                             'y_challal@esi.dz'])
 
@@ -1466,8 +1471,8 @@ def validation_preinscription_view(request, inscription_pk):
                     context['decision_jury'] = dict(DECISIONS_JURY)
                     context['pdf'] = 1
                     context['range'] = ['f', 'o']
-                    # afficher les crédits uniquement pour CP
-                    # c'est ridicule mais a priori ça vient de la tutelle
+                    # afficher les crأ©dits uniquement pour CP
+                    # c'est ridicule mais a priori أ§a vient de la tutelle
                     context['credits'] = 1 if inscription_.formation.programme.ordre <= 2 else None
                     context['signature'] = 1
                     context['institution'] = inscription_.etudiant.user.institution()
@@ -1510,7 +1515,7 @@ def validation_preinscription_view(request, inscription_pk):
                     if settings.EMAIL_ENABLED:
                         email.send(fail_silently=True)
 
-                    messages.success(request, "La préinscription a été validée avec succès!")
+                    messages.success(request, "La prأ©inscription a أ©tأ© validأ©e avec succأ¨s!")
                 else:
                     inscription_.preinscription.photo.delete()
                     inscription_.preinscription.quittance.delete()
@@ -1518,24 +1523,24 @@ def validation_preinscription_view(request, inscription_pk):
                     email = EmailMessage('Votre Inscription en ' + str(inscription_.formation),
                                          'Bonjour ' + inscription_.etudiant.prenom + ',\n' +
                                          "Votre inscription en : " + str(
-                                             inscription_.formation) + ' n\'a pas été validée.\n'
+                                             inscription_.formation) + ' n\'a pas أ©tأ© validأ©e.\n'
                                                                        'Motif de refus:\n' +
                                          form_data['motif_refus'] + '\n' +
                                          'Bien cordialement.\n' +
-                                         'Département', to=[inscription_.etudiant.user.email,
+                                         'Dأ©partement', to=[inscription_.etudiant.user.email,
                                                             request.user.email] if not settings.DEBUG else [
                             'y_challal@esi.dz'])
                     if settings.EMAIL_ENABLED:
                         email.send(fail_silently=True)
                     messages.warning(request,
-                                     "La préinscription n'a pas été validée! Une notification a été envoyée à l'étudiant pour compléter son dossier.")
+                                     "La prأ©inscription n'a pas أ©tأ© validأ©e! Une notification a أ©tأ© envoyأ©e أ  l'أ©tudiant pour complأ©ter son dossier.")
 
             except Exception:
                 if settings.DEBUG:
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: lors de la validation de la préinscription. Merci de le signaler à l'administrateur.")
+                                   "ERREUR: lors de la validation de la prأ©inscription. Merci de le signaler أ  l'administrateur.")
 
             # redirect to a new URL:
             # return HttpResponseRedirect(reverse('preinscription_list'))
@@ -1548,12 +1553,12 @@ def validation_preinscription_view(request, inscription_pk):
             'inscription': inscription_,
             'inscription_annee_precedente': inscription_annee_precedente_,
             'decision_jury': dict(DECISIONS_JURY),
-            'titre': 'Validation de la Pré-Inscription de ' + str(inscription_)
+            'titre': 'Validation de la Prأ©-Inscription de ' + str(inscription_)
         }
 
-        messages.info(request, "Merci de vérifier ces informations avant de valider l'inscription.")
+        messages.info(request, "Merci de vأ©rifier ces informations avant de valider l'inscription.")
         messages.warning(request,
-                         "Attention! Si une nouvelle photo est présente assurez vous qu'elle est semblable à l'ancienne. Sinon, refusez l'inscription.")
+                         "Attention! Si une nouvelle photo est prأ©sente assurez vous qu'elle est semblable أ  l'ancienne. Sinon, refusez l'inscription.")
     return render(request, 'scolar/validation_preinscription.html', context)
 
 
@@ -1577,7 +1582,7 @@ class PVPFEPDFView(LoginRequiredMixin, UserPassesTestMixin, PDFTemplateView):
             resultat_list[resultat_.inscription.etudiant.matricule] = resultat_
             self.filename += '_' + str(resultat_.inscription.etudiant.nom)
         self.filename += '.pdf'
-        # Attention, si on télécharge le PV, on marque la saisie des notes comme terminée
+        # Attention, si on tأ©lأ©charge le PV, on marque la saisie des notes comme terminأ©e
         module_suivi_ = get_object_or_404(ModulesSuivis, groupe=groupe_, module=module_)
         module_suivi_.saisie_notes = 'T'
         module_suivi_.save()
@@ -1692,11 +1697,11 @@ def import_deliberation_view(request, annee_univ_pk):
                 deliberation_file = request.FILES['file']
                 dataset = Dataset()
                 imported_data = dataset.load(deliberation_file.read().decode('utf-8'), format='csv')
-                # la première ligne du fichier doit contenir des entêtes, au moins Matricule Nom, Prenom, MoyAn,Rang, Decision
+                # la premiأ¨re ligne du fichier doit contenir des entأھtes, au moins Matricule Nom, Prenom, MoyAn,Rang, Decision
                 # insert imported_data in inscription table
                 form_data = form.cleaned_data
                 formation_ = form_data['formation']
-                # initialiser les decisions_jury en cours à Non Inscrit
+                # initialiser les decisions_jury en cours أ  Non Inscrit
                 Inscription.objects.filter(formation=formation_, decision_jury='C').update(decision_jury='X')
                 t = threading.Thread(target=task_deliberation_import, args=[formation_, imported_data, request.user])
                 t.setDaemon(True)
@@ -1707,26 +1712,26 @@ def import_deliberation_view(request, annee_univ_pk):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: L'import du PV de délibération n'a pas réussit. Il doit y avoir un problème de format")
-                    messages.info(request, "Indiquer le fichier .csv PV de délibération annuel.")
+                                   "ERREUR: L'import du PV de dأ©libأ©ration n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format")
+                    messages.info(request, "Indiquer le fichier .csv PV de dأ©libأ©ration annuel.")
                     messages.info(request,
-                                  "La première ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Rang, Decision, MoyAn")
+                                  "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Rang, Decision, MoyAn")
                     messages.info(request,
-                                  "La colonne Decision doit correspondre à une des valeurs: Admis, Non Admis, Admis avec rachat, Maladie, Abandon, Redouble, Non Inscrit")
-                    render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer les Délibérations'})
+                                  "La colonne Decision doit correspondre أ  une des valeurs: Admis, Non Admis, Admis avec rachat, Maladie, Abandon, Redouble, Non Inscrit")
+                    render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer les Dأ©libأ©rations'})
             # redirect to a new URL:
             messages.success(request,
-                             "Votre demande d'import du PV de délibérations a été prise en compte. Une notification vous sera transmise aussitôt effectuée.")
+                             "Votre demande d'import du PV de dأ©libأ©rations a أ©tأ© prise en compte. Une notification vous sera transmise aussitأ´t effectuأ©e.")
             return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_.id, }))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportDeliberationForm(annee_univ_pk)
-        messages.info(request, "Indiquer le fichier .csv PV de délibération annuel.")
+        messages.info(request, "Indiquer le fichier .csv PV de dأ©libأ©ration annuel.")
         messages.info(request,
-                      "La première ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Rang, Decision, MoyAn")
+                      "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Rang, Decision, MoyAn")
         messages.info(request,
-                      "La colonne Decision doit correspondre à une des valeurs: Admis, Non Admis, Admis avec rachat, Maladie, Abandon, Redouble, Non Inscrit")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer les Délibérations'})
+                      "La colonne Decision doit correspondre أ  une des valeurs: Admis, Non Admis, Admis avec rachat, Maladie, Abandon, Redouble, Non Inscrit")
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer les Dأ©libأ©rations'})
 
 
 @transaction.atomic
@@ -1787,22 +1792,22 @@ def task_deliberation_import(formation_, imported_data, user):
             raise Exception
         else:
             email = EmailMessage(
-                '[Talents] Erreur lors de l\importation du PV de délibération de la formation ' + str(formation_),
+                '[Talents] Erreur lors de l\importation du PV de dأ©libأ©ration de la formation ' + str(formation_),
                 'Bonjour,\n' +
-                'Une erreur s\'est produite lors de l\'importation du PV de délibération de ' + str(formation_) + '\n' +
-                'Veuillez vérifier les données et réessayer l\'importation \n' +
+                'Une erreur s\'est produite lors de l\'importation du PV de dأ©libأ©ration de ' + str(formation_) + '\n' +
+                'Veuillez vأ©rifier les donnأ©es et rأ©essayer l\'importation \n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
     email = EmailMessage(
-        '[Talents] Confirmation de l\'importation du PV de délibération de la formation ' + str(formation_),
+        '[Talents] Confirmation de l\'importation du PV de dأ©libأ©ration de la formation ' + str(formation_),
         'Bonjour,\n' +
-        'L\'importation du PV de délibération de la formation ' + str(formation_) + ' a bien été effectuée \n' +
+        'L\'importation du PV de dأ©libأ©ration de la formation ' + str(formation_) + ' a bien أ©tأ© effectuأ©e \n' +
         'Nous vous en remercions \n' +
         'Bien cordialement.\n' +
-        'Département', to=[user.email])
+        'Dأ©partement', to=[user.email])
     if settings.EMAIL_ENABLED:
         email.send(fail_silently=True)
 
@@ -1810,7 +1815,7 @@ def task_deliberation_import(formation_, imported_data, user):
 @login_required
 def export_inscriptions(request, formation_pk):
     if not (request.user.is_scolarite() or request.user.is_direction()):
-        messages.error(request, "Vous n'êtes pas autorisés à excéuter cette opération.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  excأ©uter cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     try:
@@ -1844,7 +1849,7 @@ def export_inscriptions(request, formation_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des notes. Merci de le signaler à l'administrateur.")
+                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des notes. Merci de le signaler أ  l'administrateur.")
     return response
 
 
@@ -1862,7 +1867,7 @@ def affectation_groupe_view(request):
                 affectation_file = request.FILES['file']
                 dataset = Dataset()
                 imported_data = dataset.load(affectation_file.read().decode('utf-8'), format='csv')
-                # la première ligne du fichier doit contenir des entêtes, au moins Matricule Groupe Nom Prenom
+                # la premiأ¨re ligne du fichier doit contenir des entأھtes, au moins Matricule Groupe Nom Prenom
                 # insert imported_data in inscription table
                 form_data = form.cleaned_data
                 formation_ = form_data['formation']
@@ -1875,24 +1880,24 @@ def affectation_groupe_view(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: L'import des affectations aux groupes n'a pas réussit. Veuillez vérifier le fichier et son format.")
+                                   "ERREUR: L'import des affectations aux groupes n'a pas rأ©ussit. Veuillez vأ©rifier le fichier et son format.")
 
                     return render(request, 'scolar/import.html',
                                   {'form': form, 'titre': 'Importer l\'affectation aux groupes'})
 
             messages.success(request,
-                             "La demande d'affectation aux groupes est prise en compte. Vous recevrez une notification aussitôt effectuée!")
+                             "La demande d'affectation aux groupes est prise en compte. Vous recevrez une notification aussitأ´t effectuأ©e!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('etudiant_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportAffectationForm()
         messages.info(request,
-                      "Indiquer le fichier .csv d'affectation aux groupes des étudiants inscrits dans la formation indiquée ci-dessous.")
+                      "Indiquer le fichier .csv d'affectation aux groupes des أ©tudiants inscrits dans la formation indiquأ©e ci-dessous.")
         messages.info(request,
-                      "La première ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Groupe")
+                      "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Groupe")
         messages.warning(request,
-                         "Attention! Ne faites cette affectation qu'après avoir créé les sections et groupes et avoir indiqués pour chaque groupe les UE optionnelles.")
+                         "Attention! Ne faites cette affectation qu'aprأ¨s avoir crأ©أ© les sections et groupes et avoir indiquأ©s pour chaque groupe les UE optionnelles.")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer l\'affectation aux groupes'})
 
 
@@ -1911,13 +1916,13 @@ def task_affectation_groupe_import(formation_, imported_data, user):
                                                                              'etudiant': etudiant_,
                                                                              'formation': formation_,
                                                                              # TODO enlever l'affectatation au groupe dans inscription on le maintient pour legacy compatibility
-                                                                             # On gère le groupe dans InscriptionPeriode
+                                                                             # On gأ¨re le groupe dans InscriptionPeriode
                                                                              'groupe': groupe_,
                                                                              # 'rang':0,
                                                                              # 'moy':0,
                                                                              # 'moy_post_delib':0,
                                                                          })
-            # On crée les InscriptionPeriode et on l'affecte au même groupe dans les deux semestres
+            # On crأ©e les InscriptionPeriode et on l'affecte au mأھme groupe dans les deux semestres
             for periode_ in formation_.programme.periodes.all():
                 InscriptionPeriode.objects.update_or_create(inscription=inscription_, periodepgm=periode_, defaults={
                     'inscription': inscription_,
@@ -1927,19 +1932,19 @@ def task_affectation_groupe_import(formation_, imported_data, user):
             if inscription_.etudiant.user:
                 email = EmailMessage('[Talents] Affectation au groupe ' + str(groupe_),
                                      'Bonjour, ' + inscription_.etudiant.nom + ' ' + inscription_.etudiant.prenom + '\n' +
-                                     'Nous vous informons que vous avez été effecté au groupe ' + str(groupe_) + '\n' +
+                                     'Nous vous informons que vous avez أ©tأ© effectأ© au groupe ' + str(groupe_) + '\n' +
                                      'Bien cordialement.\n' +
-                                     'Département', to=[inscription_.etudiant.user.email])
+                                     'Dأ©partement', to=[inscription_.etudiant.user.email])
                 if settings.EMAIL_ENABLED:
                     email.send(fail_silently=True)
         email = EmailMessage(
             '[Talents] Confirmation de l\'importation de l\'affectation aux groupes de la formation ' + str(formation_),
             'Bonjour,\n' +
             'L\'importation de l\'affectation aux groupes de la formation ' + str(
-                formation_) + ' a bien été effectuée \n' +
+                formation_) + ' a bien أ©tأ© effectuأ©e \n' +
             'Nous vous en remercions \n' +
             'Bien cordialement.\n' +
-            'Département', to=[user.email])
+            'Dأ©partement', to=[user.email])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
 
@@ -1953,16 +1958,16 @@ def task_affectation_groupe_import(formation_, imported_data, user):
                 'Bonjour,\n' +
                 'Une erreur s\'est produite lors de l\'importation de l\affectation aux groupes de ' + str(
                     formation_) + '\n' +
-                'Veuillez vérifier les données et réessayer l\'importation \n' +
+                'Veuillez vأ©rifier les donnأ©es et rأ©essayer l\'importation \n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
 
 def affectation_pfe_valide_view(request):
     if not request.user.is_stage():
-        messages.error(request, "Vous n'avez pas les permissions pour exécuter cette opération.")
+        messages.error(request, "Vous n'avez pas les permissions pour exأ©cuter cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -1975,12 +1980,12 @@ def affectation_pfe_valide_view(request):
                 affectation_file = request.FILES['file']
                 dataset = Dataset()
                 imported_data = dataset.load(affectation_file.read().decode('utf-8'), format='csv')
-                # la première ligne du fichier doit contenir des entêtes, au moins Matricule Groupe Nom Prenom
+                # la premiأ¨re ligne du fichier doit contenir des entأھtes, au moins Matricule Groupe Nom Prenom
                 # insert imported_data in inscription table
                 form_data = form.cleaned_data
                 diplome_ = form_data['diplome']
-                # attention, il s'agit ici de la formation associé au groupe de PFE et non pas la formation d'inscription
-                # elles peuvent être différentes dans le cas de PFE mixtes, car on crée une formation Mixte, mais chaque étudiant du binôme garde sa spécialité donc sa formation à laquelle il est déjà inscrit
+                # attention, il s'agit ici de la formation associأ© au groupe de PFE et non pas la formation d'inscription
+                # elles peuvent أھtre diffأ©rentes dans le cas de PFE mixtes, car on crأ©e une formation Mixte, mais chaque أ©tudiant du binأ´me garde sa spأ©cialitأ© donc sa formation أ  laquelle il est dأ©jأ  inscrit
                 formation_ = form_data['formation']
                 module_ = Module.objects.get(formation=formation_, matiere__pfe=True)
                 for row in imported_data.dict:
@@ -2002,7 +2007,7 @@ def affectation_pfe_valide_view(request):
                                                                         })
 
                         try:
-                            # modifier le groupe de l'inscription à la formation du PFE (Ing ou Master)
+                            # modifier le groupe de l'inscription أ  la formation du PFE (Ing ou Master)
                             inscription_ = Inscription.objects.get(etudiant__matricule=matricule_,
                                                                    formation__programme__diplome=diplome_,
                                                                    formation__annee_univ=formation_.annee_univ)
@@ -2027,12 +2032,12 @@ def affectation_pfe_valide_view(request):
                         pfe_.coencadrants.add(module_.coordinateur)
                         encadrant_list = [module_.coordinateur]
                     else:
-                        messages.error(request, "Il faut désigner un coencadrant pour le PFE N°: " + str(pfe_.id))
+                        messages.error(request, "Il faut dأ©signer un coencadrant pour le PFE Nآ°: " + str(pfe_.id))
                         continue
                     pfe_.groupe = groupe_
                     pfe_.save()
 
-                    # on crée une activité d'encadrement ce qui va déclecnher l'insertion des charges et permettra la saisie des notes
+                    # on crأ©e une activitأ© d'encadrement ce qui va dأ©clecnher l'insertion des charges et permettra la saisie des notes
                     # le PFE figurera ainsi dans Mes enseignements et les charges
 
                     config_charge_ = form_data['config_charge']
@@ -2056,26 +2061,26 @@ def affectation_pfe_valide_view(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: L'affectation aux PFE n'a pas réussit. Le fichier est peut être mal formé!")
+                                   "ERREUR: L'affectation aux PFE n'a pas rأ©ussit. Le fichier est peut أھtre mal formأ©!")
                     messages.info(request,
-                                  "Indiquer le fichier .csv d'affectation aux PFE des étudiants inscrits dans la formation indiquée ci-dessous.")
+                                  "Indiquer le fichier .csv d'affectation aux PFE des أ©tudiants inscrits dans la formation indiquأ©e ci-dessous.")
                     messages.info(request,
-                                  "La première ligne du fichier doit comporter au moins les colonnes suivantes: Groupe, ID,")
+                                  "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Groupe, ID,")
                     messages.info(request, "La colonne Groupe correspond au code PFE, par ex. PSL23.")
                     render(request, 'scolar/import.html', {'form': form, 'titre': 'Confirmer l\'affectation aux PFE'})
-            messages.success(request, "L'affectation des étudiants aux PFE validés a été réalisée avec succès!")
+            messages.success(request, "L'affectation des أ©tudiants aux PFE validأ©s a أ©tأ© rأ©alisأ©e avec succأ¨s!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('pfe_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportAffectationDiplomeForm()
         messages.info(request,
-                      "Indiquer le fichier .csv d'affectation aux PFE des étudiants inscrits dans la formation indiquée ci-dessous.")
+                      "Indiquer le fichier .csv d'affectation aux PFE des أ©tudiants inscrits dans la formation indiquأ©e ci-dessous.")
         messages.info(request,
-                      "La première ligne du fichier doit comporter au moins les colonnes suivantes: Groupe, ID")
+                      "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Groupe, ID")
         messages.info(request, "La colonne Groupe correspond au code PFE, par ex. PSL23..")
         messages.warning(request,
-                         "Assurez vous que tous les binômes suivent le même module. Pour les binômes mixtes il faut créer une formation Mixte")
+                         "Assurez vous que tous les binأ´mes suivent le mأھme module. Pour les binأ´mes mixtes il faut crأ©er une formation Mixte")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Confirmer l\'affectation aux PFE'})
 
 
@@ -2093,12 +2098,12 @@ def affectation_pfe_view(request):
                 affectation_file = request.FILES['file']
                 dataset = Dataset()
                 imported_data = dataset.load(affectation_file.read().decode('utf-8'), format='csv')
-                # la première ligne du fichier doit contenir des entêtes, au moins Matricule Groupe Nom Prenom
+                # la premiأ¨re ligne du fichier doit contenir des entأھtes, au moins Matricule Groupe Nom Prenom
                 # insert imported_data in inscription table
                 form_data = form.cleaned_data
                 diplome_ = form_data['diplome']
-                # attention, il s'agit ici de la formation associé au groupe de PFE et non pas la formation d'inscription
-                # elles peuvent être différentes dans le cas de PFE mixtes, car on crée une formation Mixte, mais chaque étudiant du binôme garde sa spécialité donc sa formation à laquelle il est déjà inscrit
+                # attention, il s'agit ici de la formation associأ© au groupe de PFE et non pas la formation d'inscription
+                # elles peuvent أھtre diffأ©rentes dans le cas de PFE mixtes, car on crأ©e une formation Mixte, mais chaque أ©tudiant du binأ´me garde sa spأ©cialitأ© donc sa formation أ  laquelle il est dأ©jأ  inscrit
                 formation_ = form_data['formation']
                 module_ = Module.objects.get(formation=formation_, matiere__pfe=True)
                 for row in imported_data.dict:
@@ -2115,7 +2120,7 @@ def affectation_pfe_view(request):
                                                                   prenom__icontains=prenom_).matricule
                             except Exception:
                                 messages.error(request,
-                                               "L'étudiant " + nom_ + " " + prenom_ + " n'existe pas. Il faut corriger le nom ou l'insérer")
+                                               "L'أ©tudiant " + nom_ + " " + prenom_ + " n'existe pas. Il faut corriger le nom ou l'insأ©rer")
                                 break
                             matricule_list.append(matricule_)
 
@@ -2138,7 +2143,7 @@ def affectation_pfe_view(request):
                                                                         })
 
                         try:
-                            # modifier le groupe de l'inscription à la formation du PFE (Ing ou Master)
+                            # modifier le groupe de l'inscription أ  la formation du PFE (Ing ou Master)
                             inscription_ = Inscription.objects.get(etudiant=etudiant_,
                                                                    formation__programme__diplome=diplome_,
                                                                    formation__annee_univ=formation_.annee_univ)
@@ -2158,7 +2163,7 @@ def affectation_pfe_view(request):
                             continue
 
                     if len(etudiant_list) == 0:
-                        messages.error(request, "Au moins un étudiant n'est pas valide sur cette ligne")
+                        messages.error(request, "Au moins un أ©tudiant n'est pas valide sur cette ligne")
                         continue
 
                     if row['CoEncadrants']:
@@ -2166,7 +2171,7 @@ def affectation_pfe_view(request):
                         # encadrant_=encadrant_list[0]
                     else:
                         messages.error(request,
-                                       "La présence d'un Encdrant pour le PFE " + str(groupe_) + " est obligatoire.")
+                                       "La prأ©sence d'un Encdrant pour le PFE " + str(groupe_) + " est obligatoire.")
                         continue
 
                     pfe_, created = PFE.objects.update_or_create(groupe=groupe_, defaults={
@@ -2180,7 +2185,7 @@ def affectation_pfe_view(request):
                         pfe_.coencadrants.add(enseignant)
                     pfe_.save()
 
-                    # on crée une activité d'encadrement ce qui va déclecnher l'insertion des charges et permettra la saisie des notes
+                    # on crأ©e une activitأ© d'encadrement ce qui va dأ©clecnher l'insertion des charges et permettra la saisie des notes
                     # le PFE figurera ainsi dans Mes enseignements et les charges
 
                     config_charge_ = form_data['config_charge']
@@ -2204,34 +2209,34 @@ def affectation_pfe_view(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: L'affectation aux PFE n'a pas réussit. Le fichier est peut être mal formé!")
+                                   "ERREUR: L'affectation aux PFE n'a pas rأ©ussit. Le fichier est peut أھtre mal formأ©!")
                     messages.info(request,
-                                  "Indiquer le fichier .csv d'affectation aux PFE des étudiants inscrits dans la formation indiquée ci-dessous.")
+                                  "Indiquer le fichier .csv d'affectation aux PFE des أ©tudiants inscrits dans la formation indiquأ©e ci-dessous.")
                     messages.info(request,
-                                  "La première ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Groupe, Intitule, Promoteur, Encadrant")
+                                  "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Groupe, Intitule, Promoteur, Encadrant")
                     messages.info(request, "La colonne Groupe correspond au code PFE, par ex. PSL23.")
                     render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer l\'affectation aux PFE'})
-            messages.success(request, "L'affectation aux PFE a été réalisée avec succès!")
+            messages.success(request, "L'affectation aux PFE a أ©tأ© rأ©alisأ©e avec succأ¨s!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('pfe_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportAffectationDiplomeForm()
         messages.info(request,
-                      "Indiquer le fichier .csv d'affectation aux PFE des étudiants inscrits dans la formation indiquée ci-dessous.")
+                      "Indiquer le fichier .csv d'affectation aux PFE des أ©tudiants inscrits dans la formation indiquأ©e ci-dessous.")
         messages.info(request,
-                      "La première ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Groupe, Promoteur, Intitule, CoEncadrants")
+                      "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Nom, Prenom, Groupe, Promoteur, Intitule, CoEncadrants")
         messages.info(request, "La colonne Groupe correspond au code PFE, par ex. PSL23..")
         messages.warning(request,
-                         "Assurez vous que tous les binômes suivent le même module. Pour les binômes mixtes il faut créer une formation Mixte")
+                         "Assurez vous que tous les binأ´mes suivent le mأھme module. Pour les binأ´mes mixtes il faut crأ©er une formation Mixte")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer l\'affectation aux PFE'})
 
 
 @receiver(post_save, sender=InscriptionPeriode)
 def add_resultat_inscription(sender, update_fields, instance, created, **kwargs):
-    # créer les résultats que doit avoir l'étudiant
+    # crأ©er les rأ©sultats que doit avoir l'أ©tudiant
     if instance.groupe:
-        # màj le groupe de Inscription avec le groupe de la dernière InscriptionPeriode <=> groupe actuel
+        # mأ j le groupe de Inscription avec le groupe de la derniأ¨re InscriptionPeriode <=> groupe actuel
         derniere_inscription_periode = instance.inscription.inscription_periodes.all().order_by(
             'periodepgm__periode__ordre').last()
         if derniere_inscription_periode == instance:
@@ -2271,10 +2276,10 @@ def add_resultat_inscription(sender, update_fields, instance, created, **kwargs)
                         resultat_.acquis = True
                         resultat_.save(update_fields=['moy', 'moy_post_delib', 'ects', 'acquis'])
                 else:
-                    # ici on gère le cas d'un changement de groupe vers un groupe compatible (suivant les mêmes modules que
-                    # l'ancien groupe, mais pour certaines matières elles sont suivies à des semestres différents
-                    # ATTENTION: on ne gère pas bien le changement de groupe vers un groupe incompatible: on crée les nouveaux modules mais
-                    # on ne supprime pas les anciens par peur de perdre des notes et résultats intermédiaires
+                    # ici on gأ¨re le cas d'un changement de groupe vers un groupe compatible (suivant les mأھmes modules que
+                    # l'ancien groupe, mais pour certaines matiأ¨res elles sont suivies أ  des semestres diffأ©rents
+                    # ATTENTION: on ne gأ¨re pas bien le changement de groupe vers un groupe incompatible: on crأ©e les nouveaux modules mais
+                    # on ne supprime pas les anciens par peur de perdre des notes et rأ©sultats intermأ©diaires
                     resultat_.module = modules_suivis_.get(module__matiere=matiere_).module
                     resultat_.resultat_ue = resultat_ue
                     resultat_.save(update_fields=['module', 'resultat_ue'])
@@ -2296,15 +2301,15 @@ def notes_module_import_view(request, module_pk, groupe_pk):
     if request.user.is_direction():
         pass
     elif module_.formation.archive or module_.pv_existe():
-        messages.error(request, "La saisie des notes est clôturée pour cette formation.")
+        messages.error(request, "La saisie des notes est clأ´turأ©e pour cette formation.")
         return HttpResponseRedirect(
             reverse('note_list', kwargs={'groupe_pk': groupe_pk, 'matiere_pk': module_.matiere.id}))
     elif request.user.is_enseignant():
         if not assure_module(request.user.enseignant, module_):
-            messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+            messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
             return redirect('/accounts/login/?next=%s' % request.path)
     else:
-        messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -2314,7 +2319,7 @@ def notes_module_import_view(request, module_pk, groupe_pk):
 
         # check whether it's valid:
         if form.is_valid():
-            # Vérifier que l'OTP est correct
+            # Vأ©rifier que l'OTP est correct
             if not settings.SMS_ENABLED or request.user.is_direction() or request.user.enseignant.check_otp(
                     form.cleaned_data['otp']):
                 try:
@@ -2331,13 +2336,13 @@ def notes_module_import_view(request, module_pk, groupe_pk):
                         raise Exception
                     else:
                         messages.error(request,
-                                       "ERREUR: L'import des notes n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                       "ERREUR: L'import des notes n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                         return HttpResponseRedirect(
                             reverse('note_list', kwargs={'groupe_pk': groupe_pk, 'matiere_pk': module_.matiere.id}))
                 messages.info(request,
-                              "Votre demande d'importation de notes a été prise en compte. Une notification vous sera transmise une fois la tâche terminée.")
+                              "Votre demande d'importation de notes a أ©tأ© prise en compte. Une notification vous sera transmise une fois la tأ¢che terminأ©e.")
             else:
-                messages.error(request, "Le Mot de Passe à usage unique saisi est incorrect.")
+                messages.error(request, "Le Mot de Passe أ  usage unique saisi est incorrect.")
         else:
             messages.error(request, "Le formulaire est incorrect.")
         # redirect to a new URL:
@@ -2347,13 +2352,13 @@ def notes_module_import_view(request, module_pk, groupe_pk):
     else:
         if not request.user.enseignant.tel:
             messages.error(request,
-                           "Votre numéro de téléphone n'est pas enregsitré dans la base. Il est nécessaire pour vous envoyer un Mot de passe à Usage Unique.")
+                           "Votre numأ©ro de tأ©lأ©phone n'est pas enregsitrأ© dans la base. Il est nأ©cessaire pour vous envoyer un Mot de passe أ  Usage Unique.")
             messages.info(request,
-                          "Merci de communiquer votre numéro à l'administration afin que vous puissiez saisir les notes.")
+                          "Merci de communiquer votre numأ©ro أ  l'administration afin que vous puissiez saisir les notes.")
             return HttpResponseRedirect(
                 reverse('note_list', kwargs={'groupe_pk': groupe_pk, 'matiere_pk': module_.matiere.id}))
         else:
-            # Génération et envoie de l'OTP pour sécuriser la saisie des notes
+            # Gأ©nأ©ration et envoie de l'OTP pour sأ©curiser la saisie des notes
             url_ = settings.SMS_URL
             params_ = {
                 'function': 'sms_send',
@@ -2367,12 +2372,12 @@ def notes_module_import_view(request, module_pk, groupe_pk):
                 requests.get(url=url_, params=params_)
 
             form = OTPImportFileForm()
-            messages.warning(request, "Nous avons transmis un code secret, à saisir, par SMS sur votre numéro.")
+            messages.warning(request, "Nous avons transmis un code secret, أ  saisir, par SMS sur votre numأ©ro.")
             messages.info(request,
                           "Indiquez le fichier .xlsx contenant les notes de " + str(module_.matiere.code) + ' ' + str(
                               groupe_.code))
             messages.info(request,
-                          "La première ligne du fichier doit contenir au moins les colonnes: Matricule, et une colonne préfixée par Moy puis le code du module, ex. MoyALSDD, MoyURSI, etc.")
+                          "La premiأ¨re ligne du fichier doit contenir au moins les colonnes: Matricule, et une colonne prأ©fixأ©e par Moy puis le code du module, ex. MoyALSDD, MoyURSI, etc.")
             #             return render(request, 'scolar/import_notes_form.html', {'form': form, 'titre':'Importer des notes', 'module_':module_, 'groupe_':groupe_,
             #                                                                      'sms':settings.SMS_ENABLED,
             #                                                                      'url':settings.SMS_URL,
@@ -2393,7 +2398,7 @@ def task_notes_module_import(module_, groupe_, imported_data, user):
 
             etudiant_ = Etudiant.objects.get(matricule=row['Matricule'])
 
-            # récupérer le résultat de l'étudiant correspondant au module
+            # rأ©cupأ©rer le rأ©sultat de l'أ©tudiant correspondant au module
             non_modifie = ''
             try:
                 resultat_ = get_object_or_404(Resultat, inscription__decision_jury='C', inscription__etudiant=etudiant_,
@@ -2428,7 +2433,7 @@ def task_notes_module_import(module_, groupe_, imported_data, user):
                             continue
 
                 else:
-                    non_modifie += str(etudiant_) + ' Module déjà acquis\n'
+                    non_modifie += str(etudiant_) + ' Module dأ©jأ  acquis\n'
     except Exception:
         if settings.DEBUG:
             raise Exception
@@ -2437,9 +2442,9 @@ def task_notes_module_import(module_, groupe_, imported_data, user):
                                  'Bonjour,\n' +
                                  'Une erreur s\'est produite lors de l\'enregistrement des notes de ' + str(
                                      module_) + '\n' +
-                                 'Veuillez réessayer l\'importation \n' +
+                                 'Veuillez rأ©essayer l\'importation \n' +
                                  'Bien cordialement.\n' +
-                                 'Département',
+                                 'Dأ©partement',
                                  to=[user.email, module_.formation.programme.departement.responsable.user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
@@ -2450,17 +2455,17 @@ def task_notes_module_import(module_, groupe_, imported_data, user):
             'saisie_notes': 'T'
         })
         if non_modifie != '':
-            non_modifie = 'Les notes de ces étudiants n\'ont pas été modifiées:\n' + non_modifie
+            non_modifie = 'Les notes de ces أ©tudiants n\'ont pas أ©tأ© modifiأ©es:\n' + non_modifie
         email = EmailMessage(
             '[Talents] Confirmation de l\'enregistrement des notes de ' + str(module_.matiere.code) + ' ' + str(
                 groupe_),
             'Bonjour,\n' +
             'L\'enregistrement des notes de ' + str(module_.matiere.code) + ' du groupe ' + str(
-                groupe_) + ' a bien été effectué \n' +
+                groupe_) + ' a bien أ©tأ© effectuأ© \n' +
             non_modifie +
-            'Modification effectuée via le compte ' + user.email + '\n' +
+            'Modification effectuأ©e via le compte ' + user.email + '\n' +
             'Bien cordialement.\n' +
-            'Département',
+            'Dأ©partement',
             to=[user.email, module_.formation.programme.departement.responsable.user.email] if not settings.DEBUG else
             settings.STAFF_EMAILS['webmaster'])
         if settings.EMAIL_ENABLED:
@@ -2469,7 +2474,7 @@ def task_notes_module_import(module_, groupe_, imported_data, user):
 
 def notes_import_view(request):
     if not (request.user.is_direction()):
-        messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -2495,24 +2500,24 @@ def notes_import_view(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: L'import des notes n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                   "ERREUR: L'import des notes n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                     messages.info(request,
-                                  "Indiquez le fichier .csv contenant les notes qui correspondent à la formation indiquée ci-dessous.")
+                                  "Indiquez le fichier .csv contenant les notes qui correspondent أ  la formation indiquأ©e ci-dessous.")
                     messages.info(request,
-                                  "La première ligne du fichier doit contenir au moins les colonnes: Matricule, et une colonne par matière, ex. ALSDD, URSI, etc.  préfixée par le terme Moy")
+                                  "La premiأ¨re ligne du fichier doit contenir au moins les colonnes: Matricule, et une colonne par matiأ¨re, ex. ALSDD, URSI, etc.  prأ©fixأ©e par le terme Moy")
 
                     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des notes'})
             messages.info(request,
-                          "Votre demande d'importation de notes a été prise en compte. Une notification vous sera transmise une fois la tâche terminée.")
+                          "Votre demande d'importation de notes a أ©tأ© prise en compte. Une notification vous sera transmise une fois la tأ¢che terminأ©e.")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('notes_formation_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportNotesForm()
         messages.info(request,
-                      "Indiquez le fichier .csv contenant les notes qui correspondent à la formation indiquée ci-dessous.")
+                      "Indiquez le fichier .csv contenant les notes qui correspondent أ  la formation indiquأ©e ci-dessous.")
         messages.info(request,
-                      "La première ligne du fichier doit contenir au moins les colonnes: Matricule, et une colonne par matière, ex. ALSDD, URSI, etc. préfixée par le terme Moy")
+                      "La premiأ¨re ligne du fichier doit contenir au moins les colonnes: Matricule, et une colonne par matiأ¨re, ex. ALSDD, URSI, etc. prأ©fixأ©e par le terme Moy")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des notes'})
 
 
@@ -2523,11 +2528,11 @@ def task_notes_import(formation_, imported_data, user):
             etudiant_ = Etudiant.objects.get(matricule=row['Matricule'])
             inscription_ = Inscription.objects.get(etudiant=etudiant_, formation=formation_)
             # modules_suivis=ModulesSuivis.objects.filter(groupe=inscription_.groupe).values_list('module')
-            # les resultats d'un étudiant sont déjà créés lors de son affectation à un groupe (on sait ce qu'il doit suivre
+            # les resultats d'un أ©tudiant sont dأ©jأ  crأ©أ©s lors de son affectation أ  un groupe (on sait ce qu'il doit suivre
             for resultat_ in Resultat.objects.filter(inscription=inscription_):  # , module__in=modules_suivis
-                # on tente de récupérer la note du module du fichier excel
+                # on tente de rأ©cupأ©rer la note du module du fichier excel
                 moy_ = row.get('Moy' + resultat_.module.matiere.code)
-                # si une telle colonne existe dans le fichier excel alors on récupère la moyenne
+                # si une telle colonne existe dans le fichier excel alors on rأ©cupأ¨re la moyenne
                 if moy_:
                     resultat_.moy = decimal.Decimal(moy_.replace(",", "."))
                     resultat_.moy_post_delib = resultat_.moy
@@ -2548,18 +2553,18 @@ def task_notes_import(formation_, imported_data, user):
                                  'Bonjour,\n' +
                                  'Une erreur s\'est produite lors de l\'enregistrement des notes de ' + str(
                                      formation_) + '\n' +
-                                 'Veuillez réessayer l\'importation \n' +
+                                 'Veuillez rأ©essayer l\'importation \n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[user.email])
+                                 'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
     email = EmailMessage('[Talents] Confirmation de l\'enregistrement des notes de ' + str(formation_),
                          'Bonjour,\n' +
-                         'L\'importation des notes de ' + str(formation_) + ' a bien été effectuée \n' +
+                         'L\'importation des notes de ' + str(formation_) + ' a bien أ©tأ© effectuأ©e \n' +
                          'Nous vous en remercions \n' +
                          'Bien cordialement.\n' +
-                         'Département', to=[user.email])
+                         'Dأ©partement', to=[user.email])
     if settings.EMAIL_ENABLED:
         email.send(fail_silently=True)
 
@@ -2580,7 +2585,7 @@ class SettingsDetailView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTest
 
         context['activite_charge_config_table'] = table
 
-        context['titre'] = 'Paramètres de Talents'
+        context['titre'] = 'Paramأ¨tres de Talents'
         table = ResidenceUnivTable(ResidenceUniv.objects.all().order_by('nom'),
                                    exclude=exclude_columns(self.request.user))
         RequestConfig(self.request).configure(table)
@@ -2616,7 +2621,7 @@ class SettingsUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTest
         #         form.fields['banniere']=forms.ImageField(label='Banniere', required=False, widget=forms.FileInput(attrs={'class':"custom-file-input"}))
         #         form.fields['logo']=forms.ImageField(label='Logo', required=False, widget=forms.FileInput(attrs={'class':"custom-file-input"}))
         #         form.fields['logo_bis']=forms.ImageField(label='Logo bis', required=False, widget=forms.FileInput(attrs={'class':"custom-file-input"}))
-        #         form.fields['header']=forms.ImageField(label='Entête', required=False, widget=forms.FileInput(attrs={'class':"custom-file-input"}))
+        #         form.fields['header']=forms.ImageField(label='Entأھte', required=False, widget=forms.FileInput(attrs={'class':"custom-file-input"}))
         #         form.fields['footer']=forms.ImageField(label='Pied de page', required=False, widget=forms.FileInput(attrs={'class':"custom-file-input"}))
         form.helper.add_input(Submit('submit', 'Enregistrer', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
@@ -2638,14 +2643,14 @@ class SettingsUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTest
 
         context['residence_univ_table'] = table
 
-        context['titre'] = 'Paramètres de Talents'
+        context['titre'] = 'Paramأ¨tres de Talents'
 
         return context
 
 
 def organismes_import_view(request):
     if not (request.user.is_stage() or request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas les permissions d'accès à cette opération")
+        messages.error(request, "Vous n'avez pas les permissions d'accأ¨s أ  cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -2677,28 +2682,28 @@ def organismes_import_view(request):
                     except Exception:
                         lignes_problemes.append(row['sigle'])
                         continue
-                    # vérifier que le nom est identique à l'existant
+                    # vأ©rifier que le nom est identique أ  l'existant
             except Exception:
                 if settings.DEBUG:
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'importation du fichier des organisme n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                   "L'importation du fichier des organisme n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                     return render(request, 'scolar/import.html',
                                   {'form': form, 'titre': 'Importer des Organismes d\'accueil en Stage'})
             # redirect to a new URL:
-            messages.success(request, "L'importation du fichier des Organismes s'est faite avec succès!")
+            messages.success(request, "L'importation du fichier des Organismes s'est faite avec succأ¨s!")
             if len(lignes_problemes) > 0:
-                messages.warning(request, "Ces organismes n'ont pu être importées")
+                messages.warning(request, "Ces organismes n'ont pu أھtre importأ©es")
                 for pb in lignes_problemes:
                     messages.warning(request, pb)
             return HttpResponseRedirect(reverse('organisme_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer un fichier .csv des Organismes à importer dans la base de ESI Talents.")
+        messages.info(request, "Indiquer un fichier .csv des Organismes أ  importer dans la base de ESI Talents.")
         messages.info(request,
-                      "le fichier doit avoir comme entête les colonnes suivantes: SIGLE, NOM, ADRESSE, PAYS, TYPE, NATURE, STATUT, SECTEUR, TAILLE")
+                      "le fichier doit avoir comme entأھte les colonnes suivantes: SIGLE, NOM, ADRESSE, PAYS, TYPE, NATURE, STATUT, SECTEUR, TAILLE")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Organismes'})
 
 
@@ -2727,25 +2732,25 @@ def pays_import_view(request):
                     except Exception:
                         lignes_problemes.append(row['code'])
                         continue
-                    # vérifier que le nom est identique à l'existant
+                    # vأ©rifier que le nom est identique أ  l'existant
             except Exception:
                 if settings.DEBUG:
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'importation du fichier des pays n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                   "L'importation du fichier des pays n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Pays'})
             # redirect to a new URL:
-            messages.success(request, "L'importation du fichier des Pays s'est faite avec succès!")
+            messages.success(request, "L'importation du fichier des Pays s'est faite avec succأ¨s!")
             if len(lignes_problemes) > 0:
-                messages.warning(request, "Ces Pays n'ont pu être importées")
+                messages.warning(request, "Ces Pays n'ont pu أھtre importأ©es")
                 for pb in lignes_problemes:
                     messages.warning(request, pb)
             return HttpResponseRedirect(reverse('settings'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer un fichier .csv des Pays à importer dans la base de ESI Talents.")
+        messages.info(request, "Indiquer un fichier .csv des Pays أ  importer dans la base de ESI Talents.")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Pays'})
 
 
@@ -2774,25 +2779,25 @@ def wilayas_import_view(request):
                     except Exception:
                         lignes_problemes.append(row['code'])
                         continue
-                    # vérifier que le nom est identique à l'existant
+                    # vأ©rifier que le nom est identique أ  l'existant
             except Exception:
                 if settings.DEBUG:
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'importation du fichier des wilayas n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                   "L'importation du fichier des wilayas n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Wilayas'})
             # redirect to a new URL:
-            messages.success(request, "L'importation du fichier des Wilayas s'est faite avec succès!")
+            messages.success(request, "L'importation du fichier des Wilayas s'est faite avec succأ¨s!")
             if len(lignes_problemes) > 0:
-                messages.warning(request, "Ces Wilayas n'ont pu être importées")
+                messages.warning(request, "Ces Wilayas n'ont pu أھtre importأ©es")
                 for pb in lignes_problemes:
                     messages.warning(request, pb)
             return HttpResponseRedirect(reverse('settings'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer un fichier .csv des Wilayas à importer dans la base de ESI Talents.")
+        messages.info(request, "Indiquer un fichier .csv des Wilayas أ  importer dans la base de ESI Talents.")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Wilayas'})
 
 
@@ -2822,25 +2827,25 @@ def communes_import_view(request):
                     except Exception:
                         lignes_problemes.append(row['code_postal'])
                         continue
-                    # vérifier que le nom est identique à l'existant
+                    # vأ©rifier que le nom est identique أ  l'existant
             except Exception:
                 if settings.DEBUG:
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'importation du fichier des communes n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                   "L'importation du fichier des communes n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Commune'})
             # redirect to a new URL:
-            messages.success(request, "L'importation du fichier des Comunes s'est faite avec succès!")
+            messages.success(request, "L'importation du fichier des Comunes s'est faite avec succأ¨s!")
             if len(lignes_problemes) > 0:
-                messages.warning(request, "Ces Commune n'ont pu être importées")
+                messages.warning(request, "Ces Commune n'ont pu أھtre importأ©es")
                 for pb in lignes_problemes:
                     messages.warning(request, pb)
             return HttpResponseRedirect(reverse('settings'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer un fichier .csv des Communes à importer dans la base de ESI Talents.")
+        messages.info(request, "Indiquer un fichier .csv des Communes أ  importer dans la base de ESI Talents.")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Communes'})
 
 
@@ -2869,14 +2874,14 @@ def etudiants_import_maj_view(request):
                     except Exception:
                         lignes_problemes.append(row['Matricule'] + ' Indexistant')
                         continue
-                    # vérifier que le nom est identique à l'existant
+                    # vأ©rifier que le nom est identique أ  l'existant
                     new_nom = row['NomEtud']
                     new_Ddn = datetime.datetime.strptime(row['Ddn'], '%Y-%m-%d').date()
 
                     if etudiant_.date_naissance == new_Ddn and etudiant_.nom.lower().replace(' ',
                                                                                              '') == new_nom.lower().replace(
                             ' ', ''):
-                        # mettre à jour le dossier étudiant avec les infos
+                        # mettre أ  jour le dossier أ©tudiant avec les infos
                         Etudiant.objects.filter(matricule=row['Matricule']).update(
                             nom=row['NomEtud'].upper(),
                             nom_a=row['NomEtudA'] if row['NomEtudA'] != '' else etudiant_.nom_a,
@@ -2895,37 +2900,37 @@ def etudiants_import_maj_view(request):
                             residence_univ=row['ResidenceU'].upper()
                         )
                     else:
-                        lignes_problemes.append(row['Matricule'] + ' Noms ou Ddn différents.')
+                        lignes_problemes.append(row['Matricule'] + ' Noms ou Ddn diffأ©rents.')
                         continue
             except Exception:
                 if settings.DEBUG:
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'importation du fichier des étudiants n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                   "L'importation du fichier des أ©tudiants n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                     messages.info(
-                        "La première ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
+                        "La premiأ¨re ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
                         "'LieuNaissance', 'WilayaNaissance', 'NomEtudA', 'PrenomsA', 'LieuNaissanceA'," +
                         "'Telephone', 'AdressePrincipale', 'WilayaResidence', 'CommuneResidence'," +
                         "'Interne', 'ResidenceU'")
-                    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des étudiants'})
+                    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des أ©tudiants'})
             # redirect to a new URL:
-            messages.success(request, "L'importatation du fichier des étudiants s'est faite avec succès!")
+            messages.success(request, "L'importatation du fichier des أ©tudiants s'est faite avec succأ¨s!")
             if len(lignes_problemes) > 0:
-                messages.warning(request, "Ces étudiants n'ont pu être importé")
+                messages.warning(request, "Ces أ©tudiants n'ont pu أھtre importأ©")
                 for pb in lignes_problemes:
                     messages.warning(request, pb)
             return HttpResponseRedirect(reverse('etudiant_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer un fichier .csv des étudiants à importer dans la base de ESI Talents.")
+        messages.info(request, "Indiquer un fichier .csv des أ©tudiants أ  importer dans la base de ESI Talents.")
         messages.info(request,
-                      "La première ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
+                      "La premiأ¨re ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
                       "'LieuNaissance', 'WilayaNaissance', 'NomEtudA', 'PrenomsA', 'LieuNaissanceA'," +
                       "'Telephone', 'AdressePrincipale', 'WilayaResidence', 'CommuneResidence'," +
                       "'Interne', 'ResidenceU'")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des étudiants'})
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des أ©tudiants'})
 
 
 def etudiants_import_view(request):
@@ -3010,29 +3015,29 @@ def etudiants_import_view(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "L'importation du fichier des étudiants n'a pas réussit. Il doit y avoir un problème de format du fichier.")
+                                   "L'importation du fichier des أ©tudiants n'a pas rأ©ussit. Il doit y avoir un problأ¨me de format du fichier.")
                     messages.info(request,
-                                  "La première ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
+                                  "La premiأ¨re ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
                                   "'LieuNaissance', 'WilayaNaissance', 'NomEtudA', 'PrenomsA', 'LieuNaissanceA'," +
                                   "'Telephone', 'AdressePrincipale', 'WilayaResidence', 'CommuneResidence'," +
                                   "'Interne', 'ResidenceU'")
-                    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des étudiants'})
+                    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des أ©tudiants'})
             # redirect to a new URL:
-            messages.success(request, "L'importation du fichier des étudiants s'est faite avec succès!")
+            messages.success(request, "L'importation du fichier des أ©tudiants s'est faite avec succأ¨s!")
             if lignes_pb != '':
-                messages.warning(request, "Les lignes suivantes n'ont pas été insérées à cause d'erreurs:\n" +
+                messages.warning(request, "Les lignes suivantes n'ont pas أ©tأ© insأ©rأ©es أ  cause d'erreurs:\n" +
                                  lignes_pb)
             return HttpResponseRedirect(reverse('etudiant_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer un fichier .csv des étudiants à importer dans la base de ESI Talents.")
+        messages.info(request, "Indiquer un fichier .csv des أ©tudiants أ  importer dans la base de ESI Talents.")
         messages.info(request,
-                      "La première ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
+                      "La premiأ¨re ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'Ddn'," +
                       "'LieuNaissance', 'WilayaNaissance', 'NomEtudA', 'PrenomsA', 'LieuNaissanceA'," +
                       "'Telephone', 'AdressePrincipale', 'WilayaResidence', 'CommuneResidence'," +
                       "'Interne', 'ResidenceU'")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des étudiants'})
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des أ©tudiants'})
 
 
 def inscriptions_import_view(request):
@@ -3059,7 +3064,7 @@ def inscriptions_import_view(request):
                         'prenom': row['Prenoms'],
                     }
                                                                         )
-                    # Inscription de l'étudiant
+                    # Inscription de l'أ©tudiant
                     annee_univ_, created = AnneeUniv.objects.get_or_create(annee_univ=row['AnScol'], defaults={
                         'annee_univ': row['AnScol']
                     })
@@ -3074,7 +3079,7 @@ def inscriptions_import_view(request):
                             'etudiant': etudiant_,
                             'formation': formation_,
                         })
-                    # créer inscription_periodes selon le programme
+                    # crأ©er inscription_periodes selon le programme
                     for periode_ in formation_.programme.periodes.all():
                         InscriptionPeriode.objects.update_or_create(inscription=inscription_, periodepgm=periode_,
                                                                     defaults={
@@ -3088,23 +3093,23 @@ def inscriptions_import_view(request):
                 else:
                     messages.error(request, "ERREUR: Echec de l'importation des inscriptions.")
                     messages.info(request,
-                                  "La première ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'AnScol', 'Promo'")
-                    messages.info(request, "La colonne AnScol indique l'année universitaire, par ex. 2019")
+                                  "La premiأ¨re ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'AnScol', 'Promo'")
+                    messages.info(request, "La colonne AnScol indique l'annأ©e universitaire, par ex. 2019")
                     messages.info(request,
-                                  "La colonne Promo doit correspondre à une des promo 1CP, 2CP, 1CS, 2SL, 2SQ, 2ST, 3SL, 3ST, 3SQ, MSL, MST, MSQ")
+                                  "La colonne Promo doit correspondre أ  une des promo 1CP, 2CP, 1CS, 2SL, 2SQ, 2ST, 3SL, 3ST, 3SQ, MSL, MST, MSQ")
                     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des inscriptions'})
             # redirect to a new URL:
-            messages.success(request, "L'importation des inscriptions s'est faite avec succès!")
+            messages.success(request, "L'importation des inscriptions s'est faite avec succأ¨s!")
             return HttpResponseRedirect(reverse('inscription_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer un fichier .csv des inscriptions à importer dans la base de ESI Talents.")
+        messages.info(request, "Indiquer un fichier .csv des inscriptions أ  importer dans la base de ESI Talents.")
         messages.info(request,
-                      "La première ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'AnScol', 'Promo'")
-        messages.info(request, "La colonne AnScol indique l'année universitaire, par ex. 2019")
+                      "La premiأ¨re ligne du fichier .csv doit comprendre au moins les colonnes: 'Matricule','NomEtud', 'Prenoms', 'AnScol', 'Promo'")
+        messages.info(request, "La colonne AnScol indique l'annأ©e universitaire, par ex. 2019")
         messages.info(request,
-                      "La colonne Promo doit correspondre à une des promo 1CP, 2CP, 1CS, 2SL, 2SQ, 2ST, 3SL, 3ST, 3SQ, MSL, MSQ, MST")
+                      "La colonne Promo doit correspondre أ  une des promo 1CP, 2CP, 1CS, 2SL, 2SQ, 2ST, 3SL, 3ST, 3SQ, MSL, MSQ, MST")
 
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des inscriptions'})
 
@@ -3160,19 +3165,19 @@ def enseignants_import_view(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: l'importation du fichier des enseignants s'est arrêtée avec echec.")
+                                   "ERREUR: l'importation du fichier des enseignants s'est arrأھtأ©e avec echec.")
                     messages.info(request,
-                                  "La première ligne doit comporter au moins les colonnes suivantes: 'Nom', 'Eps', 'Prenom', 'NomA', 'EpsA', 'PrenomA', 'Sexe', 'Grade', 'Situation', 'Tel', 'Bureau', 'Bal', 'Email', 'Charge'")
+                                  "La premiأ¨re ligne doit comporter au moins les colonnes suivantes: 'Nom', 'Eps', 'Prenom', 'NomA', 'EpsA', 'PrenomA', 'Sexe', 'Grade', 'Situation', 'Tel', 'Bureau', 'Bal', 'Email', 'Charge'")
                     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des enseignants'})
             # redirect to a new URL:
-            messages.success(request, "L'importation du fichier des enseignants s'est faite avec succès!")
+            messages.success(request, "L'importation du fichier des enseignants s'est faite avec succأ¨s!")
             return HttpResponseRedirect(reverse('enseignant_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
         messages.info(request, "Indiquer le fichier .csv des enseignants.")
         messages.info(request,
-                      "La première ligne doit comporter au moins les colonnes suivantes: 'Nom', 'Eps', 'Prenom', 'NomA', 'EpsA', 'PrenomA', 'Sexe', 'Grade', 'Situation', 'Tel', 'Bureau', 'Bal', 'Email', 'Charge'")
+                      "La premiأ¨re ligne doit comporter au moins les colonnes suivantes: 'Nom', 'Eps', 'Prenom', 'NomA', 'EpsA', 'PrenomA', 'Sexe', 'Grade', 'Situation', 'Tel', 'Bureau', 'Bal', 'Email', 'Charge'")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des enseignants'})
 
 
@@ -3210,21 +3215,21 @@ def feedback_import_view(request, module_pk):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: L'importation des feedbacks s'est terminée avec echec!")
+                    messages.error(request, "ERREUR: L'importation des feedbacks s'est terminأ©e avec echec!")
                     messages.info(request,
-                                  "La première ligne du fichier .csv doit comprendre les colonnes: Q01, Q02, Q03, ... Q10, Comment")
-                    messages.info(request, "Les cellules comprennent les évaluations sous la forme de ++, +, -, --")
+                                  "La premiأ¨re ligne du fichier .csv doit comprendre les colonnes: Q01, Q02, Q03, ... Q10, Comment")
+                    messages.info(request, "Les cellules comprennent les أ©valuations sous la forme de ++, +, -, --")
                     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des feedbacks'})
             # redirect to a new URL:
-            messages.success(request, "L'importation des feedback s'est faite avec succès!")
+            messages.success(request, "L'importation des feedback s'est faite avec succأ¨s!")
             return HttpResponseRedirect(reverse('module_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFeedbackForm(module_pk)
-        messages.info(request, "Indiquer le fichier .csv contenant les évaluations du module indiqué ci-dessous.")
+        messages.info(request, "Indiquer le fichier .csv contenant les أ©valuations du module indiquأ© ci-dessous.")
         messages.info(request,
-                      "La première ligne du fichier .csv doit comprendre les colonnes: Q01, Q02, Q03, ... Q10, Comment")
-        messages.info(request, "Les cellules comprennent les évaluations sous la forme de ++, +, -, --")
+                      "La premiأ¨re ligne du fichier .csv doit comprendre les colonnes: Q01, Q02, Q03, ... Q10, Comment")
+        messages.info(request, "Les cellules comprennent les أ©valuations sous la forme de ++, +, -, --")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des feedbacks'})
 
 
@@ -3301,7 +3306,7 @@ class FeedbackChart(Chart):
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: echec de création du graphique des feedbacks.")
+                messages.error(self.request, "ERREUR: echec de crأ©ation du graphique des feedbacks.")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -3312,7 +3317,7 @@ class FeedbackChart(Chart):
 
 class DeliberationListView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, TemplateView):
     template_name = 'scolar/filter_list.html'
-    success_message = "Choisir la formation pour les délibérations. Privilégiez le format Résumé plus rapide à générer."
+    success_message = "Choisir la formation pour les dأ©libأ©rations. Privilأ©giez le format Rأ©sumأ© plus rapide أ  gأ©nأ©rer."
 
     def test_func(self):
         return self.request.user.is_scolarite() or self.request.user.is_direction()
@@ -3328,7 +3333,7 @@ class DeliberationListView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
 
         table = DeliberationFormationTable(filter_.qs, exclude=exclude_columns(self.request.user))
         RequestConfig(self.request).configure(table)
-        context['titre'] = 'Délibérations'
+        context['titre'] = 'Dأ©libأ©rations'
         context['filter'] = filter_
         context['table'] = table
         context['back'] = reverse('home')
@@ -3337,7 +3342,7 @@ class DeliberationListView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
 
 def get_resultat_list_context(formation_pk):
     """
-    cette fonction fabrique le context des résultats détaillés par semestre/UE/matière pour chaque inscrit
+    cette fonction fabrique le context des rأ©sultats dأ©taillأ©s par semestre/UE/matiأ¨re pour chaque inscrit
     """
     formation_ = Formation.objects.get(id=formation_pk)
     inscription_list = formation_.inscriptions_pour_deliberations().order_by('rang')
@@ -3375,7 +3380,7 @@ def get_resultat_list_context(formation_pk):
 class PVDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
     model = PV
     template_name = 'scolar/delete.html'
-    success_message = "Le PV a bien été supprimé."
+    success_message = "Le PV a bien أ©tأ© supprimأ©."
 
     def test_func(self):
         return self.request.user.is_direction()
@@ -3403,7 +3408,7 @@ class PVListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         RequestConfig(self.request).configure(pv_list)
         context['filter'] = filter_
         context['table'] = pv_list
-        context['titre'] = 'List de procés verbaux de délibérations'
+        context['titre'] = 'List de procأ©s verbaux de dأ©libأ©rations'
         return context
 
 
@@ -3428,7 +3433,7 @@ class DeliberationDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
 @login_required
 def confirmer_deliberation_view(request, formation_pk):
     if not request.user.is_direction():
-        messages.error(request, "Vous n'avez pas les permissions pour accéder à cette vue.")
+        messages.error(request, "Vous n'avez pas les permissions pour accأ©der أ  cette vue.")
         return redirect('/accounts/login/?next=%s' % request.path)
     try:
         formation_ = get_object_or_404(Formation, id=formation_pk)
@@ -3437,14 +3442,14 @@ def confirmer_deliberation_view(request, formation_pk):
         t.setDaemon(True)
         t.start()
         messages.info(request,
-                      "Votre demande de confirmation du PV de délibérations et envoi des décisions est prise en compte. Vous recevrez une notification aussitôt généré.")
+                      "Votre demande de confirmation du PV de dأ©libأ©rations et envoi des dأ©cisions est prise en compte. Vous recevrez une notification aussitأ´t gأ©nأ©rأ©.")
         # redirect to a new URL:
         return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_pk, }))
     except Exception:
         if settings.DEBUG:
             raise Exception
         else:
-            messages.error(request, "ERREUR: lors de la demande de confirmation des délibérations.")
+            messages.error(request, "ERREUR: lors de la demande de confirmation des dأ©libأ©rations.")
     return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_pk, }))
 
 
@@ -3465,18 +3470,18 @@ def task_confirmer_deliberation(formation_, user):
 
             try:
                 recipient_ = [inscription_.etudiant.user.email]
-                email = ('[Talents] Décision du Jury de Déliberation',
+                email = ('[Talents] Dأ©cision du Jury de Dأ©liberation',
                          'Bonjour ' + str(inscription_.etudiant.nom) + ' ' + str(inscription_.etudiant.prenom) + ',\n' +
-                         'Le jury a délibéré\n' +
+                         'Le jury a dأ©libأ©rأ©\n' +
                          'Identification: ' + str(inscription_.etudiant) + '\n' +
-                         'Décision du jury: ' + dict(DECISIONS_JURY)[inscription_.decision_jury] + '\n' +
+                         'Dأ©cision du jury: ' + dict(DECISIONS_JURY)[inscription_.decision_jury] + '\n' +
                          'Moyenne Annuelle: ' + str(inscription_.moy) + '\n' +
                          moyenne_rachat_str +
                          'Rang: ' + str(inscription_.rang) + '\n' +
-                         'Vous pouvez avoir accès à tous les détails concernant vos résultats dans votre compte Talents.\n' +
-                         'Ceci est un message automatique. Il ne peut servir pour faire valoir vos droits. Seul le PV signé par le conseil fait foi.\n' +
+                         'Vous pouvez avoir accأ¨s أ  tous les dأ©tails concernant vos rأ©sultats dans votre compte Talents.\n' +
+                         'Ceci est un message automatique. Il ne peut servir pour faire valoir vos droits. Seul le PV signأ© par le conseil fait foi.\n' +
                          'Bien cordialement.\n' +
-                         'Département',
+                         'Dأ©partement',
                          'talents@esi.dz',
                          recipient_)
                 email_list += (email,)
@@ -3488,14 +3493,14 @@ def task_confirmer_deliberation(formation_, user):
 
         erreur_envoi = 'Erreurs d\'envoi de notifications :\n' + non_envoye if non_envoye != '' else ''
 
-        email = EmailMessage('[Talents] Confirmation des délibérations de la formation ' + str(formation_),
+        email = EmailMessage('[Talents] Confirmation des dأ©libأ©rations de la formation ' + str(formation_),
                              'Bonjour,\n' +
-                             'La confirmation du PV de délibération de ' + str(
-                                 formation_) + ' et envoi des décisions est terminée \n' +
+                             'La confirmation du PV de dأ©libأ©ration de ' + str(
+                                 formation_) + ' et envoi des dأ©cisions est terminأ©e \n' +
                              erreur_envoi +
                              'Nous vous en remercions \n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email])
+                             'Dأ©partement', to=[user.email])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=False)
 
@@ -3504,12 +3509,12 @@ def task_confirmer_deliberation(formation_, user):
             raise Exception
         else:
             email = EmailMessage(
-                '[Talents] Erreur lors de la confirmation du PV de délibération la formation ' + str(formation_),
+                '[Talents] Erreur lors de la confirmation du PV de dأ©libأ©ration la formation ' + str(formation_),
                 'Bonjour,\n' +
-                'Une erreur s\'est produite lors de la confirmation des délibérations de la formation ' + str(
+                'Une erreur s\'est produite lors de la confirmation des dأ©libأ©rations de la formation ' + str(
                     formation_) + '\n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -3529,18 +3534,18 @@ def task_confirmer_deliberation(formation_, user):
 #
 #             try:
 #                 email_= inscription_.etudiant.user.email
-#                 email = EmailMessage('[Talents] Décision du Jury de Déliberation',
+#                 email = EmailMessage('[Talents] Dأ©cision du Jury de Dأ©liberation',
 #                                      'Bonjour '+str(inscription_.etudiant.nom)+' '+str(inscription_.etudiant.prenom)+',\n'+
-#                                      'Le jury a délibéré\n'+
+#                                      'Le jury a dأ©libأ©rأ©\n'+
 #                                      'Identification: '+str(inscription_.etudiant)+'\n'+
-#                                      'Décision du jury: '+dict(DECISIONS_JURY)[inscription_.decision_jury]+'\n'+
+#                                      'Dأ©cision du jury: '+dict(DECISIONS_JURY)[inscription_.decision_jury]+'\n'+
 #                                      'Moyenne Annuelle: '+str(inscription_.moy)+'\n'+
 #                                       moyenne_rachat_str +
 #                                      'Rang: '+str(inscription_.rang)+'\n'+
-#                                      'Vous pouvez avoir accès à tous les détails concernant vos résultats dans votre compte Talents.\n'+
-#                                      'Ceci est un message automatique. Il ne peut servir pour faire valoir vos droits. Seul le PV signé par le conseil fait foi.\n'+
+#                                      'Vous pouvez avoir accأ¨s أ  tous les dأ©tails concernant vos rأ©sultats dans votre compte Talents.\n'+
+#                                      'Ceci est un message automatique. Il ne peut servir pour faire valoir vos droits. Seul le PV signأ© par le conseil fait foi.\n'+
 #                                      'Bien cordialement.\n'+
-#                                      'Département', to=[email_] )
+#                                      'Dأ©partement', to=[email_] )
 #                 if settings.EMAIL_ENABLED :
 #                     email.send(fail_silently=False)
 #             except Exception:
@@ -3549,13 +3554,13 @@ def task_confirmer_deliberation(formation_, user):
 #
 #         erreur_envoi= 'Erreurs d\'envoi de notifications :\n'+ non_envoye if non_envoye != '' else ''
 #
-#         email = EmailMessage('[Talents] Confirmation des délibérations de la formation '+str(formation_),
+#         email = EmailMessage('[Talents] Confirmation des dأ©libأ©rations de la formation '+str(formation_),
 #                              'Bonjour,\n'+
-#                              'La confirmation du PV de délibération de '+str(formation_)+' et envoi des décisions est terminée \n'+
+#                              'La confirmation du PV de dأ©libأ©ration de '+str(formation_)+' et envoi des dأ©cisions est terminأ©e \n'+
 #                              erreur_envoi+
 #                              'Nous vous en remercions \n'+
 #                              'Bien cordialement.\n'+
-#                              'Département', to=[user.email] )
+#                              'Dأ©partement', to=[user.email] )
 #         if settings.EMAIL_ENABLED:
 #             email.send(fail_silently=False)
 #
@@ -3563,17 +3568,17 @@ def task_confirmer_deliberation(formation_, user):
 #         if settings.DEBUG:
 #             raise Exception
 #         else:
-#             email = EmailMessage('[Talents] Erreur lors de la confirmation du PV de délibération la formation '+str(formation_),
+#             email = EmailMessage('[Talents] Erreur lors de la confirmation du PV de dأ©libأ©ration la formation '+str(formation_),
 #                                  'Bonjour,\n'+
-#                                  'Une erreur s\'est produite lors de la confirmation des délibérations de la formation '+str(formation_)+'\n'+
+#                                  'Une erreur s\'est produite lors de la confirmation des dأ©libأ©rations de la formation '+str(formation_)+'\n'+
 #                                  'Bien cordialement.\n'+
-#                                  'Département', to=[user.email] )
+#                                  'Dأ©partement', to=[user.email] )
 #             if settings.EMAIL_ENABLED:
 #                 email.send(fail_silently=True)
 
 def deliberation_annuelle_settings_view(request, formation_pk):
     if not request.user.is_direction():
-        messages.error(request, "Vous n'avez pas les permissions pour accéder à cette vue.")
+        messages.error(request, "Vous n'avez pas les permissions pour accأ©der أ  cette vue.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -3589,13 +3594,13 @@ def deliberation_annuelle_settings_view(request, formation_pk):
             t.setDaemon(True)
             t.start()
             messages.info(request,
-                          "Votre demande de génération du PV est prise en compte. Vous recevrez une notification aussitôt généré.")
+                          "Votre demande de gأ©nأ©ration du PV est prise en compte. Vous recevrez une notification aussitأ´t gأ©nأ©rأ©.")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_pk, }))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = SelectPVAnnuelSettingsForm()
-        messages.info(request, "Indiquez la configuration du PV de délibération annuelle à générer.")
+        messages.info(request, "Indiquez la configuration du PV de dأ©libأ©ration annuelle أ  gأ©nأ©rer.")
     return render(request, 'scolar/deliberation_annuelle_settings.html', {'form': form, 'formation': formation_})
 
 
@@ -3604,7 +3609,7 @@ def deliberation_annuelle_settings_view(request, formation_pk):
 #     context={}
 #     data=form_.cleaned_data
 #     try:
-#         sort_=data['sort'] # indique comment trier les étudiants par rang (pour délibérer) ou par groupe (pour vérifier les notes)
+#         sort_=data['sort'] # indique comment trier les أ©tudiants par rang (pour dأ©libأ©rer) ou par groupe (pour vأ©rifier les notes)
 #
 #         periode_list ={}
 #         for periode_ in formation_.programme.periodes.all():
@@ -3657,22 +3662,22 @@ def deliberation_annuelle_settings_view(request, formation_pk):
 #         if settings.DEBUG:
 #             raise Exception
 #         else:
-#             email = EmailMessage('[Talents] Erreur lors de la génération du PV de  la formation '+str(formation_),
+#             email = EmailMessage('[Talents] Erreur lors de la gأ©nأ©ration du PV de  la formation '+str(formation_),
 #                                  'Bonjour,\n'+
-#                                  'Une erreur s\'est produite lors de la génération de la formation '+str(formation_)+'\n'+
-#                                  'Veuillez vérifier les notes et réessayer \n'+
+#                                  'Une erreur s\'est produite lors de la gأ©nأ©ration de la formation '+str(formation_)+'\n'+
+#                                  'Veuillez vأ©rifier les notes et rأ©essayer \n'+
 #                                  'Bien cordialement.\n'+
-#                                  'Département', to=[user.email] )
+#                                  'Dأ©partement', to=[user.email] )
 #             if settings.EMAIL_ENABLED:
 #                 email.send(fail_silently=True)
 #     else:
-#         print('[Talents] Confirmation de la génération du PV de la formation '+str(formation_))
-#         email = EmailMessage('[Talents] Confirmation de la génération du PV de la formation '+str(formation_),
+#         print('[Talents] Confirmation de la gأ©nأ©ration du PV de la formation '+str(formation_))
+#         email = EmailMessage('[Talents] Confirmation de la gأ©nأ©ration du PV de la formation '+str(formation_),
 #                              'Bonjour,\n'+
-#                              'La génération du PV de délibération de '+str(formation_)+' est terminée \n'+
+#                              'La gأ©nأ©ration du PV de dأ©libأ©ration de '+str(formation_)+' est terminأ©e \n'+
 #                              'Nous vous en remercions \n'+
 #                              'Bien cordialement.\n'+
-#                              'Département', to=[user.email] )
+#                              'Dأ©partement', to=[user.email] )
 #         if settings.EMAIL_ENABLED:
 #             email.send(fail_silently=True)
 
@@ -3683,7 +3688,7 @@ def task_deliberation_annuelle(form_, formation_, user):
     data = form_.cleaned_data
     try:
         sort_ = data[
-            'sort']  # indique comment trier les étudiants par rang (pour délibérer) ou par groupe (pour vérifier les notes)
+            'sort']  # indique comment trier les أ©tudiants par rang (pour dأ©libأ©rer) ou par groupe (pour vأ©rifier les notes)
 
         header = ['Matricule', 'Nom', 'Prenom']
         periode_list = {}
@@ -3797,12 +3802,12 @@ def task_deliberation_annuelle(form_, formation_, user):
 
             filename = "PV_" + str(formation_) + '.xlsx'
             filename = filename.replace(' ', '_')
-            email = EmailMessage('[Talents] Génération du PV de ' + str(formation_),
+            email = EmailMessage('[Talents] Gأ©nأ©ration du PV de ' + str(formation_),
                                  'Bonjour,\n' +
-                                 'La génération du PV de délibération de ' + str(formation_) + ' est terminée \n' +
+                                 'La gأ©nأ©ration du PV de dأ©libأ©ration de ' + str(formation_) + ' est terminأ©e \n' +
                                  'Veuillez trouver ci-joint le PV au format Excel\n' +
                                  'Bien cordialement.\n' +
-                                 'Département',
+                                 'Dأ©partement',
                                  to=[user.email, formation_.programme.departement.responsable.user.email] +
                                     settings.STAFF_EMAILS['scolarite'] +
                                     settings.STAFF_EMAILS['direction'])
@@ -3814,22 +3819,22 @@ def task_deliberation_annuelle(form_, formation_, user):
         if settings.DEBUG:
             raise Exception
         else:
-            email = EmailMessage('[Talents] Erreur lors de la génération du PV de  la formation ' + str(formation_),
+            email = EmailMessage('[Talents] Erreur lors de la gأ©nأ©ration du PV de  la formation ' + str(formation_),
                                  'Bonjour,\n' +
-                                 'Une erreur s\'est produite lors de la génération de la formation ' + str(
+                                 'Une erreur s\'est produite lors de la gأ©nأ©ration de la formation ' + str(
                                      formation_) + '\n' +
-                                 'Veuillez vérifier les notes et réessayer \n' +
+                                 'Veuillez vأ©rifier les notes et rأ©essayer \n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[user.email])
+                                 'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
     else:
         if not data['xls']:
-            email = EmailMessage('[Talents] Confirmation de la Génération du PV de ' + str(formation_),
+            email = EmailMessage('[Talents] Confirmation de la Gأ©nأ©ration du PV de ' + str(formation_),
                                  'Bonjour,\n' +
-                                 'La génération du PV de délibération de ' + str(formation_) + ' est terminée \n' +
+                                 'La gأ©nأ©ration du PV de dأ©libأ©ration de ' + str(formation_) + ' est terminأ©e \n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[user.email])
+                                 'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -3837,7 +3842,7 @@ def task_deliberation_annuelle(form_, formation_, user):
 @login_required
 def export_pv_view(request, formation_pk):
     if not (request.user.is_scolarite() or request.user.is_direction()):
-        messages.error(request, "Vous n'êtes pas autorisé à excéuter cette opération.")
+        messages.error(request, "Vous n'أھtes pas autorisأ© أ  excأ©uter cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     try:
@@ -3919,13 +3924,13 @@ def export_pv_view(request, formation_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: Il y a eu une erreur lors de l'export du PV. Merci de le signaler à l'administrateur.")
+                           "ERREUR: Il y a eu une erreur lors de l'export du PV. Merci de le signaler أ  l'administrateur.")
     return response
 
 
 # def get_resultat_list_provisoire_context(formation_pk, matieres_moyenne, periode_cible):
 #     """
-#     cette fonction fabrique le context des résultats détaillés par semestre/UE/matière pour chaque inscrit
+#     cette fonction fabrique le context des rأ©sultats dأ©taillأ©s par semestre/UE/matiأ¨re pour chaque inscrit
 #     """
 #     formation_=Formation.objects.get(id = formation_pk)
 #     inscription_list=formation_.inscriptions_pour_deliberations()
@@ -3978,7 +3983,7 @@ def export_pv_view(request, formation_pk):
 
 def get_resultat_list_provisoire_context(formation_pk, matieres_moyenne):
     """
-    cette fonction fabrique le context des résultats détaillés par semestre/UE/matière pour chaque inscrit
+    cette fonction fabrique le context des rأ©sultats dأ©taillأ©s par semestre/UE/matiأ¨re pour chaque inscrit
     """
     formation_ = Formation.objects.get(id=formation_pk)
     inscription_list = formation_.inscriptions_pour_deliberations()
@@ -4017,7 +4022,7 @@ def get_resultat_list_provisoire_context(formation_pk, matieres_moyenne):
 
 def deliberation_provisoire_settings_view(request, formation_pk, periode_pk):
     if not request.user.is_direction():
-        messages.error(request, "Vous n'avez pas les permissions pour accéder à cette vue.")
+        messages.error(request, "Vous n'avez pas les permissions pour accأ©der أ  cette vue.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -4034,7 +4039,7 @@ def deliberation_provisoire_settings_view(request, formation_pk, periode_pk):
             t.setDaemon(True)
             t.start()
             messages.info(request,
-                          "Votre demande de génération du PV est prise en compte. Vous recevrez une notification aussitôt généré.")
+                          "Votre demande de gأ©nأ©ration du PV est prise en compte. Vous recevrez une notification aussitأ´t gأ©nأ©rأ©.")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_pk, }))
             # return HttpResponseRedirect("%s?%s" % (reverse('deliberation_provisoire', kwargs={'formation_pk':formation_pk, 'periode_pk':periode_pk}),
@@ -4042,7 +4047,7 @@ def deliberation_provisoire_settings_view(request, formation_pk, periode_pk):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = SelectPVSettingsForm(formation_pk)
-        messages.info(request, "Indiquez la configuration du PV de délibération semestrielle à générer.")
+        messages.info(request, "Indiquez la configuration du PV de dأ©libأ©ration semestrielle أ  gأ©nأ©rer.")
     return render(request, 'scolar/deliberation_provisoire_settings.html',
                   {'form': form, 'formation': formation_, 'periode': periode_})
 
@@ -4118,22 +4123,22 @@ def deliberation_provisoire_settings_view(request, formation_pk, periode_pk):
 #         if settings.DEBUG:
 #             raise Exception
 #         else:
-#             email = EmailMessage('[Talents] Erreur lors de la génération du PV de  la formation '+str(formation_),
+#             email = EmailMessage('[Talents] Erreur lors de la gأ©nأ©ration du PV de  la formation '+str(formation_),
 #                                  'Bonjour,\n'+
-#                                  'Une erreur s\'est produite lors de la génération de la formation '+str(formation_)+'\n'+
-#                                  'Veuillez vérifier les notes et réessayer \n'+
+#                                  'Une erreur s\'est produite lors de la gأ©nأ©ration de la formation '+str(formation_)+'\n'+
+#                                  'Veuillez vأ©rifier les notes et rأ©essayer \n'+
 #                                  'Bien cordialement.\n'+
-#                                  'Département', to=[user.email] )
+#                                  'Dأ©partement', to=[user.email] )
 #             if settings.EMAIL_ENABLED:
 #                 email.send(fail_silently=True)
 #     else:
-#         print('[Talents] Confirmation de la génération du PV de la formation ')
-#         email = EmailMessage('[Talents] Confirmation de la génération du PV de la formation '+str(formation_),
+#         print('[Talents] Confirmation de la gأ©nأ©ration du PV de la formation ')
+#         email = EmailMessage('[Talents] Confirmation de la gأ©nأ©ration du PV de la formation '+str(formation_),
 #                              'Bonjour,\n'+
-#                              'La génération du PV de délibération de '+str(formation_)+' est terminée \n'+
+#                              'La gأ©nأ©ration du PV de dأ©libأ©ration de '+str(formation_)+' est terminأ©e \n'+
 #                              'Nous vous en remercions \n'+
 #                              'Bien cordialement.\n'+
-#                              'Département', to=[user.email] )
+#                              'Dأ©partement', to=[user.email] )
 #         if settings.EMAIL_ENABLED:
 #             email.send(fail_silently=True)
 
@@ -4174,15 +4179,15 @@ def task_deliberation_provisoire(form_, formation_, periode, user):
             item['id'] = inscrit.id
             item['moy'] = resultat_list[inscrit.etudiant.matricule + '_' + periode.code + '_moy']
             inscrits_list.append(item)
-        # trier les inscrits selon la moyenne portant sur les matières choisies
+        # trier les inscrits selon la moyenne portant sur les matiأ¨res choisies
         inscrits_list.sort(key=operator.itemgetter('moy'), reverse=True)
         # calculer la rang de chaque inscrit et l'annoter avec
         # extraire la liste des moyennes
         moyenne_list = []
         for inscrit in inscrits_list:
             moyenne_list.append(inscrit['moy'])
-        # reconstruire la liste des inscrits triée
-        # calculer le rang au même temps
+        # reconstruire la liste des inscrits triأ©e
+        # calculer le rang au mأھme temps
         sorted_inscription_list = []
         rang_list = {}
         for inscrit in inscrits_list:
@@ -4230,24 +4235,24 @@ def task_deliberation_provisoire(form_, formation_, periode, user):
         if settings.DEBUG:
             raise Exception
         else:
-            email = EmailMessage('[Talents] Erreur lors de la génération du PV de  la formation ' + str(formation_),
+            email = EmailMessage('[Talents] Erreur lors de la gأ©nأ©ration du PV de  la formation ' + str(formation_),
                                  'Bonjour,\n' +
-                                 'Une erreur s\'est produite lors de la génération de la formation ' + str(
+                                 'Une erreur s\'est produite lors de la gأ©nأ©ration de la formation ' + str(
                                      formation_) + '\n' +
-                                 'Veuillez vérifier les notes et réessayer \n' +
+                                 'Veuillez vأ©rifier les notes et rأ©essayer \n' +
                                  'Bien cordialement.\n' +
-                                 'Département' +
+                                 'Dأ©partement' +
                                  str(e), to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
     else:
-        print('[Talents] Confirmation de la génération du PV de la formation ')
-        email = EmailMessage('[Talents] Confirmation de la génération du PV de la formation ' + str(formation_),
+        print('[Talents] Confirmation de la gأ©nأ©ration du PV de la formation ')
+        email = EmailMessage('[Talents] Confirmation de la gأ©nأ©ration du PV de la formation ' + str(formation_),
                              'Bonjour,\n' +
-                             'La génération du PV de délibération de ' + str(formation_) + ' est terminée \n' +
+                             'La gأ©nأ©ration du PV de dأ©libأ©ration de ' + str(formation_) + ' est terminأ©e \n' +
                              'Nous vous en remercions \n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email])
+                             'Dأ©partement', to=[user.email])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
 
@@ -4272,14 +4277,14 @@ def deliberation_calcul_view(request, formation_pk):
         t.setDaemon(True)
         t.start()
         messages.success(request,
-                         "Votre demande de calcul des moyennes et rangs est prise en compte. Une notification vous sera transmise aussitôt terminée.")
+                         "Votre demande de calcul des moyennes et rangs est prise en compte. Une notification vous sera transmise aussitأ´t terminأ©e.")
         # redirect to a new URL:
     except Exception:
         if settings.DEBUG:
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: une erreur s'est produite lors de la demande de calcul des moyennes et rangs. Merci de le signaler à l'administrateur.")
+                           "ERREUR: une erreur s'est produite lors de la demande de calcul des moyennes et rangs. Merci de le signaler أ  l'administrateur.")
     return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_pk, }))
 
 
@@ -4287,7 +4292,7 @@ def deliberation_calcul_view(request, formation_pk):
 def task_deliberation_calcul(formation_, user):
     try:
         for inscription_ in formation_.inscriptions_pour_deliberations():
-            # màj moyenne et rang de chaque semestre
+            # mأ j moyenne et rang de chaque semestre
             for periode_ in inscription_.inscription_periodes.all():
                 periode_.moy = periode_.moyenne()
                 # periode_.moy_post_delib = periode_.moyenne_post_delib()
@@ -4302,7 +4307,7 @@ def task_deliberation_calcul(formation_, user):
                 periode_.rang = periode_.ranking()
                 periode_.save(update_fields=['rang'])
 
-                # màj ECTS pour chaque résultat et indiquer modules acquis
+                # mأ j ECTS pour chaque rأ©sultat et indiquer modules acquis
                 for ue_ in periode_.resultat_ues.all():
                     for resultat_ in ue_.resultat_matieres.all():
                         resultat_.ects = resultat_.calcul_ects()
@@ -4311,7 +4316,7 @@ def task_deliberation_calcul(formation_, user):
 
             inscription_.moy = inscription_.moyenne()
             # inscription_.moy_post_delib=inscription_.moyenne_post_delib()
-            # faire une proposition automatique de la décision selon la moyenne et décision actuelle (abandon, maladie ou encours
+            # faire une proposition automatique de la dأ©cision selon la moyenne et dأ©cision actuelle (abandon, maladie ou encours
             if inscription_.proposition_decision_jury == 'X':
                 if inscription_.moy >= 10 and inscription_.nb_ne() == 0:
                     if formation_.programme.concours:
@@ -4330,22 +4335,22 @@ def task_deliberation_calcul(formation_, user):
             raise Exception
         else:
             email = EmailMessage(
-                '[Talents] Erreur lors de la génération du PV de délibération de la formation ' + str(formation_),
+                '[Talents] Erreur lors de la gأ©nأ©ration du PV de dأ©libأ©ration de la formation ' + str(formation_),
                 'Bonjour,\n' +
-                'Une erreur s\'est produite lors de la génération du PV de délibération de la formation ' + str(
+                'Une erreur s\'est produite lors de la gأ©nأ©ration du PV de dأ©libأ©ration de la formation ' + str(
                     formation_) + '\n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
     else:
         email = EmailMessage(
-            '[Talents] Confirmation de calcul du PV de délibération de la formation ' + str(formation_),
+            '[Talents] Confirmation de calcul du PV de dأ©libأ©ration de la formation ' + str(formation_),
             'Bonjour,\n' +
-            'Le calcul du PV de délibération de ' + str(formation_) + ' est terminée \n' +
+            'Le calcul du PV de dأ©libأ©ration de ' + str(formation_) + ' est terminأ©e \n' +
             'Nous vous en remercions \n' +
             'Bien cordialement.\n' +
-            'Département', to=[user.email])
+            'Dأ©partement', to=[user.email])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
 
@@ -4374,20 +4379,20 @@ def note_eliminatoire_update_view(request, formation_pk):
                             module_.save(update_fields=['note_eliminatoire'])
             except Exception:
                 if settings.DEBUG:
-                    raise Exception("Erreur lors de la mise à jour des notes élimibatoire")
+                    raise Exception("Erreur lors de la mise أ  jour des notes أ©limibatoire")
                 else:
                     messages.error(request,
-                                   "ERREUR: les notes éliminatoires n'ont pu être mises à jours à cause d'erreurs lors du calcul.")
+                                   "ERREUR: les notes أ©liminatoires n'ont pu أھtre mises أ  jours أ  cause d'erreurs lors du calcul.")
                     return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_pk, }))
             # redirect to a new URL:
-            messages.success(request, "Les notes élimibatoires ont été enregistrées avec succès!")
-            messages.info(request, "Vous pouvez lancer le calcul du PV de délibérations.")
+            messages.success(request, "Les notes أ©limibatoires ont أ©tأ© enregistrأ©es avec succأ¨s!")
+            messages.info(request, "Vous pouvez lancer le calcul du PV de dأ©libأ©rations.")
             return render(request, 'scolar/note_eliminatoire_update.html',
                           {'form': form, 'module_list': module_list, 'formation': formation_})
             # if a GET (or any other method) we'll create a blank form
     else:
         form = SelectModuleForm(formation_pk)
-        messages.info(request, "Cochez les modules pour lesquels vous voulez enregistrer la note éliminatoire")
+        messages.info(request, "Cochez les modules pour lesquels vous voulez enregistrer la note أ©liminatoire")
     return render(request, 'scolar/note_eliminatoire_update.html',
                   {'form': form, 'module_list': module_list, 'formation': formation_})
 
@@ -4576,7 +4581,7 @@ class FeedbackUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTest
     model = Feedback
     fields = ['comment', 'show']
     template_name = 'scolar/update.html'
-    success_message = "Le feedback a été modifié avec succès!"
+    success_message = "Le feedback a أ©tأ© modifiأ© avec succأ¨s!"
 
     def test_func(self):
         return self.request.user.is_direction()
@@ -4591,14 +4596,14 @@ class FeedbackUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTest
 
 
 def feedback_etudiant_update_view(request, inscription_pk, periode_pk):
-    # attention il faut évaluer les modules suivis au niveau des activités qui peuvent être différents des modules
-    # prévus dans la programmation, par exemple un groupe SQ peut suivre un module TPRO des SL, mais dans son programme on prévoit un autre module TPRO des SQ
+    # attention il faut أ©valuer les modules suivis au niveau des activitأ©s qui peuvent أھtre diffأ©rents des modules
+    # prأ©vus dans la programmation, par exemple un groupe SQ peut suivre un module TPRO des SL, mais dans son programme on prأ©voit un autre module TPRO des SQ
     inscription_ = Inscription.objects.get(id=inscription_pk)
     periodepgm_ = PeriodeProgramme.objects.get(id=periode_pk)
     inscription_periode_ = InscriptionPeriode.objects.get(inscription=inscription_, periodepgm=periode_pk)
-    # TODO les questions ne sont pas adaptées au PFE, faut donc l'exclure et prévoir d'autres questions dans une maj
+    # TODO les questions ne sont pas adaptأ©es au PFE, faut donc l'exclure et prأ©voir d'autres questions dans une maj
     groupe_section = inscription_periode_.groupe.section.groupes.all().filter(
-        code__isnull=True).get()  # le groupe qui représente la section
+        code__isnull=True).get()  # le groupe qui reprأ©sente la section
     activites_suivies_list = Activite.objects.filter(cible__in=[inscription_periode_.groupe, groupe_section],
                                                      module__periode__periode=periodepgm_.periode,
                                                      module__matiere__pfe=False)
@@ -4649,20 +4654,20 @@ def feedback_etudiant_update_view(request, inscription_pk, periode_pk):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: L'introduction de votre avis s'est terminé avec des erreurs. Merci de le signaler à l'administrateur")
+                                   "ERREUR: L'introduction de votre avis s'est terminأ© avec des erreurs. Merci de le signaler أ  l'administrateur")
                     return HttpResponseRedirect(reverse('etudiant_activite'))
             messages.success(request,
-                             "Nous vous remercions. Votre avis sera pris en compte et transféré aux équipes pédagogiques")
+                             "Nous vous remercions. Votre avis sera pris en compte et transfأ©rأ© aux أ©quipes pأ©dagogiques")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('etudiant_activite'))
         else:
             messages.error(request,
-                           'Votre formulaire contient des erreures. Merci de vérifier que vous avez bien remplis tous les onglets de ce formulaire.')
+                           'Votre formulaire contient des erreures. Merci de vأ©rifier que vous avez bien remplis tous les onglets de ce formulaire.')
     # if a GET (or any other method) we'll create a blank form
     else:
         form = FeedbackUpdateForm(inscription_pk, periode_pk)
         messages.error(request,
-                       "Merci de renseigner le formulaire pour chacun des modules. Autrement l'évaluation ne sera pas enregistrée!")
+                       "Merci de renseigner le formulaire pour chacun des modules. Autrement l'أ©valuation ne sera pas enregistrأ©e!")
     return render(request, 'scolar/feedback_update_form.html', {'form': form, 'module_list': module_list})
 
 
@@ -4703,7 +4708,7 @@ class ModuleCopyView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
                                                           initial=0)
         form.fields['periode'] = forms.ModelChoiceField(
             queryset=PeriodeProgramme.objects.filter(programme=module_.formation.programme.id), initial=0)
-        form.helper.add_input(Submit('submit', 'Créer', css_class='btn-primary'))
+        form.helper.add_input(Submit('submit', 'Crأ©er', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse('planification_update',
                                    kwargs={'formation_pk': module_.formation.id, 'periode_pk': module_.periode.id})
@@ -4715,7 +4720,7 @@ class ModuleCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     fields = ['matiere', 'formation', 'coordinateur', 'periode']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_module'
-    success_message = "Le module a bien été créé."
+    success_message = "Le module a bien أ©tأ© crأ©أ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -4730,7 +4735,7 @@ class ModuleCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
         # form.fields['matiere']=forms.ModelChoiceField(queryset=Matiere.objects.filter(id__in=matieres_formation).order_by('code'))
         form.fields['matiere'] = forms.ModelChoiceField(
             queryset=Matiere.objects.filter(matiere_ues__periode__programme=formation_.programme).order_by('code'))
-        form.helper.add_input(Submit('submit', 'Créer', css_class='btn-primary'))
+        form.helper.add_input(Submit('submit', 'Crأ©er', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse('planification_update',
                                    kwargs={'formation_pk': formation_.id, 'periode_pk': periode_.id})
@@ -4770,16 +4775,16 @@ def module_evaluation_copy_view(request, module_pk):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: La copie de la fiche d'évaluation n'a pas réussit.")
-                    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Sélectionner un Module'})
-            messages.success(request, "La copie de la fiche d'évaluation s'est faite avec succès!")
+                    messages.error(request, "ERREUR: La copie de la fiche d'أ©valuation n'a pas rأ©ussit.")
+                    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Sأ©lectionner un Module'})
+            messages.success(request, "La copie de la fiche d'أ©valuation s'est faite avec succأ¨s!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('module_detail', kwargs={'pk': module_pk}))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = SelectSingleModuleForm()
-        messages.info(request, "Indiquez le module à partir duqeul vous voulez copier la fiche d'évaluation.")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Sélectionner un Module'})
+        messages.info(request, "Indiquez le module أ  partir duqeul vous voulez copier la fiche d'أ©valuation.")
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Sأ©lectionner un Module'})
 
 
 class ModuleUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
@@ -4787,7 +4792,7 @@ class ModuleUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     fields = ['coordinateur', 'periode', 'matiere']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_module'
-    success_message = "Le module a bien été modifié."
+    success_message = "Le module a bien أ©tأ© modifiأ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -4806,7 +4811,7 @@ class ModuleDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     model = Module
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_module'
-    success_message = "Le module a bien été supprimé."
+    success_message = "Le module a bien أ©tأ© supprimأ©."
 
     def get_success_url(self):
         return reverse('planification_update', kwargs={'formation_pk': self.kwargs.get('formation_pk'),
@@ -4815,7 +4820,7 @@ class ModuleDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
 
 @receiver(pre_delete, sender=Module)
 def update_resultat_module_delete(sender, instance, **kwargs):
-    # si un module suivi porte sur la même matière, basculer les résultats sur ce module
+    # si un module suivi porte sur la mأھme matiأ¨re, basculer les rأ©sultats sur ce module
     module_similaire_list = Module.objects.filter(formation=instance.formation,
                                                   matiere__code=instance.matiere.code).exclude(id=instance.id)
     if module_similaire_list.exists():
@@ -4834,7 +4839,7 @@ class ModulesSuivisUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permissio
     fields = ['module', 'groupe']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_modulessuivis'
-    success_message = "La modification du déroulement du module pour ce groupe a bien été effectuée."
+    success_message = "La modification du dأ©roulement du module pour ce groupe a bien أ©tأ© effectuأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -4852,7 +4857,7 @@ class ModulesSuivisCreateView(LoginRequiredMixin, SuccessMessageMixin, Permissio
     fields = ['module', 'groupe']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_modulessuivis'
-    success_message = "L'affectation du module au groupe a bien été effectuée."
+    success_message = "L'affectation du module au groupe a bien أ©tأ© effectuأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -4861,7 +4866,7 @@ class ModulesSuivisCreateView(LoginRequiredMixin, SuccessMessageMixin, Permissio
         groupe_ = get_object_or_404(Groupe, id=self.kwargs.get('groupe_pk'))
         form.fields['module'] = forms.ModelChoiceField(queryset=Module.objects.filter(id=module_.id), initial=0)
         form.fields['groupe'] = forms.ModelChoiceField(queryset=Groupe.objects.filter(id=groupe_.id), initial=0)
-        form.helper.add_input(Submit('submit', 'Créer', css_class='btn-primary'))
+        form.helper.add_input(Submit('submit', 'Crأ©er', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse('planification_update',
                                    kwargs={'formation_pk': module_.formation.id, 'periode_pk': module_.periode.id})
@@ -4880,7 +4885,7 @@ class ModulesSuivisDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permissio
     model = ModulesSuivis
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_modulessuivis'
-    success_message = "Le module a bien été retiré au groupe."
+    success_message = "Le module a bien أ©tأ© retirأ© au groupe."
 
     def get_success_url(self):
         return reverse('planification_update', kwargs={'formation_pk': self.kwargs.get('formation_pk'),
@@ -4907,7 +4912,7 @@ class AbsenceChart(Chart):
         self.labels = []
         self.data = []
         periode_ = PeriodeProgramme.objects.get(id=periode_pk)
-        self.titre = "Nombre d'absences par matière : " + str(periode_.periode.code)
+        self.titre = "Nombre d'absences par matiأ¨re : " + str(periode_.periode.code)
         try:
             inscription_etudiant = get_object_or_404(Inscription, etudiant=etudiant_pk,
                                                      formation__annee_univ__encours=True,
@@ -4935,7 +4940,7 @@ class AbsenceChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: la génération du graphique des absences s'est terminée avec echec!")
+                               "ERREUR: la gأ©nأ©ration du graphique des absences s'est terminأ©e avec echec!")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -4981,7 +4986,7 @@ class ProfileChart(Chart):
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors dde la génération du graphique du profil.")
+                messages.error(self.request, "ERREUR: lors dde la gأ©nأ©ration du graphique du profil.")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5051,7 +5056,7 @@ class EtudiantEffectifsChart(Chart):
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la génération du graphique des effectifs étudiants")
+                messages.error(self.request, "ERREUR: lors de la gأ©nأ©ration du graphique des effectifs أ©tudiants")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5080,7 +5085,7 @@ class AbsenceLiveChart(Chart):
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la génération du graphique du nombre d'absences par jour")
+                messages.error(self.request, "ERREUR: lors de la gأ©nأ©ration du graphique du nombre d'absences par jour")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5109,7 +5114,7 @@ class EtudiantWilayaResidenceChart(Chart):
             inscriptions_encours = Inscription.objects.filter(formation__annee_univ__annee_univ=annee_univ_pk).exclude(
                 Q(decision_jury='X') | Q(inscription_periodes__groupe__isnull=True) | Q(
                     decision_jury__startswith='F')).values('etudiant')
-            # les étudiants en master ont une double inscription
+            # les أ©tudiants en master ont une double inscription
             etudiants_encours_aggregate = Etudiant.objects.filter(matricule__in=inscriptions_encours).distinct().values(
                 'wilaya_residence__nom').annotate(nb_etudiants=Count('matricule')).order_by('nb_etudiants')
 
@@ -5125,7 +5130,7 @@ class EtudiantWilayaResidenceChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du graphique d'aggrégat des Wilayas de résidence.")
+                               "ERREUR: lors de la gأ©nأ©ration du graphique d'aggrأ©gat des Wilayas de rأ©sidence.")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5146,7 +5151,7 @@ class EtudiantInterneChart(Chart):
             inscriptions_encours = Inscription.objects.filter(formation__annee_univ__annee_univ=annee_univ_pk).exclude(
                 Q(decision_jury='X') | Q(inscription_periodes__groupe__isnull=True) | Q(
                     decision_jury__startswith='F')).values('etudiant')
-            # les étudiants en master ont une double inscription
+            # les أ©tudiants en master ont une double inscription
             etudiants_encours_aggregate = Etudiant.objects.filter(matricule__in=inscriptions_encours).distinct().values(
                 'interne').annotate(nb_etudiants=Count('matricule')).order_by('nb_etudiants')
             total = Etudiant.objects.filter(matricule__in=inscriptions_encours).distinct().count()
@@ -5160,7 +5165,7 @@ class EtudiantInterneChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du graphique d'aggrégat des Wilayas de résidence.")
+                               "ERREUR: lors de la gأ©nأ©ration du graphique d'aggrأ©gat des Wilayas de rأ©sidence.")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5183,7 +5188,7 @@ class DashboardEtudiantView(LoginRequiredMixin, TemplateView):
             formation__annee_univ__annee_univ=annee_univ_encours_pk).exclude(
             Q(decision_jury='X') | Q(inscription_periodes__groupe__isnull=True) | Q(
                 decision_jury__startswith='F')).values('etudiant')
-        # les étudiants en master ont une double inscription
+        # les أ©tudiants en master ont une double inscription
         etudiants_encours_aggregate = Etudiant.objects.filter(matricule__in=inscriptions_encours).distinct().values(
             'wilaya_residence__nom').annotate(nb_etudiants=Count('matricule')).order_by('-nb_etudiants')
         context['wilayas_aggregate'] = etudiants_encours_aggregate
@@ -5220,7 +5225,7 @@ class FormationDecisionJuryChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du graphique d'aggrégat des décisions de jury.")
+                               "ERREUR: lors de la gأ©nأ©ration du graphique d'aggrأ©gat des dأ©cisions de jury.")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5256,17 +5261,17 @@ class ProgrammeAvgDecisionJuryChart(Chart):
 
             decision_list = [
                 {
-                    'label': 'Succès %: Admis et Rachat',
+                    'label': 'Succأ¨s %: Admis et Rachat',
                     'decision': 'success',
                     'color': (0, 153, 51)
                 },
                 {
-                    'label': 'Echec %: Réorientés et Abandons',
+                    'label': 'Echec %: Rأ©orientأ©s et Abandons',
                     'decision': 'echec',
                     'color': (255, 51, 0)
                 },
                 {
-                    'label': 'Seconde chance %: Redoublants et Congés de Maladie',
+                    'label': 'Seconde chance %: Redoublants et Congأ©s de Maladie',
                     'decision': 'refaire',
                     'color': (255, 255, 102)
                 },
@@ -5287,7 +5292,7 @@ class ProgrammeAvgDecisionJuryChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du graphique des aggrégats de décision de jury par programme")
+                               "ERREUR: lors de la gأ©nأ©ration du graphique des aggrأ©gats de dأ©cision de jury par programme")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5345,7 +5350,7 @@ class AbsenceEnseignantLiveChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du graphique du nombre d'absences enseignants par jour")
+                               "ERREUR: lors de la gأ©nأ©ration du graphique du nombre d'absences enseignants par jour")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5405,7 +5410,7 @@ class EnseignantChargeChart(Chart):
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la génération du graphique de répartition des charges")
+                messages.error(self.request, "ERREUR: lors de la gأ©nأ©ration du graphique de rأ©partition des charges")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5468,7 +5473,7 @@ class EnseignantEffectifsChart(Chart):
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la génération du graphique des effectifs enseignants")
+                messages.error(self.request, "ERREUR: lors de la gأ©nأ©ration du graphique des effectifs enseignants")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5507,7 +5512,7 @@ class EnseignantGradeChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du graphique d'aggrégat des grades des enseignants.")
+                               "ERREUR: lors de la gأ©nأ©ration du graphique d'aggrأ©gat des grades des enseignants.")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -5585,12 +5590,13 @@ class EtudiantDetailView(UserPassesTestMixin, DetailView):
         except Inscription.DoesNotExist:
             pass
         else:
-            # générer un chart pour chaque periode (semestre)
+            # gأ©nأ©rer un chart pour chaque periode (semestre)
             absence_chart_list = []
             for inscription_encours in inscription_encours_list:
                 for periode in inscription_encours.formation.programme.periodes.all():
                     absence_chart_list.append(AbsenceChart(etudiant_pk=self.kwargs.get('pk'), periode_pk=periode.id))
             context['absence_chart_list'] = absence_chart_list
+            
 
         return context
 
@@ -5603,7 +5609,7 @@ class EtudiantUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
               'interne', 'residence_univ', 'tel', 'numero_securite_sociale', 'activite_extra', 'tuteur']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_etudiant'
-    success_message = "Le dossier étudiant a été modifié avec succès!"
+    success_message = "Le dossier أ©tudiant a أ©tأ© modifiأ© avec succأ¨s!"
 
     def test_func(self):
         return self.request.user.is_staff_only()
@@ -5614,9 +5620,9 @@ class EtudiantUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
         form.fields['date_naissance'] = forms.DateField(input_formats=settings.DATE_INPUT_FORMATS,
                                                         widget=DatePickerInput(format='%d/%m/%Y'))
         form.fields[
-            'photo'].help_text = "Si vous voulez changer de photo, merci de déposer ici un scan d'une photo d'identité. Taille maximale 1M."
+            'photo'].help_text = "Si vous voulez changer de photo, merci de dأ©poser ici un scan d'une photo d'identitأ©. Taille maximale 1M."
         form.fields[
-            'numero_securite_sociale'].help_text = "Merci d'indiquer le numéro figurant sur l'ATS ou carte CHIFA."
+            'numero_securite_sociale'].help_text = "Merci d'indiquer le numأ©ro figurant sur l'ATS ou carte CHIFA."
         form.fields['wilaya_naissance'] = forms.ModelChoiceField(
             queryset=Wilaya.objects.all().order_by('nom'),
             label=u"Wilaya de naissance",
@@ -5629,7 +5635,7 @@ class EtudiantUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
 
         form.fields['wilaya_residence'] = forms.ModelChoiceField(
             queryset=Wilaya.objects.all().order_by('nom'),
-            label=u"Wilaya de résidence principale",
+            label=u"Wilaya de rأ©sidence principale",
             widget=ModelSelect2Widget(
                 model=Wilaya,
                 search_fields=['nom__icontains', ],
@@ -5638,7 +5644,7 @@ class EtudiantUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
         )
         form.fields['commune_residence'] = forms.ModelChoiceField(
             queryset=Commune.objects.all().order_by('nom'),
-            label=u"Commune de résidence principale",
+            label=u"Commune de rأ©sidence principale",
             widget=ModelSelect2Widget(
                 model=Commune,
                 search_fields=['nom__icontains', ],
@@ -5657,13 +5663,13 @@ class EtudiantProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPas
     model = Etudiant
     fields = ['public_profile', 'github', 'linkdin', 'activite_extra', ]
     template_name = 'scolar/update.html'
-    success_message = "Votre dossier a été mis à jour avec succès!"
+    success_message = "Votre dossier a أ©tأ© mis أ  jour avec succأ¨s!"
 
     def test_func(self):
         if self.request.user.etudiant.matricule == self.kwargs.get('pk'):
             messages.info(self.request, "Utilisez ce formulaire pour rendre votre profile visible sur Talents Finder!")
             messages.info(self.request,
-                          "Si vous voulez rajouter des activités extra-scolaire, merci d'en faire la demande à votre tuteur ou chef de département.")
+                          "Si vous voulez rajouter des activitأ©s extra-scolaire, merci d'en faire la demande أ  votre tuteur ou chef de dأ©partement.")
             return True
         else:
             return False
@@ -5682,15 +5688,15 @@ class EtudiantActiviteExtraUpdateView(LoginRequiredMixin, SuccessMessageMixin, U
     model = Etudiant
     fields = ['activite_extra', ]
     template_name = 'scolar/update.html'
-    success_message = "Le dossier de votre étudiant a été mis à jour avec succès!"
+    success_message = "Le dossier de votre أ©tudiant a أ©tأ© mis أ  jour avec succأ¨s!"
 
     def test_func(self):
         if self.request.user.is_tuteur(self.kwargs.get('pk')):
-            messages.info(self.request, "Utilisez ce formulaire pour rajouter des activités extra-scolaires.")
+            messages.info(self.request, "Utilisez ce formulaire pour rajouter des activitأ©s extra-scolaires.")
             messages.info(self.request,
-                          "Merci de se limiter aux activités officiellement reconnues à l'école dans le cadre de la vie associative et sportive.")
+                          "Merci de se limiter aux activitأ©s officiellement reconnues أ  l'أ©cole dans le cadre de la vie associative et sportive.")
             messages.warning(self.request,
-                             "Merci de vérifier la véracité des informations auprès du service des activités associatives et sportives.")
+                             "Merci de vأ©rifier la vأ©racitأ© des informations auprأ¨s du service des activitأ©s associatives et sportives.")
             return True
         else:
             return False
@@ -5765,13 +5771,13 @@ class EtudiantDocumentsListView(LoginRequiredMixin, UserPassesTestMixin, Templat
             documents['Situation Certificate ' + str(inscription_.formation)] = reverse("situation_certificate_pdf",
                                                                                         kwargs={
                                                                                             'inscription_pk': inscription_.id})
-            documents["Attestation d'études en français " + str(inscription_.formation)] = reverse(
+            documents["Attestation d'أ©tudes en franأ§ais " + str(inscription_.formation)] = reverse(
                 "attestation_etudes_francais_pdf", kwargs={'inscription_pk': inscription_.id})
         for diplome in Diplome.objects.all():
             inscriptions = Inscription.objects.filter(etudiant=self.kwargs.get('etudiant_pk'),
                                                       formation__programme__diplome=diplome)
             if inscriptions.exists():
-                documents["Relevé de Notes Global du Diplome " + str(diplome)] = reverse('releve_notes_global_pdf',
+                documents["Relevأ© de Notes Global du Diplome " + str(diplome)] = reverse('releve_notes_global_pdf',
                                                                                          kwargs={
                                                                                              'etudiant_pk': self.kwargs.get(
                                                                                                  'etudiant_pk'),
@@ -5784,10 +5790,10 @@ class EtudiantDocumentsListView(LoginRequiredMixin, UserPassesTestMixin, Templat
 def inscription_update_view(request, pk):
     inscription_ = get_object_or_404(Inscription, id=pk)
     if not (request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas la permission d'accès à cette fonction.")
+        messages.error(request, "Vous n'avez pas la permission d'accأ¨s أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
     elif inscription_.formation.archive:
-        messages.error(request, "Cette formation est archivée, il n'est pas possible de modifier cette inscription.")
+        messages.error(request, "Cette formation est archivأ©e, il n'est pas possible de modifier cette inscription.")
         return redirect('inscription_list')
 
     # if this is a POST request we need to process the form data
@@ -5810,9 +5816,9 @@ def inscription_update_view(request, pk):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: La modification de l'inscription s'est terminée avec des erreurs.")
+                    messages.error(request, "ERREUR: La modification de l'inscription s'est terminأ©e avec des erreurs.")
                     render(request, 'scolar/import.html', {'form': form, 'titre': 'Modification d\'une Inscription'})
-            messages.success(request, "La modification de l'inscription a été réalisée avec succès!")
+            messages.success(request, "La modification de l'inscription a أ©tأ© rأ©alisأ©e avec succأ¨s!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('etudiant_list'))
             # if a GET (or any other method) we'll create a blank form
@@ -5825,7 +5831,7 @@ class InscriptionDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
     permission_required = 'scolar.delete_inscription'
     model = Inscription
     template_name = 'scolar/delete.html'
-    success_message = "L'inscription a bien été supprimée."
+    success_message = "L'inscription a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('etudiant_detail', kwargs={'pk': self.kwargs.get('etudiant_pk')})
@@ -5836,7 +5842,7 @@ class InscriptionCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
     fields = ['etudiant', 'formation']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_inscription'
-    success_message = "La nouvelle inscription a été ajoutée avec succès!"
+    success_message = "La nouvelle inscription a أ©tأ© ajoutأ©e avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -5874,7 +5880,7 @@ class InscriptionListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateV
         if self.request.user.is_stage():
             btn_list['Import Affectations PFE'] = reverse('import_affectation_pfe')
         context['btn_list'] = btn_list
-        context['titre'] = 'Etudiants Inscrits Année en Cours'
+        context['titre'] = 'Etudiants Inscrits Annأ©e en Cours'
         return context
 
 
@@ -5887,9 +5893,9 @@ def inscription_annee_suivante_view(request, formation_pk):
         # t = threading.Thread(target=task_note_update,args=[form, module_, groupe_, request.user])
         # t.setDaemon(True)
         # t.start()
-        # messages.info(request, "Votre demande d'enregistrement des notes a été prise en compte. Une notification vous sera transmise.")
+        # messages.info(request, "Votre demande d'enregistrement des notes a أ©tأ© prise en compte. Une notification vous sera transmise.")
 
-        # inscrire les maladies et redoublants dans la même formation année suivante
+        # inscrire les maladies et redoublants dans la mأھme formation annأ©e suivante
         formation_idem_annee_suivante = formation_.formation_idem_annee_suivante()
         inscription_non_admis_list = Inscription.objects.filter(
             Q(formation=formation_) & (Q(decision_jury='R') | Q(decision_jury__startswith='M') | Q(decision_jury='AJ')))
@@ -5908,7 +5914,7 @@ def inscription_annee_suivante_view(request, formation_pk):
                                                                                       'etudiant': inscription_.etudiant,
                                                                                       'formation': formation_idem_annee_suivante,
                                                                                   })
-            # créer inscription_periodes selon le programme
+            # crأ©er inscription_periodes selon le programme
             for periode_ in formation_idem_annee_suivante.programme.periodes.all():
                 InscriptionPeriode.objects.update_or_create(inscription=nouvelle_inscription_, periodepgm=periode_,
                                                             defaults={
@@ -5919,7 +5925,7 @@ def inscription_annee_suivante_view(request, formation_pk):
         formation_sup_annee_suivante = formation_.formation_sup_annee_suivante()
         if formation_sup_annee_suivante == None:
 
-            # Ce cas correspond à l'année suivante qui requière le choix de spécialité
+            # Ce cas correspond أ  l'annأ©e suivante qui requiأ¨re le choix de spأ©cialitأ©
             return HttpResponseRedirect(reverse('inscriptions_import'))
         else:
             # inscrire les admis dans formation_sup_annee_suivante
@@ -5932,7 +5938,7 @@ def inscription_annee_suivante_view(request, formation_pk):
                                                                                           'etudiant': inscription_.etudiant,
                                                                                           'formation': formation_sup_annee_suivante,
                                                                                       })
-                # créer inscription_periodes selon le programme
+                # crأ©er inscription_periodes selon le programme
                 for periode_ in formation_sup_annee_suivante.programme.periodes.all():
                     InscriptionPeriode.objects.update_or_create(inscription=nouvelle_inscription_, periodepgm=periode_,
                                                                 defaults={
@@ -5940,14 +5946,14 @@ def inscription_annee_suivante_view(request, formation_pk):
                                                                     'periodepgm': periode_,
                                                                 })
 
-        messages.success(request, "Les inscriptions vers l'année suivante ont été réalisées avec succès!")
+        messages.success(request, "Les inscriptions vers l'annأ©e suivante ont أ©tأ© rأ©alisأ©es avec succأ¨s!")
         return HttpResponseRedirect(reverse('deliberation_detail', kwargs={'formation_pk': formation_pk, }))
     except Exception:
         if settings.DEBUG:
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors des inscriptions vers l'année suivante. Merci de le signaler à l'administrateur")
+                           "ERREUR: lors des inscriptions vers l'annأ©e suivante. Merci de le signaler أ  l'administrateur")
 
 
 class EnseignantListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
@@ -5993,7 +5999,7 @@ class EnseignantCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
               'situation', 'bureau', 'bal', 'webpage', 'edt']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_enseignant'
-    success_message = "L'enseignant a été ajouté avec succès!"
+    success_message = "L'enseignant a أ©tأ© ajoutأ© avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6015,7 +6021,7 @@ class EnseignantUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
               'situation', 'bureau', 'bal', 'webpage', 'edt']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_enseignant'
-    success_message = "Le dossier de l'enseignant(e) a été modifié avec succès!"
+    success_message = "Le dossier de l'enseignant(e) a أ©tأ© modifiأ© avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6073,7 +6079,7 @@ class PublicEtudiantListView(TemplateView):
             if self.request.user.is_direction():
                 btn_list = {}
                 btn_list['Import Etudiants'] = reverse('etudiants_import')
-                btn_list['Import Màj Etudiants'] = reverse('etudiants_import_maj')
+                btn_list['Import Mأ j Etudiants'] = reverse('etudiants_import_maj')
                 btn_list['Import Tutorats'] = reverse('tutorats_import')
                 btn_list['Import Inscriptions'] = reverse('inscriptions_import')
                 btn_list['Import Affectations Groupes'] = reverse('import_affectation_groupe')
@@ -6081,9 +6087,9 @@ class PublicEtudiantListView(TemplateView):
                 context['btn_list'] = btn_list
         else:
             messages.warning(self.request,
-                             "N'apparaîtront ici que les étudiants ayant choisis de rendre leur profil public.")
-            messages.info(self.request, "Pour consulter plus de profils, merci de vous connecter à votre compte.")
-        context['titre'] = 'Liste des étudiants'
+                             "N'apparaأ®tront ici que les أ©tudiants ayant choisis de rendre leur profil public.")
+            messages.info(self.request, "Pour consulter plus de profils, merci de vous connecter أ  votre compte.")
+        context['titre'] = 'Liste des أ©tudiants'
         return context
 
 
@@ -6155,7 +6161,7 @@ def groupe_list_export_view(request, groupe_pk, periode_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des étudiants. Merci de le signaler à l'administrateur.")
+                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des أ©tudiants. Merci de le signaler أ  l'administrateur.")
     return response
 
 
@@ -6174,7 +6180,7 @@ class EtudiantGroupeListView(LoginRequiredMixin, PermissionRequiredMixin, Templa
         table = InscriptionGroupeTable(self.get_queryset(**kwargs), exclude=exclude_columns(self.request.user))
         RequestConfig(self.request).configure(table)
         context['table'] = table
-        context['titre'] = 'Liste des étudiants du groupe ' + str(self.groupe_)
+        context['titre'] = 'Liste des أ©tudiants du groupe ' + str(self.groupe_)
         # context['back'] = reverse('groupe_all_list')
 
         return context
@@ -6232,7 +6238,7 @@ def get_charge_context(enseignant_qs):
 @permission_required('scolar.view_charge')
 def charge_list_view(request):
     if not request.user.is_top_management():
-        messages.error(request, "Vous n'avez pas les permissions pour accéder à cette vue.")
+        messages.error(request, "Vous n'avez pas les permissions pour accأ©der أ  cette vue.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -6256,12 +6262,12 @@ def charge_list_view(request):
                     enseignant_filter.append(enseignant.id)
             qs = Enseignant.objects.filter(id__in=enseignant_filter)
 
-            messages.success(request, "Le filtre a été appliqué avec succès. Ci-après la liste des charges demandée.")
+            messages.success(request, "Le filtre a أ©tأ© appliquأ© avec succأ¨s. Ci-aprأ¨s la liste des charges demandأ©e.")
     else:
 
         form = ChargeFilterForm()
         qs = Enseignant.objects.filter(situation='A').order_by('nom', 'prenom')
-        messages.info(request, "Utilisez ce formulaire pour filtrer les charges selon les critères ci-après.")
+        messages.info(request, "Utilisez ce formulaire pour filtrer les charges selon les critأ¨res ci-aprأ¨s.")
     try:
         context = get_charge_context(qs)
     except Exception:
@@ -6269,7 +6275,7 @@ def charge_list_view(request):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de la création de la table des charges par enseignant. Merci de le signaler à l'administrateur.")
+                           "ERREUR: lors de la crأ©ation de la table des charges par enseignant. Merci de le signaler أ  l'administrateur.")
     context['form'] = form
     context['titre'] = "Liste des charges par enseignant"
     return render(request, 'scolar/charge_list.html', context)
@@ -6288,8 +6294,8 @@ class ChargeEnseignantView(LoginRequiredMixin, PermissionRequiredMixin, Template
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération de la liste des charges. Merci de le signaler à l'administrateur.")
-        context['titre'] = "Synthèse de la charge de M./Mme " + str(self.request.user.enseignant)
+                               "ERREUR: lors de la gأ©nأ©ration de la liste des charges. Merci de le signaler أ  l'administrateur.")
+        context['titre'] = "Synthأ¨se de la charge de M./Mme " + str(self.request.user.enseignant)
         return context
 
 
@@ -6318,14 +6324,14 @@ class ChargeEnseignantDetailView(LoginRequiredMixin, SuccessMessageMixin, Permis
                 raise Exception
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la table des charges d'un enseignant!")
-        context['titre'] = 'Charge détaillée de ' + str(enseignant_)
+        context['titre'] = 'Charge dأ©taillأ©e de ' + str(enseignant_)
         context['table'] = table
         if self.request.user.has_perm('scolar.add_charge'):
             context['create_btn'] = "Charge"
             context['create_url'] = reverse('charge_enseignant_create',
                                             kwargs={'enseignant_pk': self.kwargs.get('enseignant_pk')})
             btn_list = {}
-            btn_list['Ajout Charge Selon Modèle'] = reverse('charge_selon_config_create',
+            btn_list['Ajout Charge Selon Modأ¨le'] = reverse('charge_selon_config_create',
                                                             kwargs={'enseignant_pk': self.kwargs.get('enseignant_pk')})
             context['btn_list'] = btn_list
         context['back'] = reverse('charge_enseignant', kwargs={'enseignant_pk': self.kwargs.get('enseignant_pk')})
@@ -6338,14 +6344,14 @@ class ChargeEnseignantCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
     fields = ['type', 'obs', 'vh', 'vh_eq_td', 'annee_univ', 'periode', 'realisee_par', 'cree_par',
               'repeter_chaque_semaine']
     template_name = 'scolar/create.html'
-    success_message = "La charge a été rajoutée avec succès!"
+    success_message = "La charge a أ©tأ© rajoutأ©e avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.helper = FormHelper()
         messages.info(self.request, "Utilisez ce formulaire pour renseigner une nouvelle charge!")
         messages.warning(self.request,
-                         "Attention! Pour les activités d'enseignement, merci de passer par la Planification pour éviter toute incohérence!")
+                         "Attention! Pour les activitأ©s d'enseignement, merci de passer par la Planification pour أ©viter toute incohأ©rence!")
         form.fields['annee_univ'] = forms.ModelChoiceField(queryset=AnneeUniv.objects.filter(encours=True), initial=0,
                                                            required=True)
         form.fields['realisee_par'] = forms.ModelChoiceField(queryset=Enseignant.objects.all(),
@@ -6360,7 +6366,7 @@ class ChargeEnseignantCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
 
     def get_context_data(self, **kwargs):
         context = super(ChargeEnseignantCreateView, self).get_context_data(**kwargs)
-        titre = 'Créer une nouvelle charge'
+        titre = 'Crأ©er une nouvelle charge'
         context['titre'] = titre
         return context
 
@@ -6379,7 +6385,7 @@ def charge_batch_create_view(request):
                 charge_file = request.FILES['file']
                 dataset = Dataset()
                 imported_data = dataset.load(charge_file.read().decode('utf-8'), format='csv')
-                # la première ligne du fichier doit contenir des entêtes, au moins Nom, Prenom, Charge
+                # la premiأ¨re ligne du fichier doit contenir des entأھtes, au moins Nom, Prenom, Charge
                 # insert imported_data in charge table
                 form_data = form.cleaned_data
                 annee_univ_ = form_data['annee_univ']
@@ -6395,7 +6401,7 @@ def charge_batch_create_view(request):
                             enseignant_ = get_enseignant_list_from_str(row['Nom'])[0]
                     except Exception:
                         messages.error(request, "L'enseignant " + row[
-                            'Nom'] + " n'existe pas, veuillez corriger le nom ou l'insérer dans la base")
+                            'Nom'] + " n'existe pas, veuillez corriger le nom ou l'insأ©rer dans la base")
                         continue
                     vh_ = round(decimal.Decimal(row['Charge'].replace(',', '.')), 2)
                     Charge.objects.create(
@@ -6413,20 +6419,20 @@ def charge_batch_create_view(request):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: L'importation des charges s'est terminée avec des erreurs.")
-                    messages.info(request, "Indiquer le fichier .csv des charges à créer")
+                    messages.error(request, "ERREUR: L'importation des charges s'est terminأ©e avec des erreurs.")
+                    messages.info(request, "Indiquer le fichier .csv des charges أ  crأ©er")
                     messages.info(request,
-                                  "La première ligne du fichier doit comporter au moins les colonnes suivantes: Nom, Prenom, Charge")
+                                  "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Nom, Prenom, Charge")
                     render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Charges'})
-            messages.success(request, "L'importation des charges a été réalisée avec succès!")
+            messages.success(request, "L'importation des charges a أ©tأ© rأ©alisأ©e avec succأ¨s!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('charge_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportChargeForm()
-        messages.info(request, "Indiquer le fichier .csv des charges à créer")
+        messages.info(request, "Indiquer le fichier .csv des charges أ  crأ©er")
         messages.info(request,
-                      "La première ligne du fichier doit comporter au moins les colonnes suivantes: Nom, Prenom, Charge")
+                      "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Nom, Prenom, Charge")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Charges'})
 
 
@@ -6460,19 +6466,19 @@ def charge_selon_config_create_view(request, enseignant_pk):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: La création de charge selon modèle s'est terminée avec des erreurs. Merci de le signaler à l'administrateur")
+                                   "ERREUR: La crأ©ation de charge selon modأ¨le s'est terminأ©e avec des erreurs. Merci de le signaler أ  l'administrateur")
                     messages.info(request,
-                                  "Indiquez le type de charge et les informations compélementaires demandées dans ce formulaire.")
-                    render(request, 'scolar/import.html', {'form': form, 'titre': 'Sélection charge selon modèle'})
-            messages.success(request, "La création de charge a été réalisée avec succès!")
+                                  "Indiquez le type de charge et les informations compأ©lementaires demandأ©es dans ce formulaire.")
+                    render(request, 'scolar/import.html', {'form': form, 'titre': 'Sأ©lection charge selon modأ¨le'})
+            messages.success(request, "La crأ©ation de charge a أ©tأ© rأ©alisأ©e avec succأ¨s!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('charge_enseignant_detail', kwargs={'enseignant_pk': enseignant_pk}))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = SelectChargeConfigForm()
         messages.info(request,
-                      "Indiquez le type de charge et les informations compélementaires demandées dans ce formulaire.")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Sélection charge selon modèle'})
+                      "Indiquez le type de charge et les informations compأ©lementaires demandأ©es dans ce formulaire.")
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Sأ©lection charge selon modأ¨le'})
 
 
 class ActiviteChargeConfigListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -6491,7 +6497,7 @@ class ActiviteChargeConfigListView(LoginRequiredMixin, UserPassesTestMixin, Temp
         RequestConfig(self.request).configure(table)
 
         context['table'] = table
-        context['titre'] = 'Liste des configurations de charges liées à des activités pédagogiques'
+        context['titre'] = 'Liste des configurations de charges liأ©es أ  des activitأ©s pأ©dagogiques'
         context['back'] = reverse('settings')
         if self.request.user.has_perm('scolar.add_activitechargeconfig'):
             context['create_url'] = reverse('activite_charge_config_create')
@@ -6504,7 +6510,7 @@ class ActiviteChargeConfigCreateView(LoginRequiredMixin, SuccessMessageMixin, Pe
     model = ActiviteChargeConfig
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_activitechargeconfig'
-    success_message = "La configuration a été ajouté avec succès!"
+    success_message = "La configuration a أ©tأ© ajoutأ© avec succأ¨s!"
     fields = ['categorie', 'type', 'titre', 'vh', 'vh_eq_td', 'repeter_chaque_semaine', 'repartir_entre_intervenants']
 
     def get_form(self, form_class=None):
@@ -6525,7 +6531,7 @@ class ActiviteChargeConfigUpdateView(LoginRequiredMixin, SuccessMessageMixin, Pe
     model = ActiviteChargeConfig
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_activitechargeconfig'
-    success_message = "La configuration a été modifié avec succès!"
+    success_message = "La configuration a أ©tأ© modifiأ© avec succأ¨s!"
     fields = ['categorie', 'type', 'titre', 'vh', 'vh_eq_td', 'repeter_chaque_semaine', 'repartir_entre_intervenants']
 
     def get_form(self, form_class=None):
@@ -6541,7 +6547,7 @@ class ActiviteChargeConfigDeleteView(LoginRequiredMixin, SuccessMessageMixin, Pe
     permission_required = 'scolar.delete_activitechargeconfig'
     model = ActiviteChargeConfig
     template_name = 'scolar/delete.html'
-    success_message = "La configuration a bien été supprimée."
+    success_message = "La configuration a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('settings')
@@ -6549,7 +6555,7 @@ class ActiviteChargeConfigDeleteView(LoginRequiredMixin, SuccessMessageMixin, Pe
 
 def tutorat_import_view(request):
     if not (request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas les permissions pour effectuer cette opération.")
+        messages.error(request, "Vous n'avez pas les permissions pour effectuer cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -6562,15 +6568,15 @@ def tutorat_import_view(request):
                 tutorat_file = request.FILES['file']
                 dataset = Dataset()
                 imported_data = dataset.load(tutorat_file.read().decode('utf-8'), format='csv')
-                # la première ligne du fichier doit contenir des entêtes, au moins Matricule, Enseignant
+                # la premiأ¨re ligne du fichier doit contenir des entأھtes, au moins Matricule, Enseignant
                 # update Etudiant with tuteur
                 for row in imported_data.dict:
                     try:
                         etudiant_ = Etudiant.objects.get(matricule=row.get('Matricule'))
                         enseignant_ = get_enseignant_list_from_str(row.get('Enseignant'))[0]
                     except Exception:
-                        messages.error(request, "L'étudiant" + row.get('Matricule') + " ou l'enseignant " + row[
-                            'Enseignant'] + " n'existe pas, veuillez corriger le nom ou l'insérer dans la base")
+                        messages.error(request, "L'أ©tudiant" + row.get('Matricule') + " ou l'enseignant " + row[
+                            'Enseignant'] + " n'existe pas, veuillez corriger le nom ou l'insأ©rer dans la base")
                         continue
                     etudiant_.tuteur = enseignant_
                     etudiant_.save()
@@ -6578,20 +6584,20 @@ def tutorat_import_view(request):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: L'importation des tutorats s'est terminée avec des erreurs.")
-                    messages.info(request, "Indiquer le fichier .csv des tutorat à créer")
+                    messages.error(request, "ERREUR: L'importation des tutorats s'est terminأ©e avec des erreurs.")
+                    messages.info(request, "Indiquer le fichier .csv des tutorat أ  crأ©er")
                     messages.info(request,
-                                  "La première ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Enseignant")
+                                  "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Enseignant")
                     render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Tutorats'})
-            messages.success(request, "L'importation des tutorats a été réalisée avec succès!")
+            messages.success(request, "L'importation des tutorats a أ©tأ© rأ©alisأ©e avec succأ¨s!")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('etudiant_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportFileForm()
-        messages.info(request, "Indiquer le fichier .csv des tutorats à créer")
+        messages.info(request, "Indiquer le fichier .csv des tutorats أ  crأ©er")
         messages.info(request,
-                      "La première ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Enseignant")
+                      "La premiأ¨re ligne du fichier doit comporter au moins les colonnes suivantes: Matricule, Enseignant")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Importer des Tutorats'})
 
 
@@ -6601,7 +6607,7 @@ class ChargeEnseignantUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permis
     fields = ['type', 'obs', 'vh', 'vh_eq_td', 'annee_univ', 'periode', 'realisee_par', 'cree_par',
               'repeter_chaque_semaine']
     template_name = 'scolar/update.html'
-    success_message = "La charge a été modifiée avec succès!"
+    success_message = "La charge a أ©tأ© modifiأ©e avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6621,7 +6627,7 @@ class ChargeEnseignantDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permis
     permission_required = 'scolar.delete_charge'
     model = Charge
     template_name = 'scolar/delete.html'
-    success_message = "La charge a bien été supprimée."
+    success_message = "La charge a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('charge_enseignant_detail', kwargs={'enseignant_pk': self.kwargs.get('enseignant_pk')})
@@ -6632,7 +6638,7 @@ class ActiviteCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
     model = Activite
     fields = ['type', 'module', 'cible', 'assuree_par', 'vh']
     template_name = 'scolar/create.html'
-    success_message = "L'activité a été ajoutée avec succès!"
+    success_message = "L'activitأ© a أ©tأ© ajoutأ©e avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6653,7 +6659,7 @@ class ActiviteCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
                     model=Enseignant,
                     search_fields=['nom__icontains', 'prenom__icontains'],
                 ),
-                help_text="Sélection multiple possible. Tapez le nom ou prénom de l'enseignant ou deux espaces pour avoir la liste complète.",
+                help_text="Sأ©lection multiple possible. Tapez le nom ou prأ©nom de l'enseignant ou deux espaces pour avoir la liste complأ¨te.",
 
             )
             form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
@@ -6666,12 +6672,12 @@ class ActiviteCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de l'ajout de l'activité. Merci de le signaler à l'administrateur.")
+                               "ERREUR: lors de l'ajout de l'activitأ©. Merci de le signaler أ  l'administrateur.")
         return form
 
     def get_context_data(self, **kwargs):
         context = super(ActiviteCreateView, self).get_context_data(**kwargs)
-        titre = 'Créer une nouvelle activité'
+        titre = 'Crأ©er une nouvelle activitأ©'
         context['titre'] = titre
         return context
 
@@ -6681,7 +6687,7 @@ class ActiviteUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
     model = Activite
     fields = ['type', 'module', 'cible', 'assuree_par', 'vh']
     template_name = 'scolar/update.html'
-    success_message = "Activité modifiée avec succès!"
+    success_message = "Activitأ© modifiأ©e avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6702,7 +6708,7 @@ class ActiviteUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
                 model=Enseignant,
                 search_fields=['nom__icontains', 'prenom__icontains'],
             ),
-            help_text="Sélection multiple possible. Tapez le nom ou prénom de l'enseignant ou deux espaces pour avoir la liste complète.",
+            help_text="Sأ©lection multiple possible. Tapez le nom ou prأ©nom de l'enseignant ou deux espaces pour avoir la liste complأ¨te.",
 
         )
         form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-primary'))
@@ -6716,7 +6722,7 @@ class ActiviteDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
     permission_required = 'scolar.delete_activite'
     model = Activite
     template_name = 'scolar/delete.html'
-    success_message = "L'activité a bien été supprimée."
+    success_message = "L'activitأ© a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('planification_update', kwargs={'formation_pk': str(self.kwargs.get('formation_pk')),
@@ -6728,7 +6734,7 @@ class SpecialiteCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     model = Specialite
     fields = ['code', 'intitule', 'intitule_a', 'title']
     template_name = 'scolar/create.html'
-    success_message = "La spécialité a été bien créée."
+    success_message = "La spأ©cialitأ© a أ©tأ© bien crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6741,7 +6747,7 @@ class SpecialiteCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     def get_context_data(self, **kwargs):
         context = super(SpecialiteCreateView, self).get_context_data(**kwargs)
 
-        titre = 'Créer une Spécialité'
+        titre = 'Crأ©er une Spأ©cialitأ©'
         context['titre'] = titre
         return context
 
@@ -6751,7 +6757,7 @@ class SpecialiteUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     model = Specialite
     fields = ['code', 'intitule', 'intitule_a', 'title']
     template_name = 'scolar/update.html'
-    success_message = "La spécialité a été bien modifiée."
+    success_message = "La spأ©cialitأ© a أ©tأ© bien modifiأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6763,7 +6769,7 @@ class SpecialiteUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     def get_context_data(self, **kwargs):
         context = super(SpecialiteUpdateView, self).get_context_data(**kwargs)
 
-        titre = 'Modifier la Spécialité'
+        titre = 'Modifier la Spأ©cialitأ©'
         context['titre'] = titre
         return context
 
@@ -6788,11 +6794,11 @@ class PlanificationListView(LoginRequiredMixin, UserPassesTestMixin, TemplateVie
 
         context['table'] = table
         context['filter'] = filter_
-        context['titre'] = 'Liste des formations durant l\'année universitaire en cours'
+        context['titre'] = 'Liste des formations durant l\'annأ©e universitaire en cours'
         context['back'] = reverse('home')
         if self.request.user.has_perm('scolar.add_activite'):
             context['import_url'] = reverse('planning_import_from_fet')
-            context['import_btn'] = 'Réinitialiser & Importer'
+            context['import_btn'] = 'Rأ©initialiser & Importer'
 
         return context
 
@@ -6841,7 +6847,7 @@ class PlanificationUpdateView(LoginRequiredMixin, UserPassesTestMixin, TemplateV
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du tableau de planification. Merci de le signaler à l'administrateur!")
+                               "ERREUR: lors de la gأ©nأ©ration du tableau de planification. Merci de le signaler أ  l'administrateur!")
         return context
 
 
@@ -6870,7 +6876,7 @@ def update_charge(sender, instance, action, pk_set, **kwargs):
 
 @receiver(post_delete, sender=Activite)
 def remove_charge(sender, instance, **kwargs):
-    # supprimer les charges qui correspondent à l'activité supprimée
+    # supprimer les charges qui correspondent أ  l'activitأ© supprimأ©e
     Charge.objects.filter(activite=instance).delete()
 
 
@@ -6939,7 +6945,7 @@ class AbsenceEtudiantUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permiss
     fields = ['etudiant', 'seance', 'justif', 'motif', 'date_justif']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_absenceetudiant'
-    success_message = "L'absence de l'étudiant a bien été modifiée."
+    success_message = "L'absence de l'أ©tudiant a bien أ©tأ© modifiأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -6959,7 +6965,7 @@ class AbsenceEtudiantDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permiss
     permission_required = 'scolar.delete_absenceetudiant'
     model = AbsenceEtudiant
     template_name = 'scolar/delete.html'
-    success_message = "L'absence a bien été supprimée."
+    success_message = "L'absence a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         if self.request.user.is_enseignant():
@@ -7014,7 +7020,7 @@ class AbsenceEnseignantUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permi
     fields = ['enseignant', 'seance', 'justif', 'motif', 'seance_remplacement', 'date_justif']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_absenceenseignant'
-    success_message = "L'absence de l'enseignant a bien été modifiée"
+    success_message = "L'absence de l'enseignant a bien أ©tأ© modifiأ©e"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -7039,7 +7045,7 @@ class SeanceRattrapageCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
     fields = ['activite', 'date', 'rattrapage']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_seance'
-    success_message = "La séance de rattrapage a bien été créée."
+    success_message = "La sأ©ance de rattrapage a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -7058,7 +7064,7 @@ class SeanceRattrapageCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
 @login_required
 def signaler_absence_etudiant(request):
     if not (request.user.is_direction() or request.user.is_surveillance()):
-        messages.error(request, "Vous n'avez pas accès à cette opération.")
+        messages.error(request, "Vous n'avez pas accأ¨s أ  cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -7087,7 +7093,7 @@ def signaler_absence_etudiant(request):
                             raise Exception("Signaler Absence: Resultat inexitant ou Multiple")
                         else:
                             messages.error(request, str(
-                                inscription_) + " Module inexistant ou multiple, merci de le signaler à l'administrateur")
+                                inscription_) + " Module inexistant ou multiple, merci de le signaler أ  l'administrateur")
                     else:
                         if not resultat_.acquis:
                             absence, created = AbsenceEtudiant.objects.get_or_create(seance=seance_,
@@ -7099,18 +7105,18 @@ def signaler_absence_etudiant(request):
                             absences_list += str(inscription_) + ' : ' + settings.PROTOCOLE_HOST + reverse(
                                 "etudiant_detail", kwargs={'pk': inscription_.etudiant.matricule}) + ' \n\n'
                         else:
-                            messages.info(request, str(inscription_) + ' a déjà validé le module: ' + str(
+                            messages.info(request, str(inscription_) + ' a dأ©jأ  validأ© le module: ' + str(
                                 activite_.module.matiere.code))
 
-                # envoyer la liste des absents à la direction en cas d'examen
+                # envoyer la liste des absents أ  la direction en cas d'examen
                 if activite_.type.startswith('E_'):
-                    email = EmailMessage('[Talents] Liste des Absences Signalées en ' + str(activite_),
+                    email = EmailMessage('[Talents] Liste des Absences Signalأ©es en ' + str(activite_),
                                          'Bonjour,\n' +
-                                         'Ces absences en ' + str(activite_) + ' ont été enregistrées dans Talents\n' +
+                                         'Ces absences en ' + str(activite_) + ' ont أ©tأ© enregistrأ©es dans Talents\n' +
                                          absences_list +
-                                         ' Un email leur a été transmis pour leur demander de justifier l\'absence dans les 48h.\n' +
+                                         ' Un email leur a أ©tأ© transmis pour leur demander de justifier l\'absence dans les 48h.\n' +
                                          'Bien cordialement.\n' +
-                                         'Département',
+                                         'Dأ©partement',
                                          to=[activite_.module.formation.programme.departement.responsable.user.email,
                                              activite_.module.coordinateur.user.email,
                                              request.user.email] +
@@ -7124,22 +7130,22 @@ def signaler_absence_etudiant(request):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: lors du signalement d'absence d'étudiants. Merci d'en informer l'administrateur")
+                                   "ERREUR: lors du signalement d'absence d'أ©tudiants. Merci d'en informer l'administrateur")
                     return HttpResponseRedirect(reverse('absence_list'))
             # redirect to a new URL:
-            messages.success(request, "Les absences ont bien été enregistrées.")
+            messages.success(request, "Les absences ont bien أ©tأ© enregistrأ©es.")
             return HttpResponseRedirect(reverse('absence_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = SeanceEtudiantSelectionForm()
         messages.info(request, "Merci de resenigner ce formulaire pour signaler la liste des absents.")
-    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Signaler les absences d\'étudiants'})
+    return render(request, 'scolar/import.html', {'form': form, 'titre': 'Signaler les absences d\'أ©tudiants'})
 
 
 @login_required
 def absence_etudiant_report(request):
     if not request.user.is_staff_only():
-        messages.error(request, "Vous n'avez pas accès à cette opération.")
+        messages.error(request, "Vous n'avez pas accأ¨s أ  cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -7269,24 +7275,24 @@ def absence_etudiant_report(request):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: lors de la génération du rapport global des absences")
+                    messages.error(request, "ERREUR: lors de la gأ©nأ©ration du rapport global des absences")
                     return HttpResponseRedirect(reverse('absence_list'))
             # redirect to a new URL:
-            messages.success(request, "Le rapport global des absences a été généré correctement.")
+            messages.success(request, "Le rapport global des absences a أ©tأ© gأ©nأ©rأ© correctement.")
             return response
             # if a GET (or any other method) we'll create a blank form
     else:
         form = AbsenceEtudiantReportSelectionForm()
         messages.info(request,
-                      "Merci de resenigner ce formulaire pour sélectionner les activités à faire apparaître sur le rapport global des absences")
+                      "Merci de resenigner ce formulaire pour sأ©lectionner les activitأ©s أ  faire apparaأ®tre sur le rapport global des absences")
     return render(request, 'scolar/import.html',
-                  {'form': form, 'titre': 'Sélection des activités du rapport des absences'})
+                  {'form': form, 'titre': 'Sأ©lection des activitأ©s du rapport des absences'})
 
 
 @login_required
 def signaler_absence_enseignant(request):
     if not (request.user.is_direction() or request.user.is_surveillance()):
-        messages.error(request, "Vous n'avez pas accès à cette opération.")
+        messages.error(request, "Vous n'avez pas accأ¨s أ  cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     # if this is a POST request we need to process the form data
@@ -7317,12 +7323,12 @@ def signaler_absence_enseignant(request):
                                    "ERREUR: lors du signalement d'absence de l'enseignant. Merci d'en informer l'administrateur")
                     return HttpResponseRedirect(reverse('absence_enseignant_list'))
             # redirect to a new URL:
-            messages.success(request, "L'absence a bien été enregistrée.")
+            messages.success(request, "L'absence a bien أ©tأ© enregistrأ©e.")
             return HttpResponseRedirect(reverse('absence_enseignant_list'))
             # if a GET (or any other method) we'll create a blank form
     else:
         form = SeanceSelectionForm()
-        messages.info(request, "Merci d'indiquer le nom de l'enseignant absent, puis la séance et date de l'absence.")
+        messages.info(request, "Merci d'indiquer le nom de l'enseignant absent, puis la sأ©ance et date de l'absence.")
     return render(request, 'scolar/import.html', {'form': form, 'titre': 'Signaler l\'absence d\'un enseignant'})
 
 
@@ -7331,31 +7337,31 @@ def email_absence_enseignant(sender, update_fields, instance, created, **kwargs)
     if created:
         nb_absences = instance.nb_absences()
         if nb_absences < 3:
-            email = EmailMessage(str(nb_absences) + ' Absences Signalées en ' + str(instance.seance.activite),
-                                 'Cher(e) collègue,\n' +
-                                 'Nous espérons que vous allez bien!\n' +
+            email = EmailMessage(str(nb_absences) + ' Absences Signalأ©es en ' + str(instance.seance.activite),
+                                 'Cher(e) collأ¨gue,\n' +
+                                 'Nous espأ©rons que vous allez bien!\n' +
                                  'Nous vous informons qu\'une absence au module ' + instance.seance.activite.module.matiere.code +
-                                 ' a été signalée\n' +
-                                 'Veuillez vous rapprocher du département afin de planifier la séance de remplacement si ce n\'est pas encore fait.\n' +
+                                 ' a أ©tأ© signalأ©e\n' +
+                                 'Veuillez vous rapprocher du dأ©partement afin de planifier la sأ©ance de remplacement si ce n\'est pas encore fait.\n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[instance.enseignant.user.email,
+                                 'Dأ©partement', to=[instance.enseignant.user.email,
                                                     instance.seance.activite.module.formation.programme.departement.responsable.user.email] +
                                                    settings.STAFF_EMAILS['direction'])
 
         else:
-            email = EmailMessage(str(nb_absences) + ' Absences Signalées en ' + str(instance.seance.activite),
-                                 'Nom & Prénom: ' + instance.enseignant.nom + ' ' + instance.enseignant.prenom + '\n' +
+            email = EmailMessage(str(nb_absences) + ' Absences Signalأ©es en ' + str(instance.seance.activite),
+                                 'Nom & Prأ©nom: ' + instance.enseignant.nom + ' ' + instance.enseignant.prenom + '\n' +
                                  'Email: ' + instance.enseignant.user.email + '\n' +
                                  'Tel: ' + instance.enseignant.tel + '\n\n\n' +
-                                 'Cher(e) collègue,\n' +
-                                 'Nous espérons que vous allez bien!\n' +
+                                 'Cher(e) collأ¨gue,\n' +
+                                 'Nous espأ©rons que vous allez bien!\n' +
                                  'Nous vous informons que ' + str(nb_absences) + ' absence au  ' + str(
                                      instance.seance.activite) +
-                                 ' ont été signalée\n' +
-                                 'Veuillez vous rapprocher du département afin de planifier la séance de remplacement si ce n\'est pas encore fait.\n' +
-                                 'Par ailleurs, voudriez vous vous rapprocher de la direction des études afin de discuter de vos absences fréquentes et trouver ensemble les aménagements possibles afin de les éviter.\n' +
+                                 ' ont أ©tأ© signalأ©e\n' +
+                                 'Veuillez vous rapprocher du dأ©partement afin de planifier la sأ©ance de remplacement si ce n\'est pas encore fait.\n' +
+                                 'Par ailleurs, voudriez vous vous rapprocher de la direction des أ©tudes afin de discuter de vos absences frأ©quentes et trouver ensemble les amأ©nagements possibles afin de les أ©viter.\n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[instance.enseignant.user.email,
+                                 'Dأ©partement', to=[instance.enseignant.user.email,
                                                     instance.seance.activite.module.formation.programme.departement.responsable.user.email] +
                                                    settings.STAFF_EMAILS['direction'])
 
@@ -7365,6 +7371,8 @@ def email_absence_enseignant(sender, update_fields, instance, created, **kwargs)
 
 def index(request):
     context = {}
+  
+
     return render(request, 'scolar/index.html', context)
 
 
@@ -7392,7 +7400,7 @@ class ActiviteEtudiantTableView(LoginRequiredMixin, TemplateView):
             return Activite.objects.filter(cible__in=liste_groupe_encours)
         except Exception:
             messages.error(self.request,
-                           "ERREUR: nous ne trouvons pas d'inscription en cours valide. Si ce n'est pas le cas, merci de le signaler à l'administration des études..")
+                           "ERREUR: nous ne trouvons pas d'inscription en cours valide. Si ce n'est pas le cas, merci de le signaler أ  l'administration des أ©tudes..")
             return Activite.objects.none()
 
     def get_context_data(self, **kwargs):
@@ -7403,7 +7411,7 @@ class ActiviteEtudiantTableView(LoginRequiredMixin, TemplateView):
         RequestConfig(self.request).configure(table)
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Mon activité pédagogique'
+        context['titre'] = 'Mon activitأ© pأ©dagogique'
         try:
             matiere_list = []
             inscription_list = Inscription.objects.filter(etudiant=self.request.user.etudiant,
@@ -7416,14 +7424,14 @@ class ActiviteEtudiantTableView(LoginRequiredMixin, TemplateView):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération de la matrice de compétences. Merci de le signaler à l'administrateur")
+                               "ERREUR: lors de la gأ©nأ©ration de la matrice de compأ©tences. Merci de le signaler أ  l'administrateur")
 
         return context
 
 
 class ActiviteTableView(LoginRequiredMixin, TemplateView):
     template_name = 'scolar/modal_filter_list.html'
-    titre = 'Mes activités pédagogiques'
+    titre = 'Mes activitأ©s pأ©dagogiques'
 
     def get_queryset(self, **kwargs):
         return Activite.objects.filter(assuree_par__in=[self.request.user.enseignant],
@@ -7450,7 +7458,7 @@ class ActiviteTableView(LoginRequiredMixin, TemplateView):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération de la matrice de compétences. Merci de le signaler à l'administrateur")
+                               "ERREUR: lors de la gأ©nأ©ration de la matrice de compأ©tences. Merci de le signaler أ  l'administrateur")
         return context
 
 
@@ -7470,7 +7478,7 @@ def get_note_list_context(inscription_list, module_pk, groupe_pk):
     resultat_list = {}
     note_list = {}
     for inscrit_ in inscription_list:
-        # le résultat d'un étudiant dans un module est déjà créé lors de son inscription à un groupe
+        # le rأ©sultat d'un أ©tudiant dans un module est dأ©jأ  crأ©أ© lors de son inscription أ  un groupe
         resultat_ = Resultat.objects.get(inscription=inscrit_, module__matiere=module_.matiere)
         resultat_list[inscrit_.etudiant.matricule] = resultat_
         for eval_ in evaluation_list:
@@ -7499,7 +7507,7 @@ class NoteListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                                                 module__matiere=self.kwargs.get('matiere_pk')).module
             groupe_ = get_object_or_404(Groupe, id=self.kwargs.get('groupe_pk'))
             groupe_section = groupe_.section.groupes.all().filter(
-                code__isnull=True).get()  # le groupe qui représente la section
+                code__isnull=True).get()  # le groupe qui reprأ©sente la section
             return assure_module_groupe(self.request.user.enseignant, module_, groupe_) or assure_module_groupe(
                 self.request.user.enseignant, module_, groupe_section)
         else:
@@ -7520,16 +7528,16 @@ class NoteListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                                                 module__matiere=self.kwargs.get('matiere_pk')).module
             context.update(get_note_list_context(self.get_queryset(**kwargs), module_.id, self.kwargs.get('groupe_pk')))
             messages.info(self.request,
-                          "Vous pouvez introduire les notes des étudiants en les saisissant en cliquant sur le bouton Modifier")
+                          "Vous pouvez introduire les notes des أ©tudiants en les saisissant en cliquant sur le bouton Modifier")
             if not module_.matiere.pfe:
                 messages.warning(self.request,
-                                 "Si vous préférez charger les notes à partir d'un fichier Excel, veillez à ce que le fichier ait exactement la structure du fichier téléchargeable ci-après.")
+                                 "Si vous prأ©fأ©rez charger les notes أ  partir d'un fichier Excel, veillez أ  ce que le fichier ait exactement la structure du fichier tأ©lأ©chargeable ci-aprأ¨s.")
         except Exception:
             if settings.DEBUG:
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du tableau des notes. Merci de le signaler à l'administrateur.")
+                               "ERREUR: lors de la gأ©nأ©ration du tableau des notes. Merci de le signaler أ  l'administrateur.")
         return context
 
 
@@ -7555,7 +7563,7 @@ class NoteEtudiantListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du tableau des notes. Merci de le signaler à l'administrateur.")
+                               "ERREUR: lors de la gأ©nأ©ration du tableau des notes. Merci de le signaler أ  l'administrateur.")
         return context
 
 
@@ -7581,7 +7589,7 @@ class SeanceTableView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         context['table'] = table
         context['back'] = reverse('activite')
         context['create_url'] = reverse('seance_create', kwargs={'activite_pk': self.kwargs.get('activite_pk')})
-        context['create_btn'] = 'Séance'
+        context['create_btn'] = 'Sأ©ance'
         return context
 
 
@@ -7599,7 +7607,7 @@ class AnneeUnivListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateVie
         context['back'] = self.request.META.get('HTTP_REFERER')
         if self.request.user.has_perm('scolar.add_anneeuniv'):
             context['create_url'] = reverse('anneeuniv_create')
-            context['create_btn'] = 'Année'
+            context['create_btn'] = 'Annأ©e'
         return context
 
 
@@ -7608,7 +7616,7 @@ class AnneeUnivUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     fields = ['annee_univ', 'debut', 'fin', 'encours']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_anneeuniv'
-    success_message = "La modification de l'année universitaire a bien été effectuée."
+    success_message = "La modification de l'annأ©e universitaire a bien أ©tأ© effectuأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -7628,7 +7636,7 @@ class AnneeUnivCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     fields = ['annee_univ', 'debut', 'fin', 'encours']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_anneeuniv'
-    success_message = "L'année universitaire a bien été rajoutée."
+    success_message = "L'annأ©e universitaire a bien أ©tأ© rajoutأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -7644,15 +7652,15 @@ class AnneeUnivCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
 
     def get_context_data(self, **kwargs):
         context = super(AnneeUnivCreateView, self).get_context_data(**kwargs)
-        context['titre'] = "Ajouter une nouvelle année universitaire"
+        context['titre'] = "Ajouter une nouvelle annأ©e universitaire"
         return context
 
 
 @receiver(post_save, sender=AnneeUniv)
 def update_annee_univ_encours(sender, instance, created, **kwargs):
-    # garder une seule année univ en cours
+    # garder une seule annأ©e univ en cours
     if instance.encours:
-        # mettre toutes les autres à False
+        # mettre toutes les autres أ  False
         for annee_univ_ in AnneeUniv.objects.all():
             if (annee_univ_ != instance) and (annee_univ_.encours):
                 annee_univ_.encours = False
@@ -7670,7 +7678,7 @@ class FormationListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateVie
         context = super(FormationListView, self).get_context_data(**kwargs)
         table = FormationTable(self.get_queryset(**kwargs), exclude=exclude_columns(self.request.user))
         RequestConfig(self.request).configure(table)
-        context['titre'] = 'Liste des formations durant l\'année universitaire %s' % self.kwargs.get('annee_univ_pk')
+        context['titre'] = 'Liste des formations durant l\'annأ©e universitaire %s' % self.kwargs.get('annee_univ_pk')
         context['table'] = table
         context['back'] = reverse('anneeuniv_list')
         if self.request.user.has_perm('scolar.add_formation'):
@@ -7684,7 +7692,7 @@ class FormationDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     model = Formation
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_formation'
-    success_message = "La formation a bien été supprimée!"
+    success_message = "La formation a bien أ©tأ© supprimأ©e!"
 
     def get_success_url(self):
         return reverse('formation_list', kwargs={'annee_univ_pk': str(self.kwargs.get('annee_univ_pk'))})
@@ -7695,9 +7703,9 @@ def formation_archive_toggle_view(request, formation_pk):
     formation_.archive = not formation_.archive
     formation_.save(update_fields=['archive'])
     if formation_.archive:
-        messages.success(request, 'La formation %s a été bien archivée' % str(formation_))
+        messages.success(request, 'La formation %s a أ©tأ© bien archivأ©e' % str(formation_))
     else:
-        messages.warning(request, 'La formation %s a été désarchivée' % str(formation_))
+        messages.warning(request, 'La formation %s a أ©tأ© dأ©sarchivأ©e' % str(formation_))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -7706,7 +7714,7 @@ class FormationCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     fields = ['programme', 'annee_univ', ]
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_formation'
-    success_message = "La formation a bien été créée."
+    success_message = "La formation a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -7722,7 +7730,7 @@ class FormationCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
 
     def get_context_data(self, **kwargs):
         context = super(FormationCreateView, self).get_context_data(**kwargs)
-        titre = 'Créer une Formation'
+        titre = 'Crأ©er une Formation'
         context['titre'] = titre
         return context
 
@@ -7732,7 +7740,7 @@ class FormationUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     fields = ['programme', 'annee_univ', ]
     template_name = 'scolar/update.html'
     permission_required = 'scolar.add_formation'
-    success_message = "La formation a été bien mise à jour"
+    success_message = "La formation a أ©tأ© bien mise أ  jour"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -7750,9 +7758,9 @@ class FormationUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
 @receiver(post_save, sender=Formation)
 def add_modules_formation(sender, instance, created, **kwargs):
     if created:
-        # créer les modules
+        # crأ©er les modules
         for periode_ in instance.programme.periodes.all():
-            # on crée les sessions qui correspondent aux periodes du programme
+            # on crأ©e les sessions qui correspondent aux periodes du programme
             PeriodeFormation.objects.create(formation=instance, periode=periode_.periode,
                                             session=periode_.periode.session)
             for ue in periode_.ues.all():
@@ -7786,7 +7794,7 @@ class SectionDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     model = Section
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_section'
-    success_message = "La section a bien été supprimée."
+    success_message = "La section a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('section_list', kwargs={'formation_pk': str(self.kwargs.get('formation_pk'))})
@@ -7797,7 +7805,7 @@ class SectionCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     fields = ['code', 'formation']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_section'
-    success_message = "La section a bien été créée."
+    success_message = "La section a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -7938,7 +7946,7 @@ class NotesFormationDetailView(LoginRequiredMixin, UserPassesTestMixin, Template
         context = super(NotesFormationDetailView, self).get_context_data(**kwargs)
         formation_ = get_object_or_404(Formation, id=self.kwargs.get('formation_pk'))
         periode_ = get_object_or_404(PeriodeProgramme, id=self.kwargs.get('periode_pk'))
-        # on récupère les groues qui suivent des modules durant cette periode
+        # on rأ©cupأ¨re les groues qui suivent des modules durant cette periode
         groupe_periode_list = InscriptionPeriode.objects.filter(periodepgm__periode=periode_.periode,
                                                                 groupe__section__formation=self.kwargs.get(
                                                                     'formation_pk')).values('groupe')
@@ -8009,7 +8017,7 @@ class TutoratListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView)
         RequestConfig(self.request).configure(table)
 
         context['table'] = table
-        context['titre'] = 'Mes tutorés'
+        context['titre'] = 'Mes tutorأ©s'
         context['back'] = reverse('home')
         return context
 
@@ -8088,10 +8096,10 @@ class ModuleDetailView(LoginRequiredMixin, DetailView):
             if assure_module(self.request.user.enseignant, module_):
                 feedback_list = Feedback.objects.filter(module=module_, show=True)
                 context['feedback_list'] = feedback_list
-                # alerter l'enseignant si la somme des pondérations est # de 1
+                # alerter l'enseignant si la somme des pondأ©rations est # de 1
                 if module_.somme_ponderation() != 1 and module_.somme_ponderation() != 0:
                     messages.error(self.request,
-                                   "ATTENTION! La somme des pondérations des évaluations n'est pas égale à 1. Le coordinateur(trice) devrait corriger la formule")
+                                   "ATTENTION! La somme des pondأ©rations des أ©valuations n'est pas أ©gale أ  1. Le coordinateur(trice) devrait corriger la formule")
 
         return context
 
@@ -8100,7 +8108,7 @@ class SemainierDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTes
     model = Semainier
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_semainier'
-    success_message = "La semaine a bien été supprimée."
+    success_message = "La semaine a bien أ©tأ© supprimأ©e."
 
     def test_func(self):
         module_ = Module.objects.get(id=self.kwargs.get('module_pk'))
@@ -8114,7 +8122,7 @@ class SemainierUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTes
     model = Semainier
     fields = ['semaine', 'activite_cours', 'activite_dirigee', 'observation', 'objectifs', 'matiere_competence_element']
     template_name = 'scolar/update.html'
-    success_message = "La semaine a bien été modifiée."
+    success_message = "La semaine a bien أ©tأ© modifiأ©e."
 
     def test_func(self):
         module_ = Module.objects.get(id=self.kwargs.get('module_pk'))
@@ -8138,7 +8146,7 @@ class SemainierCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTes
     fields = ['module', 'semaine', 'activite_cours', 'activite_dirigee', 'observation', 'objectifs',
               'matiere_competence_element']
     template_name = 'scolar/create.html'
-    success_message = "La semaine a bien été créée."
+    success_message = "La semaine a bien أ©tأ© crأ©أ©e."
 
     def test_func(self):
         module_ = Module.objects.get(id=self.kwargs.get('module_pk'))
@@ -8151,7 +8159,7 @@ class SemainierCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTes
         form.fields['module'] = forms.ModelChoiceField(queryset=Module.objects.filter(id=module_.id), initial=0)
         form.fields['matiere_competence_element'] = forms.ModelChoiceField(
             queryset=MatiereCompetenceElement.objects.filter(matiere=module_.matiere), required=False)
-        form.helper.add_input(Submit('submit', 'Créer', css_class='btn-primary'))
+        form.helper.add_input(Submit('submit', 'Crأ©er', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse("module_detail", kwargs={'pk': self.kwargs.get('module_pk')})
 
@@ -8167,7 +8175,7 @@ class GroupeDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     model = Groupe
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_groupe'
-    success_message = "Le groupe a bien été supprimé."
+    success_message = "Le groupe a bien أ©tأ© supprimأ©."
 
     def get_success_url(self):
         return reverse('groupe_list', kwargs={'section_pk': str(self.kwargs.get('section_pk'))})
@@ -8178,7 +8186,7 @@ class GroupeUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     model = Groupe
     fields = ['code', 'section', 'option', 'edt']
     template_name = 'scolar/update.html'
-    success_message = "Le groupe a bien été modifié."
+    success_message = "Le groupe a bien أ©tأ© modifiأ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -8206,7 +8214,7 @@ class GroupeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     model = Groupe
     fields = ['code', 'section', 'option', 'edt']
     template_name = 'scolar/create.html'
-    success_message = "Le groupe a bien été créé."
+    success_message = "Le groupe a bien أ©tأ© crأ©أ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -8252,7 +8260,7 @@ def add_modules_groupe(sender, instance, created, **kwargs):
 @receiver(m2m_changed, sender=Groupe.option.through)
 def add_option_groupe(sender, instance, action, **kwargs):
     if action == "post_add":
-        # créer les modules
+        # crأ©er les modules
         for ue in instance.option.all():
             for matiere_ in ue.matieres.all():
                 module_, created = Module.objects.get_or_create(matiere=matiere_, formation=instance.section.formation,
@@ -8271,15 +8279,15 @@ class EvaluationCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
     model = Evaluation
     fields = ['type', 'ponderation', 'module']
     template_name = 'scolar/create.html'
-    success_message = "L'évaluation a bien été créée."
+    success_message = "L'أ©valuation a bien أ©tأ© crأ©أ©e."
 
     def test_func(self):
         module_ = get_object_or_404(Module, id=self.kwargs.get('module_pk'))
 
-        # Si la formation est archivée ou si un PV est déjà établit alors ne pas autoriser la modification
+        # Si la formation est archivأ©e ou si un PV est dأ©jأ  أ©tablit alors ne pas autoriser la modification
         if module_.formation.archive or module_.pv_existe():
             messages.error(self.request,
-                           "Il n'est plus possible de modifier les notes car un PV a été établit ou la saisie est clôturée.")
+                           "Il n'est plus possible de modifier les notes car un PV a أ©tأ© أ©tablit ou la saisie est clأ´turأ©e.")
             return False
 
         if self.request.user.is_direction():
@@ -8302,7 +8310,7 @@ class EvaluationCreateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
 
     def get_context_data(self, **kwargs):
         context = super(EvaluationCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Ajouter une évaluation'
+        context['titre'] = 'Ajouter une أ©valuation'
         return context
 
 
@@ -8338,18 +8346,18 @@ def evaluation_competence_update_view(request, evaluation_pk):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: lors de l'ajout des éléments de compétence à l'évaluation. Merci de le signaler à l'administrateur.")
-            messages.success(request, "Les éléments de compétence ont bien été rajoutés à l'évaluation.")
+                                   "ERREUR: lors de l'ajout des أ©lأ©ments de compأ©tence أ  l'أ©valuation. Merci de le signaler أ  l'administrateur.")
+            messages.success(request, "Les أ©lأ©ments de compأ©tence ont bien أ©tأ© rajoutأ©s أ  l'أ©valuation.")
     else:
         form = MatiereCompetenceForm(eval_.module.matiere.id)
-        messages.info(request, "Merci de sélectionner les éléments de compétence à rajouter à l'évaluation.")
+        messages.info(request, "Merci de sأ©lectionner les أ©lأ©ments de compأ©tence أ  rajouter أ  l'أ©valuation.")
     context = {}
     qs = EvaluationCompetenceElement.objects.filter(evaluation=eval_)
     table_ = EvaluationCompetenceElementTable(qs, exclude=exclude_columns(request.user))
     RequestConfig(request).configure(table_)
     context['table'] = table_
     context['form'] = form
-    context['titre'] = 'Liste des éléments de compétence évalués'
+    context['titre'] = 'Liste des أ©lأ©ments de compأ©tence أ©valuأ©s'
     return render(request, 'scolar/form_list.html', context)
 
 
@@ -8357,7 +8365,7 @@ class EvaluationCompetenceElementUpdateView(LoginRequiredMixin, SuccessMessageMi
     model = EvaluationCompetenceElement
     fields = ['commune_au_groupe', 'ponderation', ]
     template_name = 'scolar/update.html'
-    success_message = "L'élément de compétence a bien été modifié."
+    success_message = "L'أ©lأ©ment de compأ©tence a bien أ©tأ© modifiأ©."
 
     def test_func(self):
         module_ = Evaluation.objects.get(id=self.kwargs.get('evaluation_pk')).module
@@ -8374,14 +8382,14 @@ class EvaluationCompetenceElementUpdateView(LoginRequiredMixin, SuccessMessageMi
 
     def get_context_data(self, **kwargs):
         context = super(EvaluationCompetenceElementUpdateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Modifier pondération de l\'élément de compétence dans l\'évaluation'
+        context['titre'] = 'Modifier pondأ©ration de l\'أ©lأ©ment de compأ©tence dans l\'أ©valuation'
         return context
 
 
 class EvaluationCompetenceElementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
     model = EvaluationCompetenceElement
     template_name = 'scolar/delete.html'
-    success_message = "L'élément de compétence a bien été supprimé de l'évaluation."
+    success_message = "L'أ©lأ©ment de compأ©tence a bien أ©tأ© supprimأ© de l'أ©valuation."
 
     def test_func(self):
         module_ = Evaluation.objects.get(id=self.kwargs.get('evaluation_pk')).module
@@ -8395,15 +8403,15 @@ class EvaluationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
     model = Evaluation
     fields = ['type', 'ponderation', 'module']
     template_name = 'scolar/update.html'
-    success_message = "L'évaluation a bien été modifiée."
+    success_message = "L'أ©valuation a bien أ©tأ© modifiأ©e."
 
     def test_func(self):
         module_ = get_object_or_404(Module, id=self.kwargs.get('module_pk'))
 
-        # Si la formation est archivée ou si un PV est déjà établit alors ne pas autoriser la modification
+        # Si la formation est archivأ©e ou si un PV est dأ©jأ  أ©tablit alors ne pas autoriser la modification
         if module_.formation.archive or module_.pv_existe():
             messages.error(self.request,
-                           "Il n'est plus possible de modifier les notes car un PV a été établit ou la saisie est clôturée.")
+                           "Il n'est plus possible de modifier les notes car un PV a أ©tأ© أ©tablit ou la saisie est clأ´turأ©e.")
             return False
 
         if self.request.user.is_direction():
@@ -8420,7 +8428,7 @@ class EvaluationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
                                                        initial=0, disabled=True)
         form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        form.helper.add_input(Button('modifier', 'Définir Compétences', css_class='btn-warning',
+        form.helper.add_input(Button('modifier', 'Dأ©finir Compأ©tences', css_class='btn-warning',
                                      onclick="window.location.href='" + reverse('evaluation_competence_update', kwargs={
                                          'evaluation_pk': self.kwargs.get('pk')}) + "'"))
         self.success_url = reverse('module_detail', kwargs={'pk': str(self.kwargs.get('module_pk'))})
@@ -8438,15 +8446,15 @@ class EvaluationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
 class EvaluationDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
     model = Evaluation
     template_name = 'scolar/delete.html'
-    success_message = "L'évaluation a bien été supprimée."
+    success_message = "L'أ©valuation a bien أ©tأ© supprimأ©e."
 
     def test_func(self):
         module_ = get_object_or_404(Module, id=self.kwargs.get('module_pk'))
 
-        # Si la formation est archivée ou si un PV est déjà établit alors ne pas autoriser la modification
+        # Si la formation est archivأ©e ou si un PV est dأ©jأ  أ©tablit alors ne pas autoriser la modification
         if module_.formation.archive or module_.pv_existe():
             messages.error(self.request,
-                           "Il n'est plus possible de modifier les notes car un PV a été établit ou la saisie est clôturée.")
+                           "Il n'est plus possible de modifier les notes car un PV a أ©tأ© أ©tablit ou la saisie est clأ´turأ©e.")
             return False
 
         if self.request.user.is_direction():
@@ -8465,7 +8473,7 @@ class SeanceCreate(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
     fields = ['date', 'activite', 'rattrapage']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_seance'
-    success_message = "La séance a bien été créée."
+    success_message = "La sأ©ance a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -8482,7 +8490,7 @@ class SeanceCreate(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
 
     def get_context_data(self, **kwargs):
         context = super(SeanceCreate, self).get_context_data(**kwargs)
-        context['titre'] = 'Création d\'une nouvelle séance'
+        context['titre'] = 'Crأ©ation d\'une nouvelle sأ©ance'
         return context
 
 
@@ -8491,7 +8499,7 @@ class SeanceUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     fields = ['date', 'activite', 'rattrapage']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_seance'
-    success_message = "La séance a bien été modifiée."
+    success_message = "La sأ©ance a bien أ©tأ© modifiأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -8511,7 +8519,7 @@ class SeanceDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     model = Seance
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_seance'
-    success_message = "La séance a bien été supprimée."
+    success_message = "La sأ©ance a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('assiduite', kwargs={'activite_pk': str(self.kwargs.get('activite_pk'))})
@@ -8535,9 +8543,9 @@ class ExamenListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         RequestConfig(self.request).configure(table)
         context['table'] = table
         context['btn_list'] = {
-            'Créer Examen': reverse('examen_create'),
+            'Crأ©er Examen': reverse('examen_create'),
             'Envoi Convocations': reverse('envoi_convocations_examens'),
-            'Affichage Répartition des Etudiants': reverse('affichage_convocations_examens')
+            'Affichage Rأ©partition des Etudiants': reverse('affichage_convocations_examens')
         }
         context['titre'] = "Liste des examens"
         return context
@@ -8550,7 +8558,7 @@ def examen_create_view(request):
     # if this is a POST request we need to process the form data
 
     if not (request.user.is_direction()):
-        messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     if request.method == 'POST':
@@ -8561,14 +8569,14 @@ def examen_create_view(request):
             try:
                 form_data = form.cleaned_data
                 module_ = form_data['module']
-                # Créer activite et seance correspondants à l'examen
+                # Crأ©er activite et seance correspondants أ  l'examen
                 activite_ = Activite.objects.create(
                     module=module_,
                     type=form_data['type_activite'],
                     vh=form_data['duree'].hour + form_data['duree'].minute / 60,
                     repeter_chaque_semaine=False,
                 )
-                # rajouter les groupes concernés par l'examen
+                # rajouter les groupes concernأ©s par l'examen
                 for groupe_ in form_data['groupes']:
                     activite_.cible.add(groupe_)
 
@@ -8591,7 +8599,7 @@ def examen_create_view(request):
                 else:
                     messages.error(request, "ERREUR: lors de planification d'un examen.")
                     HttpResponseRedirect(reverse('examen_list'))
-            messages.success(request, "L'examan a bien été planifié.")
+            messages.success(request, "L'examan a bien أ©tأ© planifiأ©.")
 
             return HttpResponseRedirect(reverse('seance_salles_reservation', kwargs={'seance_pk': seance_.id}))
         else:
@@ -8612,7 +8620,7 @@ class ExamenDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     permission_required = 'scolar.delete_activite'
     model = Activite
     template_name = 'scolar/delete.html'
-    success_message = "L'examen a bien été supprimé."
+    success_message = "L'examen a bien أ©tأ© supprimأ©."
 
     def get_success_url(self):
         return reverse('examen_list')
@@ -8624,7 +8632,7 @@ def seance_salles_reservation(request, seance_pk):
     seance_ = get_object_or_404(Seance, id=seance_pk)
 
     if not (request.user.is_direction()):
-        messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     if request.method == 'POST':
@@ -8634,7 +8642,7 @@ def seance_salles_reservation(request, seance_pk):
         if form.is_valid():
             try:
                 form_data = form.cleaned_data
-                # Ajouter les salles sélectionnées à la séance
+                # Ajouter les salles sأ©lectionnأ©es أ  la sأ©ance
                 for salle_id_ in form_data['salles']:
                     salle_ = get_object_or_404(Salle, id=salle_id_)
                     seance_.salles.add(salle_)
@@ -8642,18 +8650,18 @@ def seance_salles_reservation(request, seance_pk):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: lors de la réservation de salles.")
+                    messages.error(request, "ERREUR: lors de la rأ©servation de salles.")
                     HttpResponseRedirect(reverse('examen_list'))
-            messages.success(request, "Les salles ont bien été réservées.")
+            messages.success(request, "Les salles ont bien أ©tأ© rأ©servأ©es.")
 
             return HttpResponseRedirect(reverse('placer_surveillants_etudiants', kwargs={'seance_pk': seance_.id}))
     else:
         form = SeanceSallesReservationForm(seance_pk)
-        messages.info(request, "Merci de renseigner le formulaire pour réserver les salles.")
+        messages.info(request, "Merci de renseigner le formulaire pour rأ©server les salles.")
         context = {}
         context['salles'] = Salle.objects.all()
         context['form'] = form
-        context['titre'] = "Réservtaion de salles."
+        context['titre'] = "Rأ©servtaion de salles."
         return render(request, 'scolar/seance_salles_reservation.html', context)
 
 
@@ -8663,7 +8671,7 @@ def placer_surveillants_etudiants(request, seance_pk):
     seance_ = get_object_or_404(Seance, id=seance_pk)
 
     if not (request.user.is_direction()):
-        messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     if request.method == 'POST':
@@ -8673,13 +8681,13 @@ def placer_surveillants_etudiants(request, seance_pk):
         if form.is_valid():
             try:
                 form_data = form.cleaned_data
-                # Ajouter les surveillance, ajouter les enseignants à activite.assuree_par --> charges
+                # Ajouter les surveillance, ajouter les enseignants أ  activite.assuree_par --> charges
                 for enseignant_ in seance_.activite.assuree_par.all():
                     seance_.activite.assuree_par.remove(enseignant_)
 
                 for salle_ in seance_.salles.all():
                     for surveillant_id_ in form_data[salle_.code]:
-                        # rajouter le surveillant à activite.assuree_par
+                        # rajouter le surveillant أ  activite.assuree_par
                         enseignant_ = get_object_or_404(Enseignant, id=surveillant_id_)
                         seance_.activite.assuree_par.add(enseignant_)
 
@@ -8689,7 +8697,7 @@ def placer_surveillants_etudiants(request, seance_pk):
                                                                             'enseignant': enseignant_,
                                                                             'salle': salle_
                                                                         })
-                # lancer la réservation des places aléatoires en tâche de fond
+                # lancer la rأ©servation des places alأ©atoires en tأ¢che de fond
                 t = threading.Thread(target=task_reservation_places_etudiants, args=[seance_, request.user])
                 t.setDaemon(True)
                 t.start()
@@ -8699,10 +8707,10 @@ def placer_surveillants_etudiants(request, seance_pk):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: lors du placement des surveillants et étduiants en salles.")
+                    messages.error(request, "ERREUR: lors du placement des surveillants et أ©tduiants en salles.")
                     return HttpResponseRedirect(reverse('examen_list'))
             messages.success(request,
-                             "Les surveillants ont bien été affectées aux salles. Le placement des étudiants a été lancé. Une notification vous sera transmise une fois terminé.")
+                             "Les surveillants ont bien أ©tأ© affectأ©es aux salles. Le placement des أ©tudiants a أ©tأ© lancأ©. Une notification vous sera transmise une fois terminأ©.")
 
             return HttpResponseRedirect(reverse('examen_list'))
     else:
@@ -8723,10 +8731,10 @@ def task_reservation_places_etudiants(seance_, user):
         for salle_ in seance_.salles.all():
             for place_ in range(1, salle_.capacite() + 1):
                 place_disponible_list.append((salle_, place_))
-        # trier la liste des places d'une façon aléatoire
+        # trier la liste des places d'une faأ§on alأ©atoire
         random.shuffle(place_disponible_list)
 
-        # affecter une place pour chaque étudiant concerné par la séance et retirer sa place des places disponibles
+        # affecter une place pour chaque أ©tudiant concernأ© par la sأ©ance et retirer sa place des places disponibles
         for groupe_ in seance_.activite.cible.all():
             for inscription_ in groupe_.inscrits.all():
                 # retirer une place de la liste
@@ -8746,28 +8754,28 @@ def task_reservation_places_etudiants(seance_, user):
         if settings.DEBUG:
             raise Exception
         else:
-            email = EmailMessage('[Talents] Erreur Réservation Places Etudiants ' + str(seance_),
+            email = EmailMessage('[Talents] Erreur Rأ©servation Places Etudiants ' + str(seance_),
                                  'Bonjour ' + str(user.enseignant.prenom) + ',\n' +
-                                 'Une erreur s\'est produite lors de la réservation des places aux étudiants\n' +
-                                 'Merci de vérifier les capacités des salles\n'
+                                 'Une erreur s\'est produite lors de la rأ©servation des places aux أ©tudiants\n' +
+                                 'Merci de vأ©rifier les capacitأ©s des salles\n'
                                  'Bien cordialement.\n' +
-                                 'Département', to=[user.email])
+                                 'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
             else:
                 print("ERREUR: Reservation Places Etudiants")
-    email = EmailMessage('[Talents] Réservation Places Etudiants ' + str(seance_),
+    email = EmailMessage('[Talents] Rأ©servation Places Etudiants ' + str(seance_),
                          'Bonjour ' + str(user.enseignant.prenom) + ',\n' +
-                         'La réservation des places aux étudiants pour passer :' + str(
-                             seance_) + ' est effectuée avec succès' + '\n' +
-                         'Vous pouvez imprimer le PV de l\'épreuve ici:\n' +
+                         'La rأ©servation des places aux أ©tudiants pour passer :' + str(
+                             seance_) + ' est effectuأ©e avec succأ¨s' + '\n' +
+                         'Vous pouvez imprimer le PV de l\'أ©preuve ici:\n' +
                          settings.PROTOCOLE_HOST + reverse('pv_examen_list', kwargs={'seance_pk': seance_.id}) + '\n' +
                          'Bien cordialement.\n' +
-                         'Département', to=[user.email])
+                         'Dأ©partement', to=[user.email])
     if settings.EMAIL_ENABLED:
         email.send(fail_silently=True)
     else:
-        print("Reservation Places Etudiants avec Succès!")
+        print("Reservation Places Etudiants avec Succأ¨s!")
 
 
 class PVExamenListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -8781,7 +8789,7 @@ class PVExamenListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         seance_ = get_object_or_404(Seance, id=self.kwargs.get("seance_pk"))
         pv_list = {}
         for salle_ in seance_.salles.all():
-            # construire la liste des places réservées dans la salle
+            # construire la liste des places rأ©servأ©es dans la salle
             pv_list[salle_] = {
                 'reservation_place_list': ReservationPlaceEtudiant.objects.filter(seance=seance_,
                                                                                   salle=salle_).order_by('place'),
@@ -8794,21 +8802,21 @@ class PVExamenListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         return context
 
 
-# TODO écrire la vue pour l'envoie des convocation aux examens
-# prévoir un formulaire pour récupérer l'intervalle des dates d'examens
-# on convoque les étudiants, parcourir ReservationPlaceSalle dans les dates du formulaire et pour chaque étudiant envoyer un seul mail avec les réservations de places
-# ajouter l'examen à l'agenda de l'étudiant
+# TODO أ©crire la vue pour l'envoie des convocation aux examens
+# prأ©voir un formulaire pour rأ©cupأ©rer l'intervalle des dates d'examens
+# on convoque les أ©tudiants, parcourir ReservationPlaceSalle dans les dates du formulaire et pour chaque أ©tudiant envoyer un seul mail avec les rأ©servations de places
+# ajouter l'examen أ  l'agenda de l'أ©tudiant
 # on convoque les surveillants on parcours SurveillanceEnseignant dans l'intervalle des dates issues du formulaire
 # on envoie un seul mail pour toutes les surveillances de l'enseignant
-# planifier l'envoie d'un SMS de rappel le jour de la surveillance à 7h
-# ajouter les surveillances à lagenda de l'enseignant
-# Réserver les salles dans l'agenda
+# planifier l'envoie d'un SMS de rappel le jour de la surveillance أ  7h
+# ajouter les surveillances أ  lagenda de l'enseignant
+# Rأ©server les salles dans l'agenda
 @login_required
 def envoi_convocations_examens_view(request):
     # if this is a POST request we need to process the form data
 
     if not (request.user.is_direction()):
-        messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     if request.method == 'POST':
@@ -8818,13 +8826,13 @@ def envoi_convocations_examens_view(request):
         if form.is_valid():
             try:
                 form_data = form.cleaned_data
-                # Sélectionner les examens des formations compris dans l'intervalle des dates indiquées
+                # Sأ©lectionner les examens des formations compris dans l'intervalle des dates indiquأ©es
                 examen_list = Seance.objects.filter(activite__type__in=form_data['activite_type_list'],
                                                     activite__module__formation__in=form_data['formation_list'],
                                                     date__gte=form_data['date_debut'],
                                                     date__lte=form_data['date_fin']
                                                     ).order_by('date', 'heure_debut')
-                # lancer l'envoi des convocations en tâche de fond
+                # lancer l'envoi des convocations en tأ¢che de fond
                 t = threading.Thread(target=task_envoi_convocations_examens, args=[examen_list, request.user])
                 t.setDaemon(True)
                 t.start()
@@ -8835,15 +8843,15 @@ def envoi_convocations_examens_view(request):
                     messages.error(request, "ERREUR: lors du lancement de l'envoi des convocations.")
                     return HttpResponseRedirect(reverse('examen_list'))
             messages.success(request,
-                             "L'envoi des convocations a été lancé. Une notification vous sera transmise une fois la tâche terminée.")
+                             "L'envoi des convocations a أ©tأ© lancأ©. Une notification vous sera transmise une fois la tأ¢che terminأ©e.")
 
             return HttpResponseRedirect(reverse('examen_list'))
     else:
         form = ExamenSelectForm()
-        messages.info(request, "Merci de renseigner le formulaire pour sélectionner les examens à publier.")
+        messages.info(request, "Merci de renseigner le formulaire pour sأ©lectionner les examens أ  publier.")
         context = {}
         context['form'] = form
-        context['titre'] = "Sélection des examens à publier"
+        context['titre'] = "Sأ©lection des examens أ  publier"
         return render(request, 'scolar/import.html', context)
 
 
@@ -8854,7 +8862,7 @@ def task_envoi_convocations_examens(examen_list, user):
         non_envoye = ''
         # convoquer les surveillants
         for enseignant_ in Enseignant.objects.filter(situation='A'):
-            # sélectionner les surveillances programmées pour cet enseignant
+            # sأ©lectionner les surveillances programmأ©es pour cet enseignant
             surveillance_list = SurveillanceEnseignant.objects.filter(
                 seance__in=examen_list.values('id'),
                 enseignant=enseignant_
@@ -8866,16 +8874,16 @@ def task_envoi_convocations_examens(examen_list, user):
                     for surveillance_ in surveillance_list:
                         enseignant_surveillance_list += surveillance_.seance.date.strftime(
                             '%d/%m/%Y') + ' de ' + surveillance_.seance.heure_debut.strftime(
-                            '%H:%M') + ' à ' + surveillance_.seance.heure_fin.strftime(
-                            '%H:%M') + ' à la salle : ' + surveillance_.salle.code + '(' + dict(TYPES_ACT)[
+                            '%H:%M') + ' أ  ' + surveillance_.seance.heure_fin.strftime(
+                            '%H:%M') + ' أ  la salle : ' + surveillance_.salle.code + '(' + dict(TYPES_ACT)[
                                                             surveillance_.seance.activite.type] + ' ' + surveillance_.seance.activite.module.matiere.code + ')\n'
                     recipient_ = [enseignant_.user.email, user.email]
-                    email = ('[Talents] Convocation à Surveillance d\'Examens',
+                    email = ('[Talents] Convocation أ  Surveillance d\'Examens',
                              'Bonjour ' + str(enseignant_) + ',\n' +
                              'Nous vous prions d\'assurer la surveillance des examens suivants:\n' +
                              enseignant_surveillance_list +
                              'Bien cordialement.\n' +
-                             'Département',
+                             'Dأ©partement',
                              'talents@esi.dz',
                              recipient_)
                     email_list += (email,)
@@ -8883,7 +8891,7 @@ def task_envoi_convocations_examens(examen_list, user):
                     non_envoye += str(enseignant_) + '\n'
                     continue
 
-        # convoquer les étudiants
+        # convoquer les أ©tudiants
         inscription_examen_list = {}
         reservation_place_etudiant_list = ReservationPlaceEtudiant.objects.filter(
             seance__in=examen_list,
@@ -8893,19 +8901,19 @@ def task_envoi_convocations_examens(examen_list, user):
                 inscription_examen_list[reservation_.inscription] = ''
             inscription_examen_list[reservation_.inscription] += reservation_.seance.date.strftime(
                 "%d/%m/%Y") + ' de ' + reservation_.seance.heure_debut.strftime(
-                "%H:%M") + ' à ' + reservation_.seance.heure_fin.strftime(
+                "%H:%M") + ' أ  ' + reservation_.seance.heure_fin.strftime(
                 "%H:%M") + ' ==> ' + reservation_.salle.code + ':' + str(
                 reservation_.place) + '(' + reservation_.seance.activite.module.matiere.code + ')\n'
 
         for inscription_, examen_list_ in inscription_examen_list.items():
             try:
                 recipient_ = [inscription_.etudiant.user.email]
-                email = ('[Talents] Convocation à Passer des Epreuves Ecrites',
+                email = ('[Talents] Convocation أ  Passer des Epreuves Ecrites',
                          'Bonjour ' + str(inscription_.etudiant.prenom) + ',\n' +
-                         'Vous êtes convoqués à passer les épreuve écrites suivantes:\n' +
+                         'Vous أھtes convoquأ©s أ  passer les أ©preuve أ©crites suivantes:\n' +
                          examen_list_ +
                          'Bien cordialement.\n' +
-                         'Département',
+                         'Dأ©partement',
                          'talents@esi.dz',
                          recipient_)
                 email_list += (email,)
@@ -8925,15 +8933,15 @@ def task_envoi_convocations_examens(examen_list, user):
                                  'Bonjour ' + str(user.enseignant.prenom) + ',\n' +
                                  'Une erreur s\'est produite lors de l\'envoi des convocations.\n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[user.email])
+                                 'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
     else:
         email = EmailMessage('[Talents] Envoi des convocations pour examens',
                              'Bonjour ' + str(user.enseignant.prenom) + ',\n' +
-                             'L\'envoi des convocations a été effectué avec succès' + '\n' +
+                             'L\'envoi des convocations a أ©tأ© effectuأ© avec succأ¨s' + '\n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email])
+                             'Dأ©partement', to=[user.email])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
 
@@ -8943,7 +8951,7 @@ def affichage_convocations_examens_view(request):
     # if this is a POST request we need to process the form data
 
     if not (request.user.is_direction() or request.user.is_scolarite()):
-        messages.error(request, "Vous n'êtes pas autorisés à accéder à cette fonction.")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  accأ©der أ  cette fonction.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     if request.method == 'POST':
@@ -8953,13 +8961,13 @@ def affichage_convocations_examens_view(request):
         if form.is_valid():
             try:
                 form_data = form.cleaned_data
-                # Sélectionner les examens des formations compris dans l'intervalle des dates indiquées
+                # Sأ©lectionner les examens des formations compris dans l'intervalle des dates indiquأ©es
                 examen_list = Seance.objects.filter(activite__type__in=form_data['activite_type_list'],
                                                     activite__module__formation=form_data['formation'],
                                                     date__gte=form_data['date_debut'],
                                                     date__lte=form_data['date_fin']
                                                     ).order_by('date', 'heure_debut')
-                # afficher les convocations des étudiants
+                # afficher les convocations des أ©tudiants
                 inscription_examen_list = {}
                 reservation_place_etudiant_list = ReservationPlaceEtudiant.objects.filter(
                     seance__in=examen_list,
@@ -8983,14 +8991,14 @@ def affichage_convocations_examens_view(request):
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: lors de la génération de l'affichage des convocations.")
+                    messages.error(request, "ERREUR: lors de la gأ©nأ©ration de l'affichage des convocations.")
                     return HttpResponseRedirect(reverse('examen_list'))
     else:
         form = AffichageExamenSelectForm()
-        messages.info(request, "Merci de renseigner le formulaire pour sélectionner les examens à publier.")
+        messages.info(request, "Merci de renseigner le formulaire pour sأ©lectionner les examens أ  publier.")
         context = {}
         context['form'] = form
-        context['titre'] = "Sélection des examens à publier"
+        context['titre'] = "Sأ©lection des examens أ  publier"
         return render(request, 'scolar/import.html', context)
 
 
@@ -9016,7 +9024,7 @@ class RepartitionCreditChart(Chart):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la génération du graphique sur la répartition des crédits. Merci de le signaler à l'administrateur")
+                               "ERREUR: lors de la gأ©nأ©ration du graphique sur la rأ©partition des crأ©dits. Merci de le signaler أ  l'administrateur")
 
     def get_labels(self, *args, **kwargs):
         return self.labels
@@ -9094,7 +9102,7 @@ class ProgrammeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     fields = ['code', 'ordre', 'titre', 'titre_a', 'diplome', 'specialite', 'departement', 'description', 'assistant']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_formation'
-    success_message = "Le programme a été bien créé."
+    success_message = "Le programme a أ©tأ© bien crأ©أ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9116,7 +9124,7 @@ class ProgrammeUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
               'description', 'assistant']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_formation'
-    success_message = 'Le programme a été bien modifié.'
+    success_message = 'Le programme a أ©tأ© bien modifiأ©.'
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9147,7 +9155,7 @@ class DepartementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
     fields = ['intitule', 'intitule_a', 'responsable', 'cycle_intitule', 'cycle_ordre', 'signature', 'reglement']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_departement'
-    success_message = 'Le départmenet a été bien modifié.'
+    success_message = 'Le dأ©partmenet a أ©tأ© bien modifiأ©.'
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9164,7 +9172,7 @@ class DepartementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
     fields = ['intitule', 'intitule_a', 'responsable', 'signature', 'reglement', 'cycle_intitule', 'cycle_ordre']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_departement'
-    success_message = 'Le départmenet a bien été créé.'
+    success_message = 'Le dأ©partmenet a bien أ©tأ© crأ©أ©.'
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9176,7 +9184,7 @@ class DepartementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
 
     def get_context_data(self, **kwargs):
         context = super(DepartementCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Créer un département'
+        context['titre'] = 'Crأ©er un dأ©partement'
         return context
 
 
@@ -9184,7 +9192,7 @@ class DepartementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
     model = Departement
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_departement'
-    success_message = "Le département a été bien supprimé."
+    success_message = "Le dأ©partement a أ©tأ© bien supprimأ©."
 
     def get_success_url(self):
         return reverse('programme_design')
@@ -9195,7 +9203,7 @@ class DiplomeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     template_name = 'scolar/create.html'
     model = Diplome
     fields = ['intitule', 'intitule_a', 'domaine', 'filiere']
-    success_message = "Le diplôme a bien été créé."
+    success_message = "Le diplأ´me a bien أ©tأ© crأ©أ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9207,7 +9215,7 @@ class DiplomeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
 
     def get_context_data(self, **kwargs):
         context = super(DiplomeCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Ajouter un diplôme'
+        context['titre'] = 'Ajouter un diplأ´me'
         return context
 
 
@@ -9216,7 +9224,7 @@ class DiplomeUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     template_name = 'scolar/update.html'
     model = Diplome
     fields = ['intitule', 'intitule_a', 'domaine', 'filiere']
-    success_message = "Le diplôme a bien été modifié."
+    success_message = "Le diplأ´me a bien أ©tأ© modifiأ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9231,7 +9239,7 @@ class DiplomeDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     model = Diplome
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_diplome'
-    success_message = "Le diplôme a bien éte supprimé"
+    success_message = "Le diplأ´me a bien أ©te supprimأ©"
 
     def get_success_url(self):
         return reverse('programme_design')
@@ -9253,7 +9261,7 @@ class MatiereDetailView(DetailView):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la construction de la matrice de compétence pour la matière")
+                               "ERREUR: lors de la construction de la matrice de compأ©tence pour la matiأ¨re")
         context['pdf'] = False
         return context
 
@@ -9278,7 +9286,7 @@ class MatiereDetailPDFView(PDFTemplateView):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la construction de la matrice de compétence pour la matière")
+                               "ERREUR: lors de la construction de la matrice de compأ©tence pour la matiأ¨re")
         context['pdf'] = True
         return context
 
@@ -9311,7 +9319,7 @@ class MatiereDetailListPDFView(PDFTemplateView):
                 raise Exception
             else:
                 messages.error(self.request,
-                               "ERREUR: lors de la construction de la matrice de compétence pour les matière")
+                               "ERREUR: lors de la construction de la matrice de compأ©tence pour les matiأ¨re")
         context['pdf'] = True
         return context
 
@@ -9322,14 +9330,14 @@ class MatiereUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
               'edition', 'vh_cours', 'vh_td', 'pre_requis', 'objectifs', 'contenu', 'bibliographie', 'travail_perso']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_matiere'
-    success_message = "La matière a bien été modifiée."
+    success_message = "La matiأ¨re a bien أ©tأ© modifiأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.helper = MatiereFormHelper()
         form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        form.helper.add_input(Button('modifier', 'Définir Compétences', css_class='btn-warning',
+        form.helper.add_input(Button('modifier', 'Dأ©finir Compأ©tences', css_class='btn-warning',
                                      onclick="window.location.href='" + reverse('matiere_competence_update', kwargs={
                                          'matiere_pk': self.kwargs.get('pk')}) + "'"))
         self.success_url = self.request.META.get('HTTP_REFERER')
@@ -9337,7 +9345,7 @@ class MatiereUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
 
     def get_context_data(self, **kwargs):
         context = super(MatiereUpdateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Modifier la matière'
+        context['titre'] = 'Modifier la matiأ¨re'
         return context
 
 
@@ -9347,7 +9355,7 @@ class MatiereCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
               'edition', 'vh_cours', 'vh_td', 'pre_requis', 'objectifs', 'contenu', 'bibliographie', 'travail_perso']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_matiere'
-    success_message = "La matière a bien été créée."
+    success_message = "La matiأ¨re a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9360,7 +9368,7 @@ class MatiereCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
 
     def get_context_data(self, **kwargs):
         context = super(MatiereCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Créer une nouvelle matière'
+        context['titre'] = 'Crأ©er une nouvelle matiأ¨re'
         return context
 
 
@@ -9369,7 +9377,7 @@ class MatiereCompetenceElementUpdateView(LoginRequiredMixin, SuccessMessageMixin
     fields = ['niveau', ]
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_matierecompetenceelement'
-    success_message = "L'élément de compétence a bien été modifié."
+    success_message = "L'أ©lأ©ment de compأ©tence a bien أ©tأ© modifiأ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9381,7 +9389,7 @@ class MatiereCompetenceElementUpdateView(LoginRequiredMixin, SuccessMessageMixin
 
     def get_context_data(self, **kwargs):
         context = super(MatiereCompetenceElementUpdateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Modifier Niveau d\'acquisition de l\'élément de compétence'
+        context['titre'] = 'Modifier Niveau d\'acquisition de l\'أ©lأ©ment de compأ©tence'
         return context
 
 
@@ -9389,19 +9397,19 @@ class MatiereCompetenceElementDeleteView(LoginRequiredMixin, SuccessMessageMixin
     model = MatiereCompetenceElement
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_matierecompetenceelement'
-    success_message = "L'élément de compétence a bien été supprimé."
+    success_message = "L'أ©lأ©ment de compأ©tence a bien أ©tأ© supprimأ©."
 
     def get_success_url(self):
         return reverse('matiere_competence_update', kwargs={'matiere_pk': self.kwargs.get('matiere_pk')})
 
 
 def get_competence_context(matiere_competence_element_qs):
-    # on construit ici la représentation matricielle des compétences:
+    # on construit ici la reprأ©sentation matricielle des compأ©tences:
     # ddc_list : en colonne la liste des domaines de connaissance
-    # pgm_list : en colonne la liste des programmes (niveau d'études)
-    # ce_list: en ligne la liste des éléments de compétence
-    # ce_ddc_list: dans les cellules la liste des matières qui assurent cette élément de compétence
-    # ce_pgm_list : dans les cellules la liste des matières qui assrent cet élement de compétence
+    # pgm_list : en colonne la liste des programmes (niveau d'أ©tudes)
+    # ce_list: en ligne la liste des أ©lأ©ments de compأ©tence
+    # ce_ddc_list: dans les cellules la liste des matiأ¨res qui assurent cette أ©lأ©ment de compأ©tence
+    # ce_pgm_list : dans les cellules la liste des matiأ¨res qui assrent cet أ©lement de compأ©tence
     ddc_list = DomaineConnaissance.objects.all()
     pgm_list = Programme.objects.all().order_by('ordre')
     ce_ddc_list = {}
@@ -9484,9 +9492,9 @@ def competence_list_view(request):
                     'competence_element__code', 'matiere__code')
             table = MatiereCompetenceElementTable(qs, exclude=exclude_columns(request.user))
             messages.success(request,
-                             "Les éléments de compétence ont bien été sélectionnés. Vous pouvez les visualiser dans le tableau ci-bas.")
+                             "Les أ©lأ©ments de compأ©tence ont bien أ©tأ© sأ©lectionnأ©s. Vous pouvez les visualiser dans le tableau ci-bas.")
             messages.success(request,
-                             "Vous pouvez visualiser la matrice de compétence construite avec ces éléments de compétence.")
+                             "Vous pouvez visualiser la matrice de compأ©tence construite avec ces أ©lأ©ments de compأ©tence.")
     else:
 
         qs = MatiereCompetenceElement.objects.all().order_by('competence_element__competence__competence_family__code',
@@ -9495,8 +9503,8 @@ def competence_list_view(request):
         table = MatiereCompetenceElementTable(qs, exclude=exclude_columns(request.user))
 
         form = CompetenceForm()
-        # messages.info(request, "Utilisez ce formulaire pour sélectionner les éléments de compétences et visualiser la matrice de compétence.")
-        # messages.info(request, "Par défaut, tous les éléments de compétence de la catégorie choisie seront sélectionnés.")
+        # messages.info(request, "Utilisez ce formulaire pour sأ©lectionner les أ©lأ©ments de compأ©tences et visualiser la matrice de compأ©tence.")
+        # messages.info(request, "Par dأ©faut, tous les أ©lأ©ments de compأ©tence de la catأ©gorie choisie seront sأ©lectionnأ©s.")
     try:
         context = get_competence_context(qs)
     except Exception:
@@ -9504,16 +9512,16 @@ def competence_list_view(request):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de la création de la matrice de compétence. Merci de le signaler à l'administrateur.")
+                           "ERREUR: lors de la crأ©ation de la matrice de compأ©tence. Merci de le signaler أ  l'administrateur.")
     context['form'] = form
     context['table'] = table
-    context['titre'] = 'Compétences développées à l\'issue de nos formations'
+    context['titre'] = 'Compأ©tences dأ©veloppأ©es أ  l\'issue de nos formations'
     return render(request, 'scolar/competence_matrice.html', context)
 
 
 class ReferentielCompetenceView(TemplateView):
     template_name = 'scolar/referentiel_competence.html'
-    titre = 'Référentiel de Compétences'
+    titre = 'Rأ©fأ©rentiel de Compأ©tences'
 
     def get_context_data(self, **kwargs):
         context = super(ReferentielCompetenceView, self).get_context_data(**kwargs)
@@ -9537,12 +9545,12 @@ class ReferentielCompetenceView(TemplateView):
 
 class MatriceCompetenceDDCView(ReferentielCompetenceView):
     template_name = 'scolar/matrice_competence_ddc.html'
-    titre = 'Matrice des Compétences par Domaine de Connaissance'
+    titre = 'Matrice des Compأ©tences par Domaine de Connaissance'
 
 
 class MatriceCompetenceNiveauView(ReferentielCompetenceView):
     template_name = 'scolar/matrice_competence_niveau.html'
-    titre = 'Matrice des Compétences par Niveau d\'étude'
+    titre = 'Matrice des Compأ©tences par Niveau d\'أ©tude'
 
 
 class CatalogueProgrammeView(ReferentielCompetenceView):
@@ -9579,11 +9587,11 @@ def matiere_competence_update_view(request, matiere_pk):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: lors de l'ajout des éléments de compétence à la matière. Merci de le signaler à l'administrateur")
-            messages.success(request, "Les éléments de compétence sélectionnés ont bien été rajouté à la matière.")
+                                   "ERREUR: lors de l'ajout des أ©lأ©ments de compأ©tence أ  la matiأ¨re. Merci de le signaler أ  l'administrateur")
+            messages.success(request, "Les أ©lأ©ments de compأ©tence sأ©lectionnأ©s ont bien أ©tأ© rajoutأ© أ  la matiأ¨re.")
     else:
         form = CompetenceForm()
-        messages.info(request, "Merci de sélectionner les éléments de compétence à rajouter à la matière.")
+        messages.info(request, "Merci de sأ©lectionner les أ©lأ©ments de compأ©tence أ  rajouter أ  la matiأ¨re.")
 
     qs = MatiereCompetenceElement.objects.filter(matiere=matiere_).order_by(
         'competence_element__competence__competence_family__code', 'competence_element__competence__code',
@@ -9596,10 +9604,10 @@ def matiere_competence_update_view(request, matiere_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de la construction de la matrice de compétences. Merci de le signaler à l'administrateur.")
+                           "ERREUR: lors de la construction de la matrice de compأ©tences. Merci de le signaler أ  l'administrateur.")
     context['form'] = form
     context['table'] = table
-    context['titre'] = 'Compétences développées à l\'issue de nos formations'
+    context['titre'] = 'Compأ©tences dأ©veloppأ©es أ  l\'issue de nos formations'
 
     return render(request, 'scolar/competence_matrice.html', context)
 
@@ -9613,16 +9621,16 @@ class CompetenceFamilyListView(TemplateView):
                                       exclude=exclude_columns(self.request.user))
 
         RequestConfig(self.request).configure(table)
-        context['titre'] = 'Familles de Compétences'
+        context['titre'] = 'Familles de Compأ©tences'
         context['table'] = table
         context['back'] = reverse('competence_list')
         if self.request.user.has_perm('scolar.add_competencefamily'):
             context['create_url'] = reverse('competence_family_create')
-            context['create_btn'] = 'Famille Compétences'
+            context['create_btn'] = 'Famille Compأ©tences'
         btn_list = {
-            'Référentiel Compétences': reverse('referentiel_competence'),
-            'Matrice Compétence / DDC': reverse('matrice_competence_ddc'),
-            'Matrice Compétence / Niveau': reverse('matrice_competence_niveau')
+            'Rأ©fأ©rentiel Compأ©tences': reverse('referentiel_competence'),
+            'Matrice Compأ©tence / DDC': reverse('matrice_competence_ddc'),
+            'Matrice Compأ©tence / Niveau': reverse('matrice_competence_niveau')
         }
         context['btn_list'] = btn_list
         return context
@@ -9633,7 +9641,7 @@ class CompetenceFamilyCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
     fields = ['code', 'intitule']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_competencefamily'
-    success_message = "La famille de compétences a bien été créée."
+    success_message = "La famille de compأ©tences a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9645,7 +9653,7 @@ class CompetenceFamilyCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
 
     def get_context_data(self, **kwargs):
         context = super(CompetenceFamilyCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Ajouter une Famille de Compétences'
+        context['titre'] = 'Ajouter une Famille de Compأ©tences'
         return context
 
 
@@ -9654,7 +9662,7 @@ class CompetenceFamilyUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permis
     fields = ['code', 'intitule']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_competencefamily'
-    success_message = "La famille de compétence a bien été modifiée."
+    success_message = "La famille de compأ©tence a bien أ©tأ© modifiأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9669,7 +9677,7 @@ class CompetenceFamilyDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permis
     model = CompetenceFamily
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_competencefamily'
-    success_message = "La famille de compétence a bien été supprimée."
+    success_message = "La famille de compأ©tence a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('competence_family_list')
@@ -9685,13 +9693,13 @@ class CompetenceListView(TemplateView):
             exclude=exclude_columns(self.request.user))
 
         RequestConfig(self.request).configure(table)
-        context['titre'] = 'Liste de Compétences de la famille ' + self.kwargs.get('competence_family_pk')
+        context['titre'] = 'Liste de Compأ©tences de la famille ' + self.kwargs.get('competence_family_pk')
         context['table'] = table
         context['back'] = reverse('competence_family_list')
         if self.request.user.has_perm('scolar.add_competence'):
             context['create_url'] = reverse('competence_create',
                                             kwargs={'competence_family_pk': self.kwargs.get('competence_family_pk')})
-            context['create_btn'] = 'Compétence'
+            context['create_btn'] = 'Compأ©tence'
         return context
 
 
@@ -9700,7 +9708,7 @@ class CompetenceCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     fields = ['code', 'competence_family', 'intitule']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_competence'
-    success_message = "La compétence a bien été créée."
+    success_message = "La compأ©tence a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9715,7 +9723,7 @@ class CompetenceCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
 
     def get_context_data(self, **kwargs):
         context = super(CompetenceCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Ajouter une Compétences à ' + self.kwargs.get('competence_family_pk')
+        context['titre'] = 'Ajouter une Compأ©tences أ  ' + self.kwargs.get('competence_family_pk')
         return context
 
 
@@ -9724,7 +9732,7 @@ class CompetenceUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     fields = ['code', 'competence_family', 'intitule']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_competence'
-    success_message = "La compétence a bien été modifiée."
+    success_message = "La compأ©tence a bien أ©tأ© modifiأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9740,7 +9748,7 @@ class CompetenceDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     model = Competence
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_competence'
-    success_message = "La compétence a bien été supprimée."
+    success_message = "La compأ©tence a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('competence_list', kwargs={'competence_family_pk': self.kwargs.get('competence_family_pk')})
@@ -9756,14 +9764,14 @@ class CompetenceElementListView(TemplateView):
             exclude=exclude_columns(self.request.user))
         competence_ = get_object_or_404(Competence, id=self.kwargs.get('competence_pk'))
         RequestConfig(self.request).configure(table)
-        context['titre'] = 'Liste des éléments de Compétences'
+        context['titre'] = 'Liste des أ©lأ©ments de Compأ©tences'
         context['table'] = table
         context['back'] = reverse('competence_list',
                                   kwargs={'competence_family_pk': competence_.competence_family.code})
         if self.request.user.has_perm('scolar.add_competenceelement'):
             context['create_url'] = reverse('competence_element_create',
                                             kwargs={'competence_pk': self.kwargs.get('competence_pk')})
-            context['create_btn'] = 'Element de Compétence'
+            context['create_btn'] = 'Element de Compأ©tence'
         return context
 
 
@@ -9772,7 +9780,7 @@ class CompetenceElementCreateView(LoginRequiredMixin, SuccessMessageMixin, Permi
     fields = ['code', 'competence', 'intitule', 'type', 'objectif']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_competenceelement'
-    success_message = "L'étément de compétence a bien été créé."
+    success_message = "L'أ©tأ©ment de compأ©tence a bien أ©tأ© crأ©أ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9787,7 +9795,7 @@ class CompetenceElementCreateView(LoginRequiredMixin, SuccessMessageMixin, Permi
 
     def get_context_data(self, **kwargs):
         context = super(CompetenceElementCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Ajouter un Element de Compétence'
+        context['titre'] = 'Ajouter un Element de Compأ©tence'
         return context
 
 
@@ -9796,7 +9804,7 @@ class CompetenceElementUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permi
     fields = ['code', 'competence', 'intitule', 'type', 'objectif']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_competenceelement'
-    success_message = "L'étément de compétence a bien été modifié."
+    success_message = "L'أ©tأ©ment de compأ©tence a bien أ©tأ© modifiأ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9812,7 +9820,7 @@ class CompetenceElementDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permi
     model = CompetenceElement
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_competenceelement'
-    success_message = "L'étément de compétence a bien été supprimé."
+    success_message = "L'أ©tأ©ment de compأ©tence a bien أ©tأ© supprimأ©."
 
     def get_success_url(self):
         return reverse('competence_element_list', kwargs={'competence_pk': self.kwargs.get('competence_pk')})
@@ -9822,7 +9830,7 @@ class PeriodeDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     model = Periode
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_periode'
-    success_message = "Le semestre a bien été supprimé."
+    success_message = "Le semestre a bien أ©tأ© supprimأ©."
 
     def get_success_url(self):
         return reverse('programme_detail', kwargs={'pk': str(self.kwargs.get('programme_pk'))})
@@ -9832,7 +9840,7 @@ class UEDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
     model = UE
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_ue'
-    success_message = "L'UE a bien été supprimée.."
+    success_message = "L'UE a bien أ©tأ© supprimأ©e.."
 
     def get_success_url(self):
         return reverse('programme_detail', kwargs={'pk': str(self.kwargs.get('programme_pk'))})
@@ -9843,7 +9851,7 @@ class UEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
     fields = ['code', 'type', 'nature', 'periode', 'matieres']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_ue'
-    success_message = "L'UE a bien été modifiée."
+    success_message = "L'UE a bien أ©tأ© modifiأ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9858,7 +9866,7 @@ class UEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
                                                                      search_fields=['code__icontains',
                                                                                     'titre__icontains']
                                                                  ),
-                                                                 help_text="Tapez le nom de la matière. Vous pouvez sélectionner plusieurs. Tapez deux espaces pour avoir la liste complète")
+                                                                 help_text="Tapez le nom de la matiأ¨re. Vous pouvez sأ©lectionner plusieurs. Tapez deux espaces pour avoir la liste complأ¨te")
         form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse('programme_detail', kwargs={'pk': str(self.kwargs.get('programme_pk'))})
@@ -9869,7 +9877,7 @@ class ResultatUEDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     model = ResultatUE
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_resultatue'
-    success_message = "L'UE a bien été supprimée.."
+    success_message = "L'UE a bien أ©tأ© supprimأ©e.."
 
     def get_success_url(self):
         return reverse('releve_notes', kwargs={'inscription_pk': str(self.kwargs.get('inscription_pk'))})
@@ -9880,7 +9888,7 @@ class PeriodeProgrammeCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
     fields = ['periode', 'programme', 'code']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_periodeprogramme'
-    success_message = "Le semestre a bien été créé."
+    success_message = "Le semestre a bien أ©tأ© crأ©أ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9895,7 +9903,7 @@ class PeriodeProgrammeCreateView(LoginRequiredMixin, SuccessMessageMixin, Permis
 
     def get_context_data(self, **kwargs):
         context = super(PeriodeProgrammeCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Ajouter une période'
+        context['titre'] = 'Ajouter une pأ©riode'
         return context
 
 
@@ -9904,7 +9912,7 @@ class PeriodeProgrammeUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permis
     fields = ['periode', 'programme', 'code']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_periodeprogramme'
-    success_message = "Le semestre a bien été modifié."
+    success_message = "Le semestre a bien أ©tأ© modifiأ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9922,7 +9930,7 @@ class PeriodeProgrammeDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permis
     model = PeriodeProgramme
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_periodeprogramme'
-    success_message = "La période a bien été supprimée."
+    success_message = "La pأ©riode a bien أ©tأ© supprimأ©e."
 
     def get_success_url(self):
         return reverse('programme_detail', kwargs={'pk': str(self.kwargs.get('programme_pk'))})
@@ -9933,7 +9941,7 @@ class PeriodeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     fields = ['code', 'session', 'ordre', 'nb_semaines']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_periode'
-    success_message = "Le semestre a bien été créé."
+    success_message = "Le semestre a bien أ©tأ© crأ©أ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9945,7 +9953,7 @@ class PeriodeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
 
     def get_context_data(self, **kwargs):
         context = super(PeriodeCreateView, self).get_context_data(**kwargs)
-        context['titre'] = 'Ajouter une période'
+        context['titre'] = 'Ajouter une pأ©riode'
         return context
 
 
@@ -9954,7 +9962,7 @@ class PeriodeUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     fields = ['code', 'ordre', 'session', 'nb_semaines']
     template_name = 'scolar/update.html'
     permission_required = 'scolar.change_periode'
-    success_message = "Le semestre a bien été modifié."
+    success_message = "Le semestre a bien أ©tأ© modifiأ©."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9969,7 +9977,7 @@ class UECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
     fields = ['code', 'type', 'nature', 'periode', 'matieres']
     template_name = 'scolar/create.html'
     permission_required = 'scolar.add_ue'
-    success_message = "L'UE a bien été créée."
+    success_message = "L'UE a bien أ©tأ© crأ©أ©e."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -9983,7 +9991,7 @@ class UECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
                                                                      search_fields=['code__icontains',
                                                                                     'titre__icontains']
                                                                  ),
-                                                                 help_text="Tapez le nom de la matière. Vous pouvez sélectionner plusieurs. Tapez deux espaces pour avoir la liste complète")
+                                                                 help_text="Tapez le nom de la matiأ¨re. Vous pouvez sأ©lectionner plusieurs. Tapez deux espaces pour avoir la liste complأ¨te")
         form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse('programme_detail', kwargs={'pk': str(self.kwargs.get('programme_pk'))})
@@ -9999,11 +10007,11 @@ class UECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMi
 def absencesform(request, activite_pk, groupe_pk):
     activite_ = get_object_or_404(Activite, id=activite_pk)
     if request.user.is_etudiant():
-        messages.error(request, "Vous n'êtes pas autorisés à excécuter cette opération")
+        messages.error(request, "Vous n'أھtes pas autorisأ©s أ  excأ©cuter cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     elif request.user.is_enseignant():
         if not assure_module(request.user.enseignant, activite_.module):
-            messages.error(request, "Vous n'êtes pas autorisés à excécuter cette opération")
+            messages.error(request, "Vous n'أھtes pas autorisأ©s أ  excأ©cuter cette opأ©ration")
             return redirect('/accounts/login/?next=%s' % request.path)
 
         # if this is a POST request we need to process the form data
@@ -10038,17 +10046,17 @@ def absencesform(request, activite_pk, groupe_pk):
                     raise Exception
                 else:
                     messages.error(request,
-                                   "ERREUR: Le signalement des absences s'est terminé avec echec. Merci de le signaler à l'administrateur.")
+                                   "ERREUR: Le signalement des absences s'est terminأ© avec echec. Merci de le signaler أ  l'administrateur.")
                     return HttpResponseRedirect(reverse('assiduite', kwargs={'activite_pk': seance_.activite.id}))
-            messages.success(request, "Le signalement des absences s'est terminé avec succès!")
-            # envoyer un message à l'enseignant
-            email = EmailMessage('[Talents] Absences Signalées en ' + str(seance_),
+            messages.success(request, "Le signalement des absences s'est terminأ© avec succأ¨s!")
+            # envoyer un message أ  l'enseignant
+            email = EmailMessage('[Talents] Absences Signalأ©es en ' + str(seance_),
                                  'Bonjour ' + str(request.user.enseignant.prenom) + ',\n' +
                                  'Nous confirmons le signalement des absences suivantes \n' +
                                  absence_list +
-                                 'Les concernés ont été notifiés et invités à justifier leur absence dans les 48h\n'
+                                 'Les concernأ©s ont أ©tأ© notifiأ©s et invitأ©s أ  justifier leur absence dans les 48h\n'
                                  'Bien cordialement.\n' +
-                                 'Département', to=[request.user.email])
+                                 'Dأ©partement', to=[request.user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -10057,7 +10065,7 @@ def absencesform(request, activite_pk, groupe_pk):
             # if a GET (or any other method) we'll create a blank form
     else:
         form = AbsencesForm(groupe_pk, activite_.module.id)
-        messages.info(request, "Merci de cocher les étudiants absents.")
+        messages.info(request, "Merci de cocher les أ©tudiants absents.")
     return render(request, 'scolar/import.html', {'form': form, 'titre': "Fiche d'absences"})
 
 
@@ -10066,63 +10074,63 @@ def email_absence_etudiant(sender, update_fields, instance, created, **kwargs):
     if created:
         nb_absences = instance.nb_absences()
         if nb_absences < 3:
-            email = EmailMessage(str(nb_absences) + ' Absences Signalées en ' + str(instance.seance.activite),
+            email = EmailMessage(str(nb_absences) + ' Absences Signalأ©es en ' + str(instance.seance.activite),
                                  'Bonjour,\n' +
-                                 'Nous espérons que vous allez bien!\n Nous vous informons qu\'une nouvelle absence en ' + str(
+                                 'Nous espأ©rons que vous allez bien!\n Nous vous informons qu\'une nouvelle absence en ' + str(
                                      instance.seance.activite) +
-                                 ' a été signalée\n' +
+                                 ' a أ©tأ© signalأ©e\n' +
                                  'Veuillez vous rapprocher de la surveillace (' + str(
                                      instance.seance.activite.module.formation.programme.assistant.user.email) +
                                  ') dans les 48h pour justifier votre absence.\n' +
-                                 'Sinon, vous allez vous exposez à des sanctions.\n' +
-                                 'Merci de préciser dans votre justification le module er la date de l\'absence' +
+                                 'Sinon, vous allez vous exposez أ  des sanctions.\n' +
+                                 'Merci de prأ©ciser dans votre justification le module er la date de l\'absence' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[instance.etudiant.user.email])
+                                 'Dأ©partement', to=[instance.etudiant.user.email])
         elif nb_absences < 5:
             email = EmailMessage('AVERTISSEMENT & CONVOCATION ' + str(
-                nb_absences) + ' Absences Signalées en ' + instance.seance.activite.module.matiere.code,
+                nb_absences) + ' Absences Signalأ©es en ' + instance.seance.activite.module.matiere.code,
                                  'Matricule: ' + instance.etudiant.matricule + '\n' +
-                                 'Nom & Prénoms: ' + instance.etudiant.nom + ' ' + instance.etudiant.prenom + '\n' +
-                                 'Année d\'études: ' + str(instance.seance.activite.module.formation) + '\n' +
+                                 'Nom & Prأ©noms: ' + instance.etudiant.nom + ' ' + instance.etudiant.prenom + '\n' +
+                                 'Annأ©e d\'أ©tudes: ' + str(instance.seance.activite.module.formation) + '\n' +
                                  'Email: ' + instance.etudiant.user.email + '\n' +
                                  'Tel: ' + str(instance.etudiant.tel) + '\n\n\n'
                                                                         'Bonjour,\n' +
-                                 'Nous espérons que vous allez bien!\n' +
+                                 'Nous espأ©rons que vous allez bien!\n' +
                                  'Nous vous informons que ' + str(
-                                     nb_absences) + ' absences au module ' + instance.seance.activite.module.matiere.code + ' ont été signalées\n' +
+                                     nb_absences) + ' absences au module ' + instance.seance.activite.module.matiere.code + ' ont أ©tأ© signalأ©es\n' +
                                  'Ceci est un AVERTISSEMENT.\n' +
-                                 'Veuillez vous rapprocher du Chef de Département pour clarifier votre situation.\n' +
-                                 'Nous vous rappelons que la réglementation des études stipule l\'exclusion d\'une matière dans le cas de:\n' +
-                                 '3 absences consécutives non justifiées, ou\n' +
-                                 '5 absences mêmes justifiées.\n' +
+                                 'Veuillez vous rapprocher du Chef de Dأ©partement pour clarifier votre situation.\n' +
+                                 'Nous vous rappelons que la rأ©glementation des أ©tudes stipule l\'exclusion d\'une matiأ¨re dans le cas de:\n' +
+                                 '3 absences consأ©cutives non justifiأ©es, ou\n' +
+                                 '5 absences mأھmes justifiأ©es.\n' +
                                  'Bien cordialement.\n' +
-                                 'Département', to=[instance.etudiant.user.email,
+                                 'Dأ©partement', to=[instance.etudiant.user.email,
                                                     instance.seance.activite.module.formation.programme.departement.responsable.user.email] + [
                                                        x.user.email for x in
                                                        instance.seance.activite.assuree_par.all()])
         else:
-            email = EmailMessage('EXCLUSION suite à ' + str(
-                nb_absences) + ' Absences Signalées en ' + instance.seance.activite.module.matiere.code,
+            email = EmailMessage('EXCLUSION suite أ  ' + str(
+                nb_absences) + ' Absences Signalأ©es en ' + instance.seance.activite.module.matiere.code,
                                  'Matricule: ' + instance.etudiant.matricule + '\n' +
-                                 'Nom & Prénoms: ' + instance.etudiant.nom + ' ' + instance.etudiant.prenom + '\n' +
-                                 'Année d\'études: ' + str(instance.seance.activite.module.formation) + '\n' +
+                                 'Nom & Prأ©noms: ' + instance.etudiant.nom + ' ' + instance.etudiant.prenom + '\n' +
+                                 'Annأ©e d\'أ©tudes: ' + str(instance.seance.activite.module.formation) + '\n' +
                                  'Email: ' + instance.etudiant.user.email + '\n' +
                                  'Tel: \n\n\n'
                                  'Bonjour,\n' +
-                                 'Nous espérons que vous allez bien!\n' +
+                                 'Nous espأ©rons que vous allez bien!\n' +
                                  'Nous vous informons que ' + str(
-                                     nb_absences) + ' absences au module ' + instance.seance.activite.module.matiere.code + ' ont été signalées\n' +
-                                 'Nous vous rappelons que la réglementation des études stipule l\'exclusion d\'une matière dans le cas de:\n' +
-                                 '3 absences consécutives non justifiées, ou\n' +
-                                 '5 absences mêmes justifiées.\n' +
-                                 'Veuillez donc vous rapprocher du Département pour clarifier votre situation et demander le cas échéant un billet d\'accès en salle.'
-                                 'Si vous êtes redoublant ou en 1CP, nous vous conseillons d\'entamer vos prospections de réorientation dès maintenant car il est difficile de trouver des places à l\'université en mois de septembre.\n' +
+                                     nb_absences) + ' absences au module ' + instance.seance.activite.module.matiere.code + ' ont أ©tأ© signalأ©es\n' +
+                                 'Nous vous rappelons que la rأ©glementation des أ©tudes stipule l\'exclusion d\'une matiأ¨re dans le cas de:\n' +
+                                 '3 absences consأ©cutives non justifiأ©es, ou\n' +
+                                 '5 absences mأھmes justifiأ©es.\n' +
+                                 'Veuillez donc vous rapprocher du Dأ©partement pour clarifier votre situation et demander le cas أ©chأ©ant un billet d\'accأ¨s en salle.'
+                                 'Si vous أھtes redoublant ou en 1CP, nous vous conseillons d\'entamer vos prospections de rأ©orientation dأ¨s maintenant car il est difficile de trouver des places أ  l\'universitأ© en mois de septembre.\n' +
                                  'Bien cordialement.\n'
-                                 'Département', to=[instance.etudiant.user.email,
+                                 'Dأ©partement', to=[instance.etudiant.user.email,
                                                     instance.seance.activite.module.formation.programme.departement.responsable.user.email] +
                                                    settings.STAFF_EMAILS['scolarite'] + settings.STAFF_EMAILS[
                                                        'direction'])
-            # basculer l'état d'inscription vers ABANDON
+            # basculer l'أ©tat d'inscription vers ABANDON
             # inscription_=Inscription.objects.get(etudiant=instance.etudiant, formation__annee_univ__encours=True)
             # inscription_.decision_jury__startswith='F'
             # inscription_.save(update_fields=['decision_jury'])
@@ -10131,10 +10139,10 @@ def email_absence_etudiant(sender, update_fields, instance, created, **kwargs):
     elif instance.justif:
         email = EmailMessage('[Talents] Justification Absence en ' + str(instance.seance),
                              'Bonjour ' + instance.etudiant.prenom + ',\n' +
-                             'Nous vous informons que Talents a enregistré votre justification de votre absence en:\n' +
+                             'Nous vous informons que Talents a enregistrأ© votre justification de votre absence en:\n' +
                              str(instance.seance) + '\n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[instance.etudiant.user.email])
+                             'Dأ©partement', to=[instance.etudiant.user.email])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
 
@@ -10188,7 +10196,7 @@ def export_notes(request, groupe_pk, module_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des notes. Merci de le signaler à l'administrateur.")
+                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des notes. Merci de le signaler أ  l'administrateur.")
     return response
 
 
@@ -10237,7 +10245,7 @@ def export_pfe_list(request):
             row_.append(pfe_.organisme.pays.nom)
             sheet.append(row_)
 
-        filename = 'Liste_PFE_Validés.xlsx'
+        filename = 'Liste_PFE_Validأ©s.xlsx'
 
         response = HttpResponse(content_type='application/vnd.ms-excel')
         response['Content-Disposition'] = 'attachment; filename=' + filename + ";"
@@ -10246,7 +10254,7 @@ def export_pfe_list(request):
         if settings.DEBUG:
             raise Exception
         else:
-            messages.error(request, "ERREUR: Il y a eu une erreur lors de l'export du fichier des PFE validés")
+            messages.error(request, "ERREUR: Il y a eu une erreur lors de l'export du fichier des PFE validأ©s")
     return response
 
 
@@ -10309,7 +10317,7 @@ def export_etudiant_pfe_list(request, formation_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des Etudiant - PFE validés")
+                           "ERREUR: Il y a eu une erreur lors de l'export du fichier des Etudiant - PFE validأ©s")
     return response
 
 
@@ -10334,20 +10342,20 @@ def export_fiche_eval_pfe(request, groupe_pk, module_pk):
             module.formation.annee_univ.annee_suivante()), " "])
         sheet.append(['CODE PFE: ', groupe.code, " "])
         sheet.append([" ", " ", " "])
-        sheet.append(['Noms et Prénoms des Candidats', 'Matricule', 'Option'])
+        sheet.append(['Noms et Prأ©noms des Candidats', 'Matricule', 'Option'])
         for resultat_ in resultat_list:
             sheet.append([resultat_.inscription.etudiant.nom + ' ' + resultat_.inscription.etudiant.prenom,
                           resultat_.inscription.etudiant.matricule,
                           resultat_.inscription.formation.programme.specialite.intitule + ' -- ' + resultat_.inscription.formation.programme.specialite.code])
         sheet.append([" ", " ", " "])
-        sheet.append(['Intitulé du mémoire: ', " ", " "])
+        sheet.append(['Intitulأ© du mأ©moire: ', " ", " "])
         sheet.append([groupe.pfe.intitule, " ", " "])
         sheet.append([" ", " ", " "])
         sheet.append(['Date de soutenance: ', groupe.soutenance.date.strftime("%d/%m/%Y"), " "])
         sheet.append([" ", " ", " "])
         sheet.append(['COMPOSITION DU JURY', " ", " "])
         if groupe.soutenance.president:
-            sheet.append(['Président', str(groupe.soutenance.president), " "])
+            sheet.append(['Prأ©sident', str(groupe.soutenance.president), " "])
         if groupe.soutenance.examinateur:
             sheet.append(['Examinateur', str(groupe.soutenance.examinateur), " "])
         if groupe.soutenance.rapporteur:
@@ -10369,7 +10377,7 @@ def export_fiche_eval_pfe(request, groupe_pk, module_pk):
                 sheet.append([" ", " ", " "])
                 sheet.append(["EVALUATION DE: " + str(resultat_.inscription.etudiant), " ", " "])
                 sheet.append([" ", " ", " "])
-                sheet.append(['Elément de Compétence', 'Commun', 'Appréciation'])
+                sheet.append(['Elأ©ment de Compأ©tence', 'Commun', 'Apprأ©ciation'])
                 note_, created = Note.objects.get_or_create(resultat=resultat_, evaluation=eval_, defaults={
                     'resultat': resultat_,
                     'evaluation': eval_,
@@ -10401,7 +10409,7 @@ def export_fiche_eval_pfe(request, groupe_pk, module_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: Il y a eu une erreur lors de l'export du fichier d'évaluation du PFE. Merci de le signaler à l'administrateur.")
+                           "ERREUR: Il y a eu une erreur lors de l'export du fichier d'أ©valuation du PFE. Merci de le signaler أ  l'administrateur.")
     return response
 
 
@@ -10411,7 +10419,7 @@ def notes_clear_view(request, inscription_periode_pk):
     if request.user.is_direction():
         pass
     else:
-        messages.error(request, "Vous n'êtes pas autorisé à exécuter cette opération.")
+        messages.error(request, "Vous n'أھtes pas autorisأ© أ  exأ©cuter cette opأ©ration.")
         return HttpResponseRedirect(
             reverse('releve_notes', kwargs={'inscription_pk': inscription_periode_.inscription.id}))
     try:
@@ -10432,7 +10440,7 @@ def notes_clear_view(request, inscription_periode_pk):
             rang=inscription_periode_.inscription.ranking()
         )
         # redirect to a new URL:
-        messages.success(request, "Le semestre a été bien ré-initialisé")
+        messages.success(request, "Le semestre a أ©tأ© bien rأ©-initialisأ©")
         return HttpResponseRedirect(
             reverse('releve_notes', kwargs={'inscription_pk': inscription_periode_.inscription.id}))
 
@@ -10440,7 +10448,7 @@ def notes_clear_view(request, inscription_periode_pk):
         if settings.DEBUG:
             raise Exception
         else:
-            messages.error(request, "ERREUR: lors de la ré-initialisation du semestre")
+            messages.error(request, "ERREUR: lors de la rأ©-initialisation du semestre")
             return HttpResponseRedirect(
                 reverse('releve_notes', kwargs={'inscription_pk': inscription_periode_.inscription.id}))
 
@@ -10451,7 +10459,7 @@ def acquis_clear_view(request, resultat_pk):
     if request.user.is_direction():
         pass
     else:
-        messages.error(request, "Vous n'êtes pas autorisé à exécuter cette opération.")
+        messages.error(request, "Vous n'أھtes pas autorisأ© أ  exأ©cuter cette opأ©ration.")
         return HttpResponseRedirect(reverse('releve_notes', kwargs={'inscription_pk': resultat_.inscription.id}))
 
     try:
@@ -10463,7 +10471,7 @@ def acquis_clear_view(request, resultat_pk):
             acquis=False
         )
         # redirect to a new URL:
-        messages.success(request, "La note a été bien ré-initialisée")
+        messages.success(request, "La note a أ©tأ© bien rأ©-initialisأ©e")
         return HttpResponseRedirect(reverse('releve_notes', kwargs={'inscription_pk': resultat_.inscription.id}))
 
     except Exception:
@@ -10471,7 +10479,7 @@ def acquis_clear_view(request, resultat_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de la ré-initialisation de la note. veuillez la signaler à l'administrateur.")
+                           "ERREUR: lors de la rأ©-initialisation de la note. veuillez la signaler أ  l'administrateur.")
             return HttpResponseRedirect(reverse('releve_notes', kwargs={'inscription_pk': resultat_.inscription.id}))
 
 
@@ -10480,11 +10488,11 @@ def modules_acquis_view(request, inscription_pk):
     if request.user.is_direction():
         pass
     else:
-        messages.error(request, "Vous n'êtes pas autorisé à exécuter cette opération.")
+        messages.error(request, "Vous n'أھtes pas autorisأ© أ  exأ©cuter cette opأ©ration.")
         return HttpResponseRedirect(reverse('releve_notes', kwargs={'inscription_pk': inscription_pk}))
 
     try:
-        # parcourir tous les résultats de l'inscription en cours
+        # parcourir tous les rأ©sultats de l'inscription en cours
         for resultat_ in Resultat.objects.filter(inscription=inscription_pk):
             # Si module acquis alors copier l'ancien dans le nouveau
             old_resultat_ = Resultat.objects.filter(inscription__etudiant=resultat_.inscription.etudiant,
@@ -10500,7 +10508,7 @@ def modules_acquis_view(request, inscription_pk):
                 resultat_.acquis = True
                 resultat_.save(update_fields=['moy', 'moy_post_delib', 'ects', 'acquis'])
 
-        messages.success(request, "Les modules acquis ont bien été insrés dans cette inscription")
+        messages.success(request, "Les modules acquis ont bien أ©tأ© insrأ©s dans cette inscription")
         return HttpResponseRedirect(reverse('releve_notes', kwargs={'inscription_pk': inscription_pk}))
 
     except Exception:
@@ -10508,15 +10516,15 @@ def modules_acquis_view(request, inscription_pk):
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de l'insertion des modules acquis. Veuillez la signaler à l'administrateur.")
+                           "ERREUR: lors de l'insertion des modules acquis. Veuillez la signaler أ  l'administrateur.")
             return HttpResponseRedirect(reverse('releve_notes', kwargs={'inscription_pk': inscription_pk}))
 
 
 @login_required
 def note_update(request, matiere_pk, groupe_pk):
-    # Il faudra refaire le traitement des données du formuliare pour n'enregistrer
-    # que les données ayant changé et pas toutes (form.changed_data) pour éviter des
-    # problèmes de performance
+    # Il faudra refaire le traitement des donnأ©es du formuliare pour n'enregistrer
+    # que les donnأ©es ayant changأ© et pas toutes (form.changed_data) pour أ©viter des
+    # problأ¨mes de performance
 
     module_ = get_object_or_404(ModulesSuivis, groupe=groupe_pk, module__matiere=matiere_pk).module
     groupe_ = get_object_or_404(Groupe, id=groupe_pk)
@@ -10525,19 +10533,19 @@ def note_update(request, matiere_pk, groupe_pk):
         'etudiant__nom', 'etudiant__prenom')
     liste_evaluations = Evaluation.objects.filter(module=module_.id)
 
-    # Si la formation est archivée ou si un PV est déjà établit alors ne pas autoriser la modification
+    # Si la formation est archivأ©e ou si un PV est dأ©jأ  أ©tablit alors ne pas autoriser la modification
     if request.user.is_direction():
         pass
     elif module_.formation.archive or module_.pv_existe():
         messages.error(request,
-                       "Il n'est plus possible de modifier les notes car un PV a été établit ou la saisie est clôturée.")
+                       "Il n'est plus possible de modifier les notes car un PV a أ©tأ© أ©tablit ou la saisie est clأ´turأ©e.")
         return HttpResponseRedirect(reverse('note_list', kwargs={'groupe_pk': groupe_pk, 'matiere_pk': matiere_pk}))
     elif request.user.is_enseignant():
         if not assure_module_groupe(request.user.enseignant, module_, groupe_):
-            messages.error(request, "Vous n'êtes pas autorisé à effectuer cette opération")
+            messages.error(request, "Vous n'أھtes pas autorisأ© أ  effectuer cette opأ©ration")
             return redirect('/accounts/login/?next=%s' % request.path)
     else:
-        messages.error(request, "Vous n'avez pas les permissions d'accès à cette page.")
+        messages.error(request, "Vous n'avez pas les permissions d'accأ¨s أ  cette page.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     if request.method == 'POST':
@@ -10546,9 +10554,9 @@ def note_update(request, matiere_pk, groupe_pk):
         # check whether it's valid:
         if form.is_valid():
             if module_.formation.archive:
-                messages.error(request, "La saisie des notes est clôturée pour cette formation.")
+                messages.error(request, "La saisie des notes est clأ´turأ©e pour cette formation.")
             else:
-                # Vérifier que l'OTP est correct
+                # Vأ©rifier que l'OTP est correct
                 if not settings.SMS_ENABLED or request.user.is_direction() or request.user.enseignant.check_otp(
                         form.cleaned_data['otp']):
                     # submit as background task
@@ -10556,7 +10564,7 @@ def note_update(request, matiere_pk, groupe_pk):
                     t.setDaemon(True)
                     t.start()
                     messages.info(request,
-                                  "Votre demande d'enregistrement des notes a été prise en compte. Une notification vous sera transmise.")
+                                  "Votre demande d'enregistrement des notes a أ©tأ© prise en compte. Une notification vous sera transmise.")
                 else:
                     messages.error(request, "Le Code Secret saisi est incorrect.")
             # redirect to a new URL:
@@ -10565,16 +10573,16 @@ def note_update(request, matiere_pk, groupe_pk):
     else:
         if not request.user.enseignant.tel:
             messages.error(request,
-                           "Votre numéro de téléphone n'est pas enregsitré dans la base. Il est nécessaire pour vous envoyer un Mot de passe à Usage Unique.")
+                           "Votre numأ©ro de tأ©lأ©phone n'est pas enregsitrأ© dans la base. Il est nأ©cessaire pour vous envoyer un Mot de passe أ  Usage Unique.")
             messages.info(request,
-                          "Merci de communiquer votre numéro à l'administration afin que vous puissiez saisir les notes.")
+                          "Merci de communiquer votre numأ©ro أ  l'administration afin que vous puissiez saisir les notes.")
             return HttpResponseRedirect(
                 reverse('note_list', kwargs={'groupe_pk': groupe_pk, 'matiere_pk': module_.matiere.id}))
         else:
             form = NotesUpdateForm(groupe_pk, module_.id, request)
             messages.info(request, "Merci de renseigner les notes dans le formulaire")
             messages.warning(request,
-                             "Si vous ne retrouvez pas les colonnes correspondantes aux évaluations prévues, merci de demander au coordinateur(trice) d'introduire la formule de calcul.")
+                             "Si vous ne retrouvez pas les colonnes correspondantes aux أ©valuations prأ©vues, merci de demander au coordinateur(trice) d'introduire la formule de calcul.")
             return render(request, 'scolar/note_update.html',
                           {'form': form, 'liste_inscrits': liste_inscrits, 'liste_evaluations': liste_evaluations,
                            'module_': module_, 'groupe_': groupe_,
@@ -10613,7 +10621,7 @@ def task_note_update(form, module_, groupe_, user):
                         'note': data[key_]
                     })
             else:
-                # ce cas se pose quand on n'a que la moyenne générale du module
+                # ce cas se pose quand on n'a que la moyenne gأ©nأ©rale du module
                 key_ = str(inscrit_.etudiant.matricule) + '_moy'
                 resultat_.moy = data[key_]
                 resultat_.moy_post_delib = data[key_]
@@ -10633,10 +10641,10 @@ def task_note_update(form, module_, groupe_, user):
                 'Bonjour,\n' +
                 'Une erreur s\'est produite lors de l\'enregistrement des notes de ' + str(
                     module_) + ' du groupe ' + str(groupe_) + '\n' +
-                'Demande de modification effectuée via le compte ' + user.email + '\n' +
-                'Veuillez réessayer la saisie et l\'enregistrement \n' +
+                'Demande de modification effectuأ©e via le compte ' + user.email + '\n' +
+                'Veuillez rأ©essayer la saisie et l\'enregistrement \n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email, module_.formation.programme.departement.responsable.user.email])
+                'Dأ©partement', to=[user.email, module_.formation.programme.departement.responsable.user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
     else:
@@ -10644,11 +10652,11 @@ def task_note_update(form, module_, groupe_, user):
             module_.matiere.code) + ' du groupe ' + str(groupe_),
                              'Bonjour,\n' +
                              'L\'enregistrement des notes de ' + str(module_.matiere.code) + ' du groupe ' + str(
-                                 groupe_) + ' a bien été effectué \n' +
-                             'Modification effectuée via le compte ' + user.email + '\n' +
+                                 groupe_) + ' a bien أ©tأ© effectuأ© \n' +
+                             'Modification effectuأ©e via le compte ' + user.email + '\n' +
                              'Nous vous en remercions \n' +
                              'Bien cordialement.\n' +
-                             'Département',
+                             'Dأ©partement',
                              to=[user.email, module_.formation.programme.departement.responsable.user.email])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
@@ -10666,20 +10674,20 @@ def organisme_select_for_pfe_create(request):
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('pfe_create', kwargs={'organisme_pk': data['organisme'].sigle}))
         else:
-            return render(request, 'scolar/import.html', {'form': form, 'titre': "Sélectionner ou créer un organisme"})
+            return render(request, 'scolar/import.html', {'form': form, 'titre': "Sأ©lectionner ou crأ©er un organisme"})
     # if a GET (or any other method) we'll create a blank form
     else:
         form = SelectOrCreateOrganismeForm()
 
-        messages.info(request, "Merci de sélectionner un organisme d'accueil")
-        messages.info(request, "Si l'organisme recherché n'existe pas, merci de le créer.")
-        return render(request, 'scolar/import.html', {'form': form, 'titre': "Sélectionner ou créer un organisme"})
+        messages.info(request, "Merci de sأ©lectionner un organisme d'accueil")
+        messages.info(request, "Si l'organisme recherchأ© n'existe pas, merci de le crأ©er.")
+        return render(request, 'scolar/import.html', {'form': form, 'titre': "Sأ©lectionner ou crأ©er un organisme"})
 
 
 @login_required
 def organisme_create_for_pfe_create(request):
     #     if request.user.is_etudiant():
-    #         messages.error(request,"Vous n'avez pas les permissions pour executer cette opération.")
+    #         messages.error(request,"Vous n'avez pas les permissions pour executer cette opأ©ration.")
     #         return redirect('/accounts/login/?next=%s' % request.path)
     #
     if request.method == 'POST':
@@ -10691,12 +10699,12 @@ def organisme_create_for_pfe_create(request):
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('pfe_create', kwargs={'organisme_pk': organisme.sigle}))
         else:
-            return render(request, 'scolar/import.html', {'form': form, 'titre': "Créer un organisme"})
+            return render(request, 'scolar/import.html', {'form': form, 'titre': "Crأ©er un organisme"})
     # if a GET (or any other method) we'll create a blank form
     else:
         form = OrganismeForm()
-        messages.info(request, "Merci d'utiliser ce formulaire pour créer un nouvel organisme d'accueil")
-        return render(request, 'scolar/import.html', {'form': form, 'titre': "Créer un organisme"})
+        messages.info(request, "Merci d'utiliser ce formulaire pour crأ©er un nouvel organisme d'accueil")
+        return render(request, 'scolar/import.html', {'form': form, 'titre': "Crأ©er un organisme"})
 
 
 class OrganismeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
@@ -10704,7 +10712,7 @@ class OrganismeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     model = Organisme
     fields = ['sigle', 'nom', 'adresse', 'pays', 'type', 'statut', 'nature', 'secteur', 'taille']
     template_name = 'scolar/create.html'
-    success_message = "L'organisme a été créé avec succès!"
+    success_message = "L'organisme a أ©tأ© crأ©أ© avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -10718,7 +10726,7 @@ class OrganismeCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
 
     def get_context_data(self, **kwargs):
         context = super(OrganismeCreateView, self).get_context_data(**kwargs)
-        titre = 'Créer un nouvel organisme partenaire'
+        titre = 'Crأ©er un nouvel organisme partenaire'
         context['titre'] = titre
         return context
 
@@ -10728,7 +10736,7 @@ class OrganismeUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     model = Organisme
     fields = ['sigle', 'nom', 'adresse', 'pays', 'type', 'statut', 'nature', 'secteur', 'taille']
     template_name = 'scolar/update.html'
-    success_message = "L'organisme a été modifié avec succès!"
+    success_message = "L'organisme a أ©tأ© modifiأ© avec succأ¨s!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -10747,7 +10755,7 @@ class OrganismeDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionReq
     model = Organisme
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_organisme'
-    success_message = "L'organisme a bien été supprimé"
+    success_message = "L'organisme a bien أ©tأ© supprimأ©"
 
     def get_success_url(self):
         return reverse('organisme_list')
@@ -10771,7 +10779,7 @@ class OrganismeListView(TemplateView):
         context['titre'] = 'Liste des organismes d\'accueil en stages'
         if self.request.user.is_staff_only():
             context['btn_list'] = {
-                'Créer Organisme': reverse('organisme_create'),
+                'Crأ©er Organisme': reverse('organisme_create'),
                 'Importer Organismes': reverse('organismes_import')
             }
         return context
@@ -10784,7 +10792,7 @@ class PFECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
               'coencadrants', 'reserve_pour', 'resume', 'bibliographie', 'objectifs', 'resultats_attendus',
               'antecedents', 'echeancier', 'moyens_informatiques', 'projet_recherche']
     template_name = 'scolar/create.html'
-    success_message = "La proposition de PFE a bien été enregistrée. Elle sera soumise à un processus de validation."
+    success_message = "La proposition de PFE a bien أ©tأ© enregistrأ©e. Elle sera soumise أ  un processus de validation."
 
     def test_func(self):
         if self.request.user.is_staff_only() or self.request.user.is_enseignant():
@@ -10793,7 +10801,7 @@ class PFECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
             if self.request.user.etudiant.eligible_pfe():
                 if self.request.user.etudiant.nb_depots_stages() >= 3:
                     messages.error(self.request,
-                                   "Vous avez atteint le nombre maximum de dépôts de sujets de stage. Veuillez vous adresser au service des stages.")
+                                   "Vous avez atteint le nombre maximum de dأ©pأ´ts de sujets de stage. Veuillez vous adresser au service des stages.")
                     return False
                 else:
                     return True
@@ -10806,13 +10814,13 @@ class PFECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
         form = super().get_form(form_class)
         form.helper = FormHelper()
         form.fields[
-            'type'].help_text = "PFE ou Master. Merci de soumettre deux sujets différents pour le PFE et Master."
+            'type'].help_text = "PFE ou Master. Merci de soumettre deux sujets diffأ©rents pour le PFE et Master."
         form.fields[
-            'promoteur'].help_text = "Si le promoteur est enseignant à l'école, merci de le rajouter aux coencadrants aussi."
+            'promoteur'].help_text = "Si le promoteur est enseignant أ  l'أ©cole, merci de le rajouter aux coencadrants aussi."
         form.fields[
-            'antecedents'].help_text = "Renseignez les antécédents de ce stage en termes de travaux, produits, phases réaslisées, etc."
+            'antecedents'].help_text = "Renseignez les antأ©cأ©dents de ce stage en termes de travaux, produits, phases rأ©aslisأ©es, etc."
         form.fields[
-            'echeancier'].help_text = "Mettre les différentes étapes en indiquant la durée en nombre de mois pour chacune. La durée totale doit être de 9 mois au moins pour un PFE."
+            'echeancier'].help_text = "Mettre les diffأ©rentes أ©tapes en indiquant la durأ©e en nombre de mois pour chacune. La durأ©e totale doit أھtre de 9 mois au moins pour un PFE."
         form.fields['organisme'] = forms.ModelChoiceField(
             queryset=Organisme.objects.all(),
             initial=self.kwargs.get("organisme_pk"),
@@ -10820,7 +10828,7 @@ class PFECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
             required=True,
         )
         form.fields[
-            'specialites'].help_text = "Maintenez la touche Shift enfoncée pour sélectionner plusieurs spécialités."
+            'specialites'].help_text = "Maintenez la touche Shift enfoncأ©e pour sأ©lectionner plusieurs spأ©cialitأ©s."
         form.fields['coencadrants'] = forms.ModelMultipleChoiceField(
             queryset=Enseignant.objects.all().order_by('nom'),
             initial=self.request.user.enseignant if self.request.user.is_enseignant() else None,
@@ -10829,7 +10837,7 @@ class PFECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
                 search_fields=['nom__icontains', 'prenom__icontains'],
             ),
             required=False,
-            help_text="Sélection multiple possible. Tapez le nom ou prénom de l'enseignant ou deux espaces pour avoir la liste complète.",
+            help_text="Sأ©lection multiple possible. Tapez le nom ou prأ©nom de l'enseignant ou deux espaces pour avoir la liste complأ¨te.",
 
         )
         form.fields['reserve_pour'] = forms.ModelMultipleChoiceField(
@@ -10841,7 +10849,7 @@ class PFECreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
                 search_fields=['etudiant__nom__icontains', 'etudiant__prenom__icontains'],
             ),
             required=False,
-            help_text="Sélection multiple possible. Tapez le nom ou prénom de l'étudiant",
+            help_text="Sأ©lection multiple possible. Tapez le nom ou prأ©nom de l'أ©tudiant",
 
         )
 
@@ -10869,7 +10877,7 @@ def notifier_pfe(sender, update_fields, instance, created, **kwargs):
     if created:
         email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage",
                              'Bonjour,\n' +
-                             "Un nouveau sujet de stage a été soumis\n" +
+                             "Un nouveau sujet de stage a أ©tأ© soumis\n" +
                              "Vous pouvez lancer son processus de validation, via votre compte ou en suivant ce lien: \n\n" +
                              settings.PROTOCOLE_HOST + reverse('pfe_update', kwargs={'pk': instance.id}) + '\n\n' +
                              'Cordialement', to=settings.STAFF_EMAILS['stage'])
@@ -10877,41 +10885,41 @@ def notifier_pfe(sender, update_fields, instance, created, **kwargs):
             email.send(fail_silently=True)
 
         # email au promoteur
-        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage N° " + str(instance.id),
+        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage Nآ° " + str(instance.id),
                              'Bonjour,\n' +
-                             "Un nouveau sujet de stage a été soumis\n\n" +
+                             "Un nouveau sujet de stage a أ©tأ© soumis\n\n" +
 
                              instance.intitule + "\n\n" +
 
-                             "Il sera soumis à un processus de validation. Nous vous tiendrons informés de son statut de validation aussitôt terminée.\n" +
+                             "Il sera soumis أ  un processus de validation. Nous vous tiendrons informأ©s de son statut de validation aussitأ´t terminأ©e.\n" +
                              'Cordialement', to=[instance.email_promoteur])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
 
         # email aux candidats potentiels
-        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage N° " + str(instance.id),
+        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage Nآ° " + str(instance.id),
                              'Bonjour,\n' +
-                             "Un nouveau sujet de stage a été soumis\n\n" +
+                             "Un nouveau sujet de stage a أ©tأ© soumis\n\n" +
                              instance.intitule + "\n\n" +
-                             "Vous pouvez consulter la description détaillée ici:\n\n" +
+                             "Vous pouvez consulter la description dأ©taillأ©e ici:\n\n" +
                              settings.PROTOCOLE_HOST + reverse('pfe_detail', kwargs={'pk': instance.id}) + "\n" +
-                             "Liste complète des sujets proposés:\n\n" +
+                             "Liste complأ¨te des sujets proposأ©s:\n\n" +
                              settings.PROTOCOLE_HOST + reverse('pfe_list') + "\n" +
-                             "Si un sujet vous intéresse, merci de contacter le promoteur\n" +
+                             "Si un sujet vous intأ©resse, merci de contacter le promoteur\n" +
                              'Cordialement', to=settings.STAFF_EMAILS['futurs_stagiaires'])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
 
     elif not instance.groupe:
         if instance.statut_validation == "RR":
-            email = EmailMessage("[Talents] Votre sujet de stage N° " + str(instance.id) + " (Révision Requise)",
+            email = EmailMessage("[Talents] Votre sujet de stage Nآ° " + str(instance.id) + " (Rأ©vision Requise)",
                                  'Bonjour,\n' +
-                                 "Nous avons reçus les avis des collègues sur votre proposition de stage N° " + str(
+                                 "Nous avons reأ§us les avis des collأ¨gues sur votre proposition de stage Nآ° " + str(
                                      instance.id) + "\n" +
-                                 "Intitulé: " + instance.intitule + "\n\n" +
-                                 "Pourriez-vous apporter les améliorations nécessaires. Merci de renseigner le champs Réponse aux experts pour indiquer ce qui a été modifié.\n" +
-                                 "N'oubliez pas de basculer le statut de validation du sujet vers 'Révision Terminée' après la modification\n" +
-                                 "Vous pouvez modifier votre sujet en vous connectant à votre compte Talents ou via ce lien:\n\n" +
+                                 "Intitulأ©: " + instance.intitule + "\n\n" +
+                                 "Pourriez-vous apporter les amأ©liorations nأ©cessaires. Merci de renseigner le champs Rأ©ponse aux experts pour indiquer ce qui a أ©tأ© modifiأ©.\n" +
+                                 "N'oubliez pas de basculer le statut de validation du sujet vers 'Rأ©vision Terminأ©e' aprأ¨s la modification\n" +
+                                 "Vous pouvez modifier votre sujet en vous connectant أ  votre compte Talents ou via ce lien:\n\n" +
                                  settings.PROTOCOLE_HOST + reverse('pfe_update', kwargs={'pk': instance.id}) + '\n\n' +
                                  'Cordialement',
                                  to=settings.STAFF_EMAILS['stage'] + [coencadrant_.user.email for coencadrant_ in
@@ -10920,27 +10928,27 @@ def notifier_pfe(sender, update_fields, instance, created, **kwargs):
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
-            email = EmailMessage("[Talents] Votre sujet de stage N° " + str(instance.id) + " (Révision Requise)",
+            email = EmailMessage("[Talents] Votre sujet de stage Nآ° " + str(instance.id) + " (Rأ©vision Requise)",
                                  'Bonjour,\n' +
-                                 "Nous avons reçus les avis des collègues sur votre proposition de stage N° " + str(
+                                 "Nous avons reأ§us les avis des collأ¨gues sur votre proposition de stage Nآ° " + str(
                                      instance.id) + "\n" +
-                                 "Intitulé: " + instance.intitule + "\n\n" +
+                                 "Intitulأ©: " + instance.intitule + "\n\n" +
                                  "Vous pouvez visualiser le retour de la commission, dans le volet Validation, ici:\n\n" +
                                  settings.PROTOCOLE_HOST + reverse('pfe_detail', kwargs={'pk': instance.id}) + '\n\n' +
-                                 "Merci d'indiquer aux co-encadrants de l'école ou à défaut à votre futur stagiaire, les modifications à apporter pour répondre aux recommendations de la commission.\n" +
+                                 "Merci d'indiquer aux co-encadrants de l'أ©cole ou أ  dأ©faut أ  votre futur stagiaire, les modifications أ  apporter pour rأ©pondre aux recommendations de la commission.\n" +
                                  'Cordialement', to=[instance.email_promoteur])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
         elif instance.statut_validation == "V" and instance.notification:
-            # Supprimer les validations non renseignées
-            email = EmailMessage("[Talents] Votre avis sur le sujet de stage N° " + str(instance.id),
+            # Supprimer les validations non renseignأ©es
+            email = EmailMessage("[Talents] Votre avis sur le sujet de stage Nآ° " + str(instance.id),
                                  'Bonjour,\n' +
-                                 "Nous avons reçus suffisemment d'avis sur la proposition de stage N° " + str(
+                                 "Nous avons reأ§us suffisemment d'avis sur la proposition de stage Nآ° " + str(
                                      instance.id) + "\n\n" +
-                                 "Intitulé: " + instance.intitule + "\n\n" +
-                                 "Nous vous informons que votre avis n'est plus requis et le sujet a été validé\n" +
-                                 "Nous vous remercions, et espérons vous solliciter pour d'autres avis.\n" +
+                                 "Intitulأ©: " + instance.intitule + "\n\n" +
+                                 "Nous vous informons que votre avis n'est plus requis et le sujet a أ©tأ© validأ©\n" +
+                                 "Nous vous remercions, et espأ©rons vous solliciter pour d'autres avis.\n" +
                                  'Cordialement',
                                  to=settings.STAFF_EMAILS['stage'] + [validation_.expert.user.email for validation_ in
                                                                       instance.validations.filter(avis='X')])
@@ -10948,12 +10956,12 @@ def notifier_pfe(sender, update_fields, instance, created, **kwargs):
                 email.send(fail_silently=True)
             instance.validations.filter(avis='X').delete()
 
-            email = EmailMessage("[Talents] Votre sujet de stage N° " + str(instance.id) + " (Validé)",
+            email = EmailMessage("[Talents] Votre sujet de stage Nآ° " + str(instance.id) + " (Validأ©)",
                                  'Bonjour,\n' +
-                                 "Nous avons reçus les avis des collègues sur votre proposition de stage N° " + str(
+                                 "Nous avons reأ§us les avis des collأ¨gues sur votre proposition de stage Nآ° " + str(
                                      instance.id) + "\n\n" +
-                                 "Intitulé: " + instance.intitule + "\n\n" +
-                                 "Nous vous informons que votre sujet est maintenant validé\n" +
+                                 "Intitulأ©: " + instance.intitule + "\n\n" +
+                                 "Nous vous informons que votre sujet est maintenant validأ©\n" +
                                  'Cordialement',
                                  to=settings.STAFF_EMAILS['stage'] + [coencadrant_.user.email for coencadrant_ in
                                                                       instance.coencadrants.all()] +
@@ -10962,27 +10970,27 @@ def notifier_pfe(sender, update_fields, instance, created, **kwargs):
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
-            # marquer notification False pour qu'il y ait plus d'envoie de notification après de nouvelles mises à jours
+            # marquer notification False pour qu'il y ait plus d'envoie de notification aprأ¨s de nouvelles mises أ  jours
             instance.notification = False
             instance.save()
 
         elif instance.statut_validation == "RT":
-            email = EmailMessage("[Talents] Sujet de stage N° " + str(instance.id) + " (Révision Terminée)",
+            email = EmailMessage("[Talents] Sujet de stage Nآ° " + str(instance.id) + " (Rأ©vision Terminأ©e)",
                                  'Bonjour,\n' +
-                                 "La révision du sujet de stage N° " + str(instance.id) + " est terminée\n\n" +
-                                 "Intitulé: " + instance.intitule + "\n\n" +
-                                 "Vous pouvez procéder à son évaluation en vous connectant à votre compte ou via ce lien:\n\n" +
+                                 "La rأ©vision du sujet de stage Nآ° " + str(instance.id) + " est terminأ©e\n\n" +
+                                 "Intitulأ©: " + instance.intitule + "\n\n" +
+                                 "Vous pouvez procأ©der أ  son أ©valuation en vous connectant أ  votre compte ou via ce lien:\n\n" +
                                  settings.PROTOCOLE_HOST + reverse('pfe_update', kwargs={'pk': instance.id}) + '\n\n' +
                                  'Cordialement', to=settings.STAFF_EMAILS['stage'])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
-            email = EmailMessage("[Talents] Sujet de stage N° " + str(instance.id) + " (Révision Terminée)",
+            email = EmailMessage("[Talents] Sujet de stage Nآ° " + str(instance.id) + " (Rأ©vision Terminأ©e)",
                                  'Bonjour,\n' +
-                                 "Nous vous remercions d'avoir révisé le sujet de stage N° " + str(
+                                 "Nous vous remercions d'avoir rأ©visأ© le sujet de stage Nآ° " + str(
                                      instance.id) + " \n\n" +
-                                 "Intitulé: " + instance.intitule + "\n\n" +
-                                 "Nous vous tiendrons informés de son statut de validation aussitôt terminée.\n" +
+                                 "Intitulأ©: " + instance.intitule + "\n\n" +
+                                 "Nous vous tiendrons informأ©s de son statut de validation aussitأ´t terminأ©e.\n" +
                                  'Cordialement',
                                  to=[coencadrant_.user.email for coencadrant_ in instance.coencadrants.all()] +
                                     [inscription_.etudiant.user.email for inscription_ in instance.reserve_pour.all()] +
@@ -10990,9 +10998,9 @@ def notifier_pfe(sender, update_fields, instance, created, **kwargs):
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
         elif instance.statut_validation == "LR":
-            # identifier les experts qui ont déjà introduit leur avis favorable après révision
+            # identifier les experts qui ont dأ©jأ  introduit leur avis favorable aprأ¨s rأ©vision
             experts_avec_avis_favorable = instance.validations.filter(avis='V').values_list('expert')
-            # identifier les validations avec réserve pour leur demander de lever la réserve
+            # identifier les validations avec rأ©serve pour leur demander de lever la rأ©serve
             validations_avec_reserve = instance.validations.filter(Q(avis="SR") | Q(avis="MR") | Q(avis="N")).exclude(
                 expert__in=experts_avec_avis_favorable)
             for validation_ in validations_avec_reserve:
@@ -11004,13 +11012,13 @@ def notifier_pfe(sender, update_fields, instance, created, **kwargs):
                                                                                      'avis': 'X',
                                                                                      'debut': datetime.date.today()
                                                                                  })
-                email = EmailMessage("[Talents] Levée de reserve sur le sujet de stage N° " + str(instance.id),
+                email = EmailMessage("[Talents] Levأ©e de reserve sur le sujet de stage Nآ° " + str(instance.id),
                                      'Bonjour,\n' +
-                                     "Vous aviez émis une reserve sur la proposition de stage N° " + str(
+                                     "Vous aviez أ©mis une reserve sur la proposition de stage Nآ° " + str(
                                          instance.id) + "\n\n" +
-                                     "Intitulée: " + instance.intitule + "\n\n" +
-                                     "Une version révisée a été soumise.\n" +
-                                     "Nous vous invitons à réexaminer cette nouvelle version et réintroduire votre avis via votre compte Talents ou en suivant ce lien:\n\n" +
+                                     "Intitulأ©e: " + instance.intitule + "\n\n" +
+                                     "Une version rأ©visأ©e a أ©tأ© soumise.\n" +
+                                     "Nous vous invitons أ  rأ©examiner cette nouvelle version et rأ©introduire votre avis via votre compte Talents ou en suivant ce lien:\n\n" +
                                      settings.PROTOCOLE_HOST + reverse("validation_update",
                                                                        kwargs={'pk': nouvelle_validation_.id,
                                                                                'pfe_pk': instance.id}) + '\n\n' +
@@ -11026,13 +11034,13 @@ def notifier_coencadrants(sender, instance, action, pk_set, **kwargs):
         for enseignant_id_ in pk_set:
             enseignant_ = get_object_or_404(Enseignant, id=enseignant_id_)
             coencadrant_list.append(enseignant_)
-        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage N° " + str(instance.id),
+        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage Nآ° " + str(instance.id),
                              'Bonjour,\n' +
-                             "Un nouveau sujet de stage a été soumis\n\n" +
+                             "Un nouveau sujet de stage a أ©tأ© soumis\n\n" +
 
                              instance.intitule + "\n\n" +
 
-                             "Il sera soumis à un processus de validation. Nous vous tiendrons informés de son statut de validation aussitôt terminée.\n" +
+                             "Il sera soumis أ  un processus de validation. Nous vous tiendrons informأ©s de son statut de validation aussitأ´t terminأ©e.\n" +
                              'Cordialement', to=[coencadrant_.user.email for coencadrant_ in coencadrant_list])
         if settings.EMAIL_ENABLED:
             email.send(fail_silently=True)
@@ -11045,13 +11053,13 @@ def notifier_reserve_pour(sender, instance, action, pk_set, **kwargs):
         for inscription_id_ in pk_set:
             inscription_ = get_object_or_404(Inscription, id=inscription_id_)
             reserve_pour_list.append(inscription_)
-        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage N° " + str(instance.id),
+        email = EmailMessage("[Talents] Proposition d'un nouveau sujet de stage Nآ° " + str(instance.id),
                              'Bonjour,\n' +
-                             "Un nouveau sujet de stage a été soumis\n\n" +
+                             "Un nouveau sujet de stage a أ©tأ© soumis\n\n" +
 
                              instance.intitule + "\n\n" +
 
-                             "Il sera soumis à un processus de validation. Nous vous tiendrons informés de son statut de validation aussitôt terminée.\n" +
+                             "Il sera soumis أ  un processus de validation. Nous vous tiendrons informأ©s de son statut de validation aussitأ´t terminأ©e.\n" +
                              'Cordialement',
                              to=[inscription_.etudiant.user.email for inscription_ in reserve_pour_list])
         if settings.EMAIL_ENABLED:
@@ -11066,7 +11074,7 @@ class PFEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
               'resultats_attendus', 'antecedents', 'echeancier', 'moyens_informatiques', 'projet_recherche',
               'reponse_aux_experts']
     template_name = 'scolar/pfe_update.html'
-    success_message = "La proposition de sujet de stage a bien été enregistrée."
+    success_message = "La proposition de sujet de stage a bien أ©tأ© enregistrأ©e."
 
     def test_func(self):
         if not (
@@ -11099,9 +11107,9 @@ class PFEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
         form.helper = FormHelper()
         pfe_ = get_object_or_404(PFE, id=self.kwargs.get("pk"))
         form.fields[
-            'statut_validation'].help_text = "Sélectionnez Révision Terminée pour signaler la fin de la révision."
+            'statut_validation'].help_text = "Sأ©lectionnez Rأ©vision Terminأ©e pour signaler la fin de la rأ©vision."
         form.fields[
-            'specialites'].help_text = "Maintenez la touche Shift enfoncée pour sélectionner plusieurs spécialités."
+            'specialites'].help_text = "Maintenez la touche Shift enfoncأ©e pour sأ©lectionner plusieurs spأ©cialitأ©s."
         form.fields['coencadrants'] = forms.ModelMultipleChoiceField(
             queryset=Enseignant.objects.all().order_by('nom'),
             initial=pfe_.coencadrants.all(),
@@ -11110,7 +11118,7 @@ class PFEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
                 search_fields=['nom__icontains', 'prenom__icontains'],
             ),
             required=False,
-            help_text="Sélection multiple possible. Tapez le nom ou prénom de l'enseignant ou deux espaces pour avoir la liste complète.",
+            help_text="Sأ©lection multiple possible. Tapez le nom ou prأ©nom de l'enseignant ou deux espaces pour avoir la liste complأ¨te.",
 
         )
         form.fields['reserve_pour'] = forms.ModelMultipleChoiceField(
@@ -11122,7 +11130,7 @@ class PFEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
                 search_fields=['etudiant__nom__icontains', 'etudiant__prenom__icontains'],
             ),
             required=False,
-            help_text="Sélection multiple possible. Tapez le nom ou prénom de l'étudiant",
+            help_text="Sأ©lection multiple possible. Tapez le nom ou prأ©nom de l'أ©tudiant",
 
         )
 
@@ -11132,10 +11140,10 @@ class PFEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
             form.fields['reponse_aux_experts'].disabled = True
         elif pfe_.statut_validation == "RR":
             form.fields['statut_validation'] = forms.ChoiceField(disabled=False, choices=(
-            ('RT', 'Révision Terminée'), ('RR', 'Révision Requise')), initial=pfe_.statut_validation)
+            ('RT', 'Rأ©vision Terminأ©e'), ('RR', 'Rأ©vision Requise')), initial=pfe_.statut_validation)
             form.fields['reponse_aux_experts'].disabled = False
             form.fields[
-                'reponse_aux_experts'].help_text = "Utiliser ce champs pour répondre aux experts et indiquer précisemment les modifications apportées"
+                'reponse_aux_experts'].help_text = "Utiliser ce champs pour rأ©pondre aux experts et indiquer prأ©cisemment les modifications apportأ©es"
         elif pfe_.statut_validation == 'V':
             for key_ in form.fields.keys():
                 form.fields[key_].widget.attrs['readonly'] = True
@@ -11149,15 +11157,15 @@ class PFEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         if self.request.user.is_stage():
             self.success_url = reverse('service_pfe_list')
-            form.helper.add_input(Button('modifier', 'Retour à la liste', css_class='btn-info',
+            form.helper.add_input(Button('modifier', 'Retour أ  la liste', css_class='btn-info',
                                          onclick="window.location.href='" + reverse('service_pfe_list') + "'"))
         elif self.request.user.is_etudiant():
             self.success_url = reverse('etudiant_pfe_list')
-            form.helper.add_input(Button('modifier', 'Retour à la liste', css_class='btn-info',
+            form.helper.add_input(Button('modifier', 'Retour أ  la liste', css_class='btn-info',
                                          onclick="window.location.href='" + reverse('etudiant_pfe_list') + "'"))
         elif self.request.user.is_enseignant():
             self.success_url = reverse('enseignant_pfe_list')
-            form.helper.add_input(Button('modifier', 'Retour à la liste', css_class='btn-info',
+            form.helper.add_input(Button('modifier', 'Retour أ  la liste', css_class='btn-info',
                                          onclick="window.location.href='" + reverse('enseignant_pfe_list') + "'"))
         else:
             self.success_url = reverse('home')
@@ -11165,7 +11173,7 @@ class PFEUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
 
     def get_context_data(self, **kwargs):
         context = super(PFEUpdateView, self).get_context_data(**kwargs)
-        titre = "Gérer la soumission d'un sujet de stage"
+        titre = "Gأ©rer la soumission d'un sujet de stage"
         context['titre'] = titre
         exclude_columns_ = exclude_columns(self.request.user)
         if (not self.request.user.is_stage()):
@@ -11185,7 +11193,7 @@ class PFEDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(PFEDetailView, self).get_context_data(**kwargs)
-        titre = 'Sujet de Stage N°: ' + self.kwargs.get("pk")
+        titre = 'Sujet de Stage Nآ°: ' + self.kwargs.get("pk")
         context['titre'] = titre
         pfe_ = get_object_or_404(PFE, id=self.kwargs.get("pk"))
         context['pfe_form'] = PFEDetailForm(instance=pfe_)
@@ -11254,21 +11262,21 @@ class ExpertsIndexView(LoginRequiredMixin, UserPassesTestMixin, PDFTemplateView)
 @login_required
 def pfe_fiche_list_pdf_view(request, formation_pk, periode_pk):
     if not request.user.is_stage():
-        messages.error(request, "Vous n'avez pas la permission d'exécution de cette opération")
+        messages.error(request, "Vous n'avez pas la permission d'exأ©cution de cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     try:
         t = threading.Thread(target=task_pfe_fiche_list_pdf, args=[formation_pk, request.user])
         t.setDaemon(True)
         t.start()
-        messages.success(request, "Votre demande de génération des fiches PFE est effectuée avec succès.")
-        messages.success(request, "Une notification vous sera transmise une fois la tâche terminée.")
+        messages.success(request, "Votre demande de gأ©nأ©ration des fiches PFE est effectuأ©e avec succأ¨s.")
+        messages.success(request, "Une notification vous sera transmise une fois la tأ¢che terminأ©e.")
 
     except Exception:
         if settings.DEBUG:
             raise Exception
         else:
             messages.error(request,
-                           "ERREUR: lors de la demande de génération des fiches PFE. Merci de le signaler à l'administrateur.")
+                           "ERREUR: lors de la demande de gأ©nأ©ration des fiches PFE. Merci de le signaler أ  l'administrateur.")
     return HttpResponseRedirect(reverse('document_list'))
 
 
@@ -11294,12 +11302,12 @@ def task_pfe_fiche_list_pdf(formation_pk, user):
                                         footer_template=None,
                                         context=context,
                                         cmd_options=cmd_options)
-        email = EmailMessage('[Talents] Génération des Fiches PFE de ' + str(formation_),
+        email = EmailMessage('[Talents] Gأ©nأ©ration des Fiches PFE de ' + str(formation_),
                              'Bonjour,\n' +
-                             'La génération des fiches PFE de ' + str(formation_) + ' est terminée \n' +
+                             'La gأ©nأ©ration des fiches PFE de ' + str(formation_) + ' est terminأ©e \n' +
                              'Veuillez trouver ci-jointes les fiches\n' +
                              'Bien cordialement.\n' +
-                             'Département', to=[user.email]
+                             'Dأ©partement', to=[user.email]
                              )
         email.attach(filename, pdf_, 'application/pdf')
         if settings.EMAIL_ENABLED:
@@ -11309,12 +11317,12 @@ def task_pfe_fiche_list_pdf(formation_pk, user):
             raise Exception
         else:
             email = EmailMessage(
-                '[Talents] Erreur lors de la génération des fiches PFE de  la formation ' + str(formation_),
+                '[Talents] Erreur lors de la gأ©nأ©ration des fiches PFE de  la formation ' + str(formation_),
                 'Bonjour,\n' +
-                'Une erreur s\'est produite lors de la génération des fiches PFE de la formation ' + str(
+                'Une erreur s\'est produite lors de la gأ©nأ©ration des fiches PFE de la formation ' + str(
                     formation_) + '\n' +
                 'Bien cordialement.\n' +
-                'Département', to=[user.email])
+                'Dأ©partement', to=[user.email])
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
 
@@ -11323,7 +11331,7 @@ class PFEDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredM
     model = PFE
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_pfe'
-    success_message = "La proposition du stage a bien été supprimée"
+    success_message = "La proposition du stage a bien أ©tأ© supprimأ©e"
 
     def get_success_url(self):
         return reverse('service_pfe_list')
@@ -11349,7 +11357,7 @@ class PFEListView(TemplateView):
 
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des sujets de stages proposés'
+        context['titre'] = 'Liste des sujets de stages proposأ©s'
         if self.request.user.is_authenticated:
             if self.request.user.is_staff_only():
                 context['btn_list'] = {
@@ -11512,14 +11520,14 @@ class EnseignantExpertisePFEListView(LoginRequiredMixin, UserPassesTestMixin, Te
             Validation.objects.filter(pfe__groupe__isnull=True, expert=self.request.user.enseignant),
             exclude=exclude_columns_)
         context['table'] = validation_table
-        context['titre'] = "Sujets de stages à expertiser"
+        context['titre'] = "Sujets de stages أ  expertiser"
         return context
 
 
 @login_required
 def commission_validation_create_view(request, pfe_pk):
     if not (request.user.is_stage() or request.user.is_direction()):
-        messages.error(request, "Vous n'avez pas les permissions pour executer cette opération.")
+        messages.error(request, "Vous n'avez pas les permissions pour executer cette opأ©ration.")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     if request.method == 'POST':
@@ -11549,15 +11557,15 @@ def commission_validation_create_view(request, pfe_pk):
                 else:
                     action_url = "http"
                 action_url += "://" + request.get_host() + reverse('enseignant_expertise_pfe_list')
-                email = EmailMessage("[Talents] Validation du sujet de stage N° " + pfe_pk,
+                email = EmailMessage("[Talents] Validation du sujet de stage Nآ° " + pfe_pk,
                                      'Bonjour,\n' +
-                                     "Un nouveau sujet de stage a été soumis.\n\n" +
+                                     "Un nouveau sujet de stage a أ©tأ© soumis.\n\n" +
 
-                                     "Intitulé: " + pfe_.intitule + "\n\n" +
+                                     "Intitulأ©: " + pfe_.intitule + "\n\n" +
 
-                                     "Nous vous invitons à donner votre avis sur ce sujet au plus tard le: " + data[
+                                     "Nous vous invitons أ  donner votre avis sur ce sujet au plus tard le: " + data[
                                          'fin'].strftime("%d/%m/%Y") + "\n"
-                                                                       "Vous trouverez ce sujet dans votre compte Talents/Stages/Mes Validations, ou vous pouvez procéder à sa validation en cliquant ici:\n" +
+                                                                       "Vous trouverez ce sujet dans votre compte Talents/Stages/Mes Validations, ou vous pouvez procأ©der أ  sa validation en cliquant ici:\n" +
                                      action_url + ' ,\n' +
                                      'Cordialement',
                                      to=settings.STAFF_EMAILS['stage'] + [expert_.user.email for expert_ in
@@ -11566,24 +11574,24 @@ def commission_validation_create_view(request, pfe_pk):
                     email.send(fail_silently=True)
             except Exception:
                 if settings.DEBUG:
-                    raise Exception("Création commission validation.")
+                    raise Exception("Crأ©ation commission validation.")
                 else:
                     messages.error(request,
-                                   "Une erreur s'est produite pendant la création de la commission de Validation. Si le problème persiste, merci de le signaler à l'administrateur.")
+                                   "Une erreur s'est produite pendant la crأ©ation de la commission de Validation. Si le problأ¨me persiste, merci de le signaler أ  l'administrateur.")
                     render(request, 'scolar/import.html',
-                           {'form': form, 'titre': "Création d'une commission de validation"})
+                           {'form': form, 'titre': "Crأ©ation d'une commission de validation"})
             messages.success(request,
-                             "La commission de validation a été créée avec succès. Une notification a été envoyée aux membres de la commission.")
+                             "La commission de validation a أ©tأ© crأ©أ©e avec succأ¨s. Une notification a أ©tأ© envoyأ©e aux membres de la commission.")
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('pfe_update', kwargs={'pk': pfe_.id}))
         else:
             return render(request, 'scolar/import.html',
-                          {'form': form, 'titre': "Création d'une commission de validation"})
+                          {'form': form, 'titre': "Crأ©ation d'une commission de validation"})
     # if a GET (or any other method) we'll create a blank form
     else:
         form = CommissionValidationCreateForm(pfe_pk)
-        messages.info(request, "Merci d'utiliser ce formulaire pour créer une commission de validation")
-        return render(request, 'scolar/import.html', {'form': form, 'titre': "Création d'une commission de validation"})
+        messages.info(request, "Merci d'utiliser ce formulaire pour crأ©er une commission de validation")
+        return render(request, 'scolar/import.html', {'form': form, 'titre': "Crأ©ation d'une commission de validation"})
 
 
 class ValidationCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
@@ -11591,7 +11599,7 @@ class ValidationCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     model = Validation
     fields = ['pfe', 'expert', 'debut']
     template_name = 'scolar/create.html'
-    success_message = "Un(e) membre de la commission de validation a été ajouté(e) avec succès."
+    success_message = "Un(e) membre de la commission de validation a أ©tأ© ajoutأ©(e) avec succأ¨s."
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -11607,7 +11615,7 @@ class ValidationCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
 
     def get_context_data(self, **kwargs):
         context = super(ValidationCreateView, self).get_context_data(**kwargs)
-        titre = 'Ajouter un(e) membre à la commission de validation'
+        titre = 'Ajouter un(e) membre أ  la commission de validation'
         context['titre'] = titre
         return context
 
@@ -11618,7 +11626,7 @@ class ValidationUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     model = Validation
     fields = ['avis', 'commentaire', 'fin']
     template_name = 'scolar/validation_update.html'
-    success_message = "Une évaluation d'un stage a été introduite avec succès."
+    success_message = "Une أ©valuation d'un stage a أ©tأ© introduite avec succأ¨s."
 
     def test_func(self):
         pfe_ = get_object_or_404(PFE, id=self.kwargs.get("pfe_pk"))
@@ -11626,7 +11634,7 @@ class ValidationUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
         if not pfe_.statut_validation in ['V', 'N'] and validation_.avis == 'X':
             return True
         else:
-            messages.warning(self.request, "Le nouveau statut du sujet N° " + str(pfe_.id) + " est : " +
+            messages.warning(self.request, "Le nouveau statut du sujet Nآ° " + str(pfe_.id) + " est : " +
                              str(dict(STATUT_VALIDATION)[pfe_.statut_validation]) +
                              ". Vous ne pouvez pas introduire votre avis. Merci.")
             return False
@@ -11635,7 +11643,7 @@ class ValidationUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
         form = super().get_form(form_class)
         form.helper = FormHelper()
 
-        form.fields['commentaire'].label = "Si réserves ou avis défavorable, alors expliquez ici"
+        form.fields['commentaire'].label = "Si rأ©serves ou avis dأ©favorable, alors expliquez ici"
 
         form.fields['fin'] = forms.DateField(label="Fait le", input_formats=settings.DATE_INPUT_FORMATS,
                                              widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
@@ -11648,7 +11656,7 @@ class ValidationUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
 
     def get_context_data(self, **kwargs):
         context = super(ValidationUpdateView, self).get_context_data(**kwargs)
-        titre = 'Validation du sujet N°: ' + self.kwargs.get("pfe_pk")
+        titre = 'Validation du sujet Nآ°: ' + self.kwargs.get("pfe_pk")
         context['titre'] = titre
         pfe_ = get_object_or_404(PFE, id=self.kwargs.get("pfe_pk"))
         context['pfe_form'] = PFEDetailForm(instance=pfe_)
@@ -11666,9 +11674,9 @@ class ValidationUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
 def notifier_validation(sender, update_fields, instance, created, **kwargs):
     if instance.pfe:
         if instance.pfe.statut_validation == 'W' and instance.pfe.nb_avis() == 3:
-            email = EmailMessage("[Talents] 3 Avis collectés sur le sujet N° " + str(instance.pfe.id),
+            email = EmailMessage("[Talents] 3 Avis collectأ©s sur le sujet Nآ° " + str(instance.pfe.id),
                                  'Bonjour,\n' +
-                                 "Le sujet de stage N° " + str(instance.pfe.id) + " a reçu au moins 3 avis.\n" +
+                                 "Le sujet de stage Nآ° " + str(instance.pfe.id) + " a reأ§u au moins 3 avis.\n" +
                                  "Vous pouvez statuer sur sa validation.\n\n" +
                                  settings.PROTOCOLE_HOST + reverse('pfe_update',
                                                                    kwargs={'pk': instance.pfe.id}) + '\n\n' +
@@ -11676,9 +11684,9 @@ def notifier_validation(sender, update_fields, instance, created, **kwargs):
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
         elif instance.pfe.statut_validation == 'LR' and instance.avis == 'V':
-            email = EmailMessage("[Talents] Une levée de réserve sur le sujet N° " + str(instance.pfe.id),
+            email = EmailMessage("[Talents] Une levأ©e de rأ©serve sur le sujet Nآ° " + str(instance.pfe.id),
                                  'Bonjour,\n' +
-                                 "Le sujet de stage N° " + str(instance.pfe.id) + " a reçu une levée de réserve.\n" +
+                                 "Le sujet de stage Nآ° " + str(instance.pfe.id) + " a reأ§u une levأ©e de rأ©serve.\n" +
                                  "Vous pouvez statuer sur sa validation.\n\n" +
                                  settings.PROTOCOLE_HOST + reverse('pfe_update',
                                                                    kwargs={'pk': instance.pfe.id}) + '\n\n' +
@@ -11686,9 +11694,9 @@ def notifier_validation(sender, update_fields, instance, created, **kwargs):
             if settings.EMAIL_ENABLED:
                 email.send(fail_silently=True)
         elif instance.pfe.statut_validation == 'LR' and (instance.avis == 'SR' or instance.avis == 'MR'):
-            email = EmailMessage("[Talents] Une nouvelle réserve sur le sujet N° " + str(instance.pfe.id),
+            email = EmailMessage("[Talents] Une nouvelle rأ©serve sur le sujet Nآ° " + str(instance.pfe.id),
                                  'Bonjour,\n' +
-                                 "Le sujet de stage N° " + str(instance.pfe.id) + " a reçu une nouvelle réserve.\n" +
+                                 "Le sujet de stage Nآ° " + str(instance.pfe.id) + " a reأ§u une nouvelle rأ©serve.\n" +
                                  "Vous pouvez statuer sur sa validation.\n\n" +
                                  settings.PROTOCOLE_HOST + reverse('pfe_update',
                                                                    kwargs={'pk': instance.pfe.id}) + '\n\n' +
@@ -11701,7 +11709,7 @@ class ValidationDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     model = Validation
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_validation'
-    success_message = "L'expertise du stage a bien été supprimée"
+    success_message = "L'expertise du stage a bien أ©tأ© supprimأ©e"
 
     def get_success_url(self):
         return reverse('pfe_update', kwargs={'pk': self.kwargs.get('pfe_pk')})
@@ -11709,26 +11717,26 @@ class ValidationDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
 
 @login_required
 def note_pfe_update(request, module_pk, groupe_pk):
-    # Il faudra refaire le traitement des données du formuliare pour n'enregistrer
-    # que les données ayant changé et pas toutes (form.changed_data) pour éviter des
-    # problèmes de performance
+    # Il faudra refaire le traitement des donnأ©es du formuliare pour n'enregistrer
+    # que les donnأ©es ayant changأ© et pas toutes (form.changed_data) pour أ©viter des
+    # problأ¨mes de performance
     module_ = get_object_or_404(Module, id=module_pk)
     groupe_ = get_object_or_404(Groupe, id=groupe_pk)
     module_suivi_ = get_object_or_404(ModulesSuivis, groupe=groupe_, module=module_)
 
     if request.user.is_etudiant():
-        messages.error(request, "Vous n'avez pas les permissions d'accès à cette opération")
+        messages.error(request, "Vous n'avez pas les permissions d'accأ¨s أ  cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
 
     elif request.user.is_direction() or request.user.is_stage():
         pass
     elif request.user.is_enseignant():
         if not assure_module_groupe(request.user.enseignant, module_, groupe_):
-            messages.error(request, "Vous n'avez pas les permissions d'accès à cette opération")
+            messages.error(request, "Vous n'avez pas les permissions d'accأ¨s أ  cette opأ©ration")
             return redirect('/accounts/login/?next=%s' % request.path)
         elif module_suivi_.saisie_notes == 'T':
             messages.error(request,
-                           "La version finale de l'évaluation avait été établie. Il n'est plus possible de modifier cette évaluation")
+                           "La version finale de l'أ©valuation avait أ©tأ© أ©tablie. Il n'est plus possible de modifier cette أ©valuation")
             return HttpResponseRedirect(
                 reverse('note_list', kwargs={'groupe_pk': groupe_pk, 'matiere_pk': module_.matiere.id}))
 
@@ -11746,7 +11754,7 @@ def note_pfe_update(request, module_pk, groupe_pk):
         if form.is_valid():
 
             if module_.formation.archive:
-                messages.error(request, "La saisie des notes est clôturée pour cette formation.")
+                messages.error(request, "La saisie des notes est clأ´turأ©e pour cette formation.")
             else:
                 try:
                     # process the data in form.cleaned_data as required
@@ -11809,9 +11817,9 @@ def note_pfe_update(request, module_pk, groupe_pk):
                         action_url += "://" + request.get_host() + reverse('pv_pfe_pdf', kwargs={'groupe_pk': groupe_pk,
                                                                                                  'module_pk': module_pk})
 
-                        email = EmailMessage('[Talents] Délibérations Terminées ' + groupe_.code,
+                        email = EmailMessage('[Talents] Dأ©libأ©rations Terminأ©es ' + groupe_.code,
                                              'Bonjour,\n' +
-                                             'Les délibérations de la soutenance du stage N° ' + groupe_.code + ' sont terminées\n' +
+                                             'Les dأ©libأ©rations de la soutenance du stage Nآ° ' + groupe_.code + ' sont terminأ©es\n' +
                                              'Vous pouvez imprimer le PV pour la signature en cliquant sur ce lien: \n\n' +
                                              action_url + ' \n'
                                                           'Bien cordialement.\n'
@@ -11841,20 +11849,20 @@ def note_pfe_update(request, module_pk, groupe_pk):
                         soutenance_.depot_biblio = data[str(soutenance_.id) + '_depot_biblio']
                         soutenance_.save()
 
-                        # TODO il faut modifier ce qui suit. Il faut déterminer le type de l'activité directement à partir de l'activité (FK vers une table des type de charges
+                        # TODO il faut modifier ce qui suit. Il faut dأ©terminer le type de l'activitأ© directement أ  partir de l'activitأ© (FK vers une table des type de charges
                         if module_.formation.programme.ordre == 5:
                             type_ = 'PFE_Enc'
                             charge_ = ActiviteChargeConfig.objects.get(type=type_).vh_eq_td
                         else:
                             type_ = 'Mem_Enc'
                             charge_ = ActiviteChargeConfig.objects.get(type=type_).vh_eq_td
-                        # Mettre à jour les charges en fonction de la saisie du jury
+                        # Mettre أ  jour les charges en fonction de la saisie du jury
                         activite_encadrement, created = Activite.objects.get_or_create(module=module_pk,
                                                                                        cible__in=[groupe_pk, ],
                                                                                        type=type_, defaults={
                                 'type': type_,
                                 'module': module_,
-                                'vh': charge_,  # TODO mettre les type de charge et VH associé dans une table
+                                'vh': charge_,  # TODO mettre les type de charge et VH associأ© dans une table
                                 'repeter_chaque_semaine': False,
                                 'repartir_entre_intervenants': True,
                             })
@@ -11866,7 +11874,7 @@ def note_pfe_update(request, module_pk, groupe_pk):
                             activite_encadrement.assuree_par.add(enseignant)
                         activite_encadrement.save()
 
-                        # TODO il faut modifier ce qui suit. Il faut déterminer le type de l'activité directement à partir de l'activité (FK vers une table des type de charges
+                        # TODO il faut modifier ce qui suit. Il faut dأ©terminer le type de l'activitأ© directement أ  partir de l'activitأ© (FK vers une table des type de charges
                         if module_.formation.programme.ordre == 5:
                             type_ = 'PFE_Sout'
                             charge_ = ActiviteChargeConfig.objects.get(type=type_).vh_eq_td
@@ -11879,7 +11887,7 @@ def note_pfe_update(request, module_pk, groupe_pk):
                                                                                       type=type_, defaults={
                                 'type': type_,
                                 'module': module_,
-                                'vh': charge_,  # TODO mettre les type de charge et VH associé dans une table
+                                'vh': charge_,  # TODO mettre les type de charge et VH associأ© dans une table
                                 'repeter_chaque_semaine': False
                             })
 
@@ -11906,12 +11914,12 @@ def note_pfe_update(request, module_pk, groupe_pk):
                         raise Exception
                     else:
                         messages.error(request,
-                                       "ERREUR: lors de l'enregistrement de l'évaluation du PFE. Merci de le signaler à l'administrateur.")
+                                       "ERREUR: lors de l'enregistrement de l'أ©valuation du PFE. Merci de le signaler أ  l'administrateur.")
                         return render(request, 'scolar/note_pfe_update.html',
                                       {'form': form, 'liste_inscrits': liste_inscrits,
                                        'liste_evaluations': liste_evaluations, 'module': module_, 'groupe': groupe_})
                 messages.success(request,
-                                 "L'évaluation du PFE a bien été enregistrée. Vous pouvez passer signer le PV de délibération.")
+                                 "L'أ©valuation du PFE a bien أ©tأ© enregistrأ©e. Vous pouvez passer signer le PV de dأ©libأ©ration.")
                 # redirect to a new URL:
             return HttpResponseRedirect(
                 reverse('note_list', kwargs={'groupe_pk': groupe_pk, 'matiere_pk': module_.matiere.id}))
@@ -11919,7 +11927,7 @@ def note_pfe_update(request, module_pk, groupe_pk):
     else:
         form = NotesPFEUpdateForm(groupe_pk, module_pk, request)
         messages.info(request,
-                      "Utilisez ce formulaire pour introduire l'évaluation des différentes compétences attendues du PFE.")
+                      "Utilisez ce formulaire pour introduire l'أ©valuation des diffأ©rentes compأ©tences attendues du PFE.")
     return render(request, 'scolar/note_pfe_update.html',
                   {'form': form, 'liste_inscrits': liste_inscrits, 'liste_evaluations': liste_evaluations,
                    'module': module_, 'groupe': groupe_})
@@ -11934,7 +11942,7 @@ def note_pfe_lock(request, module_pk, groupe_pk):
     if request.user.is_direction() or request.user.is_stage():
         pass
     else:
-        messages.error(request, "Vous n'avez pas les permissions d'accès à cette opération")
+        messages.error(request, "Vous n'avez pas les permissions d'accأ¨s أ  cette opأ©ration")
         return redirect('/accounts/login/?next=%s' % request.path)
     try:
         if module_suivi_.saisie_notes == 'T':
@@ -11946,9 +11954,9 @@ def note_pfe_lock(request, module_pk, groupe_pk):
         if settings.DEBUG:
             raise Exception
         else:
-            messages.error(request, "ERREUR: lors du verrouillage / déverrouillage de saisie des notes.")
+            messages.error(request, "ERREUR: lors du verrouillage / dأ©verrouillage de saisie des notes.")
     else:
-        messages.success(request, "Le verrouillage / déverrouillage a été réalisé avec succès!")
+        messages.success(request, "Le verrouillage / dأ©verrouillage a أ©tأ© rأ©alisأ© avec succأ¨s!")
         # redirect to a new URL:
     return HttpResponseRedirect(reverse('notes_formation_detail', kwargs={'formation_pk': module_.formation.id,
                                                                           'periode_pk': module_.periode.id}))
@@ -11958,8 +11966,104 @@ class SeanceDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Seance
     permission_required = 'scolar.view_seance'
 
-                                    #######################################Code Régit#################################################
+                                    #######################################Code Rأ©git#################################################
+@login_required
+def ExerciceCreate(request):
+    exercices = Exercice.objects.all()
+    if request.method == 'POST':
+        exercice = Exercice(
+            annee_budg=request.POST['annee_budg'],
+            debut=request.POST['debut'],
+            fin=request.POST['fin'],
+        )
+        exercice.save()
+        messages.success(request, 'Exercice Budgetaire enregistree.')
+        return redirect('/scolar/ExerciceShow')
+    return render(request, 'scolar/add_exercice.html')
 
+@login_required
+def ExerciceShow(request):
+    exercices = Exercice.objects.all()
+    return render(request, 'scolar/show_exercices.html', {'exercices': exercices})
+                           
+@login_required
+def AvanceCreate(request, exe):
+    pi = Exercice.objects.get(pk=exe)
+  # avances= Avance.objects.filter(exercie_id=exe)
+    if request.method == 'POST':
+      
+        code_avance=request.POST.get('code_avance')
+        total=request.POST.get('total')
+        credit_non_allouee=request.POST.get('total')
+        if request.POST.get('encours') == 'on':
+            encours = True
+        else:
+            encours = False
+        #exercice=pi,
+        
+        chapitre_codes = [x.code_chap for x in Chapitre.objects.all()]
+        
+        chapitre_ids = []
+        
+        for x in chapitre_codes:
+            chapitre_ids.append(int(request.POST.get(x))) if request.POST.get(x) else print("NOT POSTED ITEM")
+        avance= Avance.objects.create (
+            code_avance=code_avance,
+            encours=encours,
+            total=total,
+            credit_non_allouee=credit_non_allouee,
+            exercice=pi    
+            )
+        for x in chapitre_ids:
+            avance.chapitres.add(Chapitre.objects.get(id=x))
+    
+        messages.success(request, 'Avance enregistree.')
+        return redirect(request.path_info)
+    else:
+        avances = Avance.objects.filter(exercice=Exercice.objects.get(pk=exe))
+        chapitres = Chapitre.objects.all()
+        return render(request, 'scolar/add_avance.html', {'avances': avances,'chapitres': chapitres, 'pi': pi})
+    
+    
+class AvanceChartView(TemplateView):
+     template_name='scolar/chart.html'
+     
+     def get_context_data(self, **kwargs) :
+        context = super(AvanceChartView, self).get_context_data(**kwargs) 
+        avances = Avance.objects.filter(encours='True')
+    
+        vect=[]
+        for avane in avances :
+            vect.append(avane.id)
+        
+        Credits = Credit.objects.filter(avance_id=vect[0])
+        exercice = Exercice.objects.get(id=Avance.objects.get(id=vect[0]).exercice_id)
+        avance= Avance.objects.get(id=vect[0])
+        Ratio_reste = []
+        nb_brds=0
+        sum_credit=0
+        sum_reste=0
+        for credit in Credits : 
+            Ratio_reste.append( "{:.2f}".format(((credit.credit_allouee.amount - credit.credit_reste.amount)*100)/credit.credit_allouee.amount))
+            sum_credit=sum_credit+ credit.credit_allouee.amount
+            sum_reste=sum_reste+credit.credit_reste.amount
+            nb_brds=nb_brds+ Bordereau.objects.filter(credit=credit).count()
+       
+        
+        print (nb_brds)
+        
+        context['pourcent_reste'] = "{:.2f}".format((sum_reste*100)/sum_credit)
+        context['exercice'] = exercice.annee_budg
+        context['sum_credit'] = sum_credit
+        context['avance'] = avance.code_avance
+        context['Ratio_reste'] = Ratio_reste
+        context['Credits'] = Credits
+        context['nb_brds'] = nb_brds
+        return context        
+    
+  
+
+@login_required
 def ChapitreCreate(request):
     if request.method == 'POST':
         chapitre = Chapitre(
@@ -11968,57 +12072,61 @@ def ChapitreCreate(request):
             libelle_chap_AR=request.POST['libelle_chap_AR'],
         )
         chapitre.save()
-        messages.success(request, 'Chapitre enregistré.')
+        messages.success(request, 'Chapitre enregistree.')
     return render(request, 'scolar/add_chapitre.html')
 
-
+@login_required
 def ChapitreShow(request):
     chapitre = Chapitre.objects.all()
     return render(request, 'scolar/show_chapitre.html', {'chapitre': chapitre})
 
-
+@login_required
 def ChapitreDelete(request, id):
     chapitre = Chapitre.objects.get(id=id)
     delete = 1
     if request.method == "POST":
         chapitre.delete()
-        messages.success(request, 'Chapitre supprimé.')
+        messages.success(request, 'Chapitre supprimee.')
         return redirect('/scolar/ChapitreShow')
     return render(request, 'scolar/delete_item.html', {'delete': delete})
 
-
-def ArticleCreate(request, art):
-    pi = Chapitre.objects.get(pk=art)
+@login_required
+def ArticleCreate(request, chap):
+    pi = Chapitre.objects.get(pk=chap)
     if request.method == 'POST':
         article = Article(
-            chapitre=Chapitre.objects.get(pk=art),
+            chapitre=Chapitre.objects.get(pk=chap),
             code_art=request.POST['code_art'],
             libelle_art_FR=request.POST['libelle_art_FR'],
             libelle_art_AR=request.POST['libelle_art_AR'],
         )
         article.save()
-        messages.success(request, 'Article enregistré.')
+        messages.success(request, 'Article enregistree.')
         return redirect(request.path_info)
     else:
-        # messages.error(request, "ERREUR: lors du verrouillage / déverrouillage de saisie des notes.")
-        articles = Article.objects.filter(chapitre=Chapitre.objects.get(pk=art))
-        # total_liste_soum = liste_soum.count()
+        articles = Article.objects.filter(chapitre=Chapitre.objects.get(pk=chap))
         return render(request, 'scolar/add_article.html', {'articles': articles, 'pi': pi})
 
 
+@login_required
 def ArticleDelete(request, art):
     article = Article.objects.get(pk=art)
-    chapitre = article.chapitre_id
+    chapitre = article.chapitre.id
     delete = 2
     if request.method == "POST":
         article.delete()
-        messages.success(request, 'Article supprimé.')
-        return redirect('/scolar/ArticleCreate')
+        messages.success(request, 'Article supprimee.')
+        articles = Article.objects.filter(chapitre=Chapitre.objects.get(pk=chapitre))
+        return render(request, 'scolar/add_article.html', {'chapitre': chapitre ,'articles':articles})
     return render(request, 'scolar/delete_item.html', {'delete': delete, 'chapitre': chapitre})
 
 
-def CreditCreate(request):
+@login_required
+def CreditCreate(request,avc):
     article = Article.objects.all()
+    avances = Avance.objects.all()
+    pavc = Avance.objects.get(pk=avc)
+    exe= pavc.exercice
     if request.method == 'POST':
         credit = Credit(
             chapitre_id=request.POST['chapitre'],
@@ -12027,53 +12135,116 @@ def CreditCreate(request):
             credit_reste=request.POST['credit_allouee'],
         )
         credit.save()
-        messages.success(request, 'credit enregistré.')
+        messages.success(request, 'Credit enregistree.')
         return redirect(request.path_info)
     else:
         article = Article.objects.all()
         crdt = Credit.objects.all()
-    return render(request, 'scolar/add_credit.html', {'article': article, 'crdt': crdt})
+    return render(request, 'scolar/add_credit.html', {'article': article, 'crdt': crdt, 'avances': avances,'pavc' :pavc,'exe':exe})                                              
+    
 
-
-def CreditAssociate(request, art):
+@login_required
+def CreditAssociate(request,avc,art):
     pi = Article.objects.get(pk=art)
+    pavc= Avance.objects.get(pk=avc)
     article = Article.objects.all()
-    if request.method == 'POST':
+    exe= pavc.exercice
+    if request.method == 'POST' and Credit.objects.filter(article=pi, avance=pavc).count()==0 :
         credit = Credit(
             article=Article.objects.get(pk=art),
             chapitre=Chapitre.objects.get(pk=pi.chapitre_id),
+            avance=Avance.objects.get(pk=avc),
             credit_allouee=request.POST['credit_allouee'],
             credit_reste=request.POST['credit_allouee'],
         )
         try:
-            credit.save()
-            messages.success(request, 'credit enregistré.')
+            credit_deja_alloue = Credit.objects.filter(article=pi, avance=pavc).count()
+            crdt = Credit.objects.all()
+            if credit_deja_alloue == 0:
+                
+                  if pavc.credit_non_allouee.amount - (credit.credit_allouee.amount) >=0:
+                            credit.save()          
+                            messages.success(request, 'credit enregistree.')
+                            messages.success(request, 'Il reste comme credit Non alloue : ' + str(
+                                  pavc.credit_non_allouee.amount - (credit.credit_allouee.amount)) + "DZD")
+                            
+                            pavc.credit_non_allouee.amount = pavc.credit_non_allouee.amount - (credit.credit_allouee.amount)
+                            pavc.save(update_fields=['credit_non_allouee'])
+                            return render(request, 'scolar/add_credit.html', {'article': article, 'pi': pi,'crdt': crdt,'pavc':pavc,'exe':exe})
+                  else : 
+                            messages.error(request, 'Vous ne pouvez pas allouer ce credit ,il ne reste comme credit dans cette avance que:' + str(
+                                  pavc.credit_non_allouee.amount) + "DZD") 
+                            return render(request,'scolar/add_credit.html', {'article': article, 'pi': pi,'crdt': crdt,'pavc':pavc,'exe':exe}) 
+                            return redirect(request.path_info)
+            else :
+                messages.error(request, 'Vous ne pouvez pas allouer un credi plusieurs fois au meme article ... ') 
+                return render(request,'scolar/add_credit.html', {'article': article, 'pi': pi,'crdt': crdt,'pavc':pavc,'exe':exe}) 
+                return redirect(request.path_info)
+     
+        except IntegrityError:     
+            messages.error(request, "Erreur dans lenregistrement")
             return redirect(request.path_info)
-        except IntegrityError:
+    
+    
+    elif request.method == 'POST'  and Credit.objects.filter(article=pi, avance=pavc).count()>0 :
+            vect=[]
+            crs=Credit.objects.filter(article=pi, avance=pavc)
+            crdt = Credit.objects.all()
+            for cr in crs :
+                vect.append(cr.id)
+        
+            credit = Credit.objects.get(id=vect[0])
+            Ancien_crdt=credit.credit_allouee.amount
+            consom= credit.credit_allouee.amount - credit.credit_reste.amount
+            if float(request.POST['credit_allouee'])>=consom :
+                credit.credit_reste=float(request.POST['credit_allouee']) - float(consom)
+                credit.credit_allouee=request.POST['credit_allouee']
+                credit.save()
+                pavc.credit_non_allouee.amount = pavc.credit_non_allouee.amount +(Ancien_crdt-credit.credit_allouee.amount)
+                pavc.save(update_fields=['credit_non_allouee'])
+                messages.success(request, 'Credit modifie avec suuces.')
+                messages.success(request, 'Il reste comme credit Non alloue : ' + str(pavc.credit_non_allouee.amount) + "DZD")
+                return render(request,'scolar/add_credit.html', {'article': article, 'pi': pi,'crdt': crdt,'pavc':pavc,'exe':exe}) 
+                return redirect(request.path_info)
+            else:
+ 
+                messages.error(request, 'Vous etes entrain de faire un transfert pour un credit insuffisant ... ' + str(credit) ) 
+                return render(request,'scolar/add_credit.html', {'article': article, 'pi': pi,'crdt': crdt,'pavc':pavc,'exe':exe}) 
+                return redirect(request.path_info)
+    
+    return render(request, 'scolar/ads_credit.html', {'pi': pi,'pavc':pavc})
 
-            messages.error(request, "Credit deja alloue pour cet Article_chapitre pour lexercice courrant")
-            return redirect(request.path_info)
-    credit_deja_alloue = Credit.objects.filter(article=pi).count()
-    crdt = Credit.objects.all()
-    if credit_deja_alloue > 0:
-        messages.warning(request, 'Vous ne pouvez pas allouer un credit plusieurs fois a un article ')
-        return render(request, 'scolar/add_credit.html', {'article': article, 'crdt': crdt})
-    return render(request, 'scolar/ads_credit.html', {'pi': pi})
 
-
-def CreditDelete(request, art):
-    credit = Credit.objects.get(article=art)
+@login_required
+def CreditDelete(request,avc, art):
+    pavc= Avance.objects.get(pk=avc)
+    credit = Credit.objects.get(article=art,avance=avc)
+    cpt_bord_liees= Bordereau.objects.filter(credit_id=credit).count()
+    exe= pavc.exercice
+    
     article = Article.objects.all()
     crdt = Credit.objects.all()
     delete = 3
     if request.method == "POST":
-        credit.delete()
-        messages.success(request, 'Credit supprimé.')
-        return render(request, 'scolar/add_credit.html', {'article': article, 'crdt': crdt})
-    return render(request, 'scolar/delete_item.html', {'delete': delete})
+        if cpt_bord_liees>0 : 
+             messages.error(request,  "Vous ne pouvez pas supprimer ce credit , des borderaux sont deja liee")
+        else :
+            credit.delete()
+            messages.success(request, 'Credit supprimee definitivement')
+            messages.success(request, 'Il reste comme credit Non alloue : ' + str(
+             
+            pavc.credit_non_allouee.amount + (credit.credit_allouee.amount)) + "DZD")
+                            
+            pavc.credit_non_allouee.amount = pavc.credit_non_allouee.amount + (credit.credit_allouee.amount)
+            pavc.save(update_fields=['credit_non_allouee'])
+            
+            
+            
+            
+            return render(request, 'scolar/add_credit.html', {'article': article, 'crdt': crdt,'pavc':pavc, 'exe':exe })
+    return render(request, 'scolar/delete_item.html', {'delete': delete ,'pavc':pavc,'exe':exe })
 
-
-class aa_PDFView(PDFTemplateView):
+class aa_avance_PDFView(PDFTemplateView):
     template_name = 'scolar/aa_pdf.html'
     cmd_options = {
         'orientation': 'Portrait',
@@ -12095,73 +12266,94 @@ class aa_PDFView(PDFTemplateView):
                     somme = somme
         return 5
 
+    
     def get_context_data(self, **kwargs):
+       
         articles = Article.objects.all()
         chapitres = Chapitre.objects.all()
         crdt = Credit.objects.all()
+        avance_ = Avance.objects.get(id=self.kwargs.get('avance_pk'))
         vecteur = []
+        sum_total=0
         for chapitre in chapitres:
-            vecteur.append(chapitre)
-            vecteur.append(Credit.objects.filter(chapitre=Chapitre.objects.get(pk=chapitre.id)).aggregate(Sum('credit_allouee')).get('credit_allouee__sum', 0.00))
-
-        print('TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT')
-        print(vecteur)
-        print('TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT')
-
-
-        #sum_pieces_letter = num2words(sum_pieces, lang='fr')
+             
+             if(Credit.objects.filter(chapitre=Chapitre.objects.get(pk=chapitre.id), avance=avance_).aggregate(Sum('credit_allouee')).get('credit_allouee__sum', 0.00) is  None) :
+                 print ('ghghghghgh')
+             else :  
+                 vecteur.append(chapitre)
+                 vecteur.append(Money(Credit.objects.filter(chapitre=Chapitre.objects.get(pk=chapitre.id), avance=avance_).aggregate(Sum('credit_allouee')).get('credit_allouee__sum', 0.00)))
+                 sum_total = sum_total+Credit.objects.filter(chapitre=Chapitre.objects.get(pk=chapitre.id), avance=avance_).aggregate(Sum('credit_allouee')).get('credit_allouee__sum', 0.00)
+        i=1
+        total=0
+        while i < len(vecteur): 
+                if(vecteur[i] is not None) :
+                  total =total+vecteur[i]
+                else :
+                     total=total
+                i = i+2
 
         context = {}
         context['year'] = datetime.datetime.now().year
         context['articles'] = articles
         context['chapitres'] = chapitres
         context['crdt'] = crdt
-        context['vecteur'] = vecteur
-
-
-
-
-
-        self.filename = 'Avance N° 01_' + str(datetime.datetime.now().year) + '.pdf'
+        context['vecteur'] = vecteur  
+        context['avance'] = avance_
+        context['total'] = total
+        context['sum_total_letter'] = num2words(sum_total, lang='fr')
+        
+        self.header_template='scolar/header_templ.html', 
+        self.footer_template='scolar/footer_templ.html',
+        self.filename = "Avance _"+avance_.code_avance+"_Exercice_"+avance_.exercice.annee_budg+'.pdf'
         return context
 
 
+@login_required
 def BordereauCreate(request, crdt):
     pi = Credit.objects.get(pk=crdt)
     ens = Regisseur.objects.get(user_id=request.user.id)
-    print('=====================================================================================================')
-    print(ens.prenom)
-    #  print ( request.user.id)
-
-    print('=====================================================================================================')
     if request.method == 'POST':
         borderau = Bordereau(
             credit=Credit.objects.get(pk=crdt),
-            deseingnation=request.POST['deseingnation'],
+            ##deseingnation=request.POST['deseingnation'],
             regisseur=ens,
+            date_borderau = datetime.date.today(),
         )
         borderau.save()
-        messages.success(request, 'Borderzau enregistré avec succes.')
+        messages.success(request, 'Bordereau enregistree avec succees.')
         return redirect(request.path_info)
-    else:
-        # messages.error(request, "ERREUR: lors du verrouillage / déverrouillage de saisie des notes.")
+    else:   
         borderaux = Bordereau.objects.filter(credit=Credit.objects.get(pk=crdt))
-        # total_liste_soum = liste_soum.count()
-        return render(request, 'scolar/add_bordereau.html', {'borderaux': borderaux})
+        return render(request, 'scolar/add_bordereau.html', {'borderaux': borderaux,'pavc':pi.avance})
 
 
-def LitImput(request):
-    credits = Credit.objects.all()
-    return render(request, 'scolar/show_credit.html', {'credits': credits})
+@login_required
+def LitImput(request,avc):
+    pavc= Avance.objects.get(pk=avc)
+    credits = Credit.objects.filter(avance_id=avc)
 
+    return render(request, 'scolar/show_credit.html', {'credits': credits,'pavc':pavc})
 
+@login_required
+def LitImput_for_exercice(request,exe):
+    pexe= Exercice.objects.get(pk=exe)
+  
+    avances = Avance.objects.filter(exercice=pexe)
+    vect=[]
+    for avane in avances :
+            for credit in Credit.objects.filter(avance=avane) :
+                vect.append(credit)
+                
+    print(len(vect))
+    
 
+    return render(request, 'scolar/show_situation_dep.html', {'vect': vect,'pexe':pexe})
+
+@login_required
 def PieceCreate(request, brdr):
     pi = Bordereau.objects.get(pk=brdr)
     credit = pi.credit
-    print('44444444444444444444444444444444444444444444444444444444444')
-    print(datetime.datetime.now().year)
-    print('44444444444444444444444444444444444444444444444444444444444')
+    pavc = credit.avance
     if request.method == 'POST' and 'Enregistrer' in request.POST:
         piece = Piece(
             bordreau=Bordereau.objects.get(pk=brdr),
@@ -12175,17 +12367,28 @@ def PieceCreate(request, brdr):
             piece.save()
             credit.credit_reste.amount = credit.credit_reste.amount - piece.montant.amount
             credit.save(update_fields=['credit_reste'])
-            messages.success(request, 'Piece justificatif ajoutéé  avec succes.')
+            messages.success(request, 'Piece justificatif ajoutee  avec succees.')
             return redirect(request.path_info)
         else:
-            messages.warning(request,
-                             "Erreur: veuillez verifier le montant de la piece et aussi le credit reste pour cet article :  " + str(
+            messages.error(request,
+                             "Erreur: veuillez verifierle montant de la piece et aussi le credit reste pour cet article :  " + str(
                                  credit.credit_reste.amount) + "DZD")
             return redirect(request.path_info)
 
-    if request.method == 'POST' and 'Cloturer' in request.POST:
-        pi.cloture = 'True'
-        pi.save(update_fields=['cloture'])
+    if request.method == 'POST' and ('Cloturer' in request.POST or 'Rejeter' in request.POST):
+        
+        if 'Cloturer' in request.POST:
+            pi.cloture = 'True'
+            pi.save(update_fields=['cloture'])
+        elif 'Rejeter' in request.POST:
+            pi.etat_borderau = 'False'
+            pi.save(update_fields=['etat_borderau'])
+            pieces = Piece.objects.filter(bordreau=Bordereau.objects.get(pk=brdr))
+            for piece in pieces:
+                credit.credit_reste.amount = credit.credit_reste.amount + piece.montant.amount
+                credit.save(update_fields=['credit_reste'])
+            
+            
     pieces = Piece.objects.filter(bordreau=Bordereau.objects.get(pk=brdr))
     nb_pieces = Piece.objects.filter(bordreau=Bordereau.objects.get(pk=brdr)).count()
     print('___________________________________________________________________________________________')
@@ -12196,14 +12399,11 @@ def PieceCreate(request, brdr):
     else:
        sum_pieces = Money(Piece.objects.filter(bordreau=pi).aggregate(Sum("montant")).get('montant__sum', 0.00))
 
-
-
-
-
     return render(request, 'scolar/add_piece.html', {'pieces': pieces, 'nb_pieces': nb_pieces, 'sum_pieces': sum_pieces, 'pi': pi,
-                   'year': datetime.datetime.now().year})
+                   'year': datetime.datetime.now().year, 'pavc':pavc})
 
 
+@login_required
 def PieceDelete(request, pc):
     piece = Piece.objects.get(pk=pc)
     pi = piece.bordreau
@@ -12214,7 +12414,13 @@ def PieceDelete(request, pc):
         nb_pieces = Piece.objects.filter(bordreau=piece.bordreau).count()
         sum_pieces = Piece.objects.filter(bordreau=piece.bordreau).aggregate(Sum("montant")).get('montant__sum', 0.00)
         piece.delete()
-        messages.success(request, 'piece supprimée avec succes')
+        
+        credit= pi.credit
+        credit_reste = pi.credit.credit_reste
+        credit.credit_reste.amount = credit.credit_reste.amount + piece.montant.amount
+        credit.save(update_fields=['credit_reste'])
+     
+        messages.success(request, 'piece supprimee avec succes')
         return redirect('PieceCreate', pi.id)
     return render(request, 'scolar/delete_item.html', {'delete': delete, 'pi': pi})
 
@@ -12226,13 +12432,9 @@ class aa_bordereau_PDFView(PDFTemplateView):
         'page-size': 'A4',
     }
 
+
     def get_context_data(self, **kwargs):
         bordereau_ = Bordereau.objects.get(id=self.kwargs.get('bordereau_pk'))
-        print('________________________________________________________')
-        print(bordereau_.credit.credit_allouee)
-        print('________________________________________________________')
-        # self.filename='BordereauPDF.pdf'
-        # pieces = Piece.objects.all()
 
         pieces = {}
         for piece_ in Piece.objects.filter(bordreau=bordereau_):
@@ -12254,14 +12456,203 @@ class aa_bordereau_PDFView(PDFTemplateView):
         context['nb_pieces'] = nb_pieces
         context['sum_pieces_letter'] = sum_pieces_letter
         context['new_sum_pieces'] = new_sum_pieces
-
-        print('ppppppppppppppppppppppppppppppppppppppppppppppppp')
         print(datetime.datetime.now().year)
         print(pieces)
         print(bordereau_)
         print(sum_pieces)
-
-        self.filename = 'NumeroBordereau_' + str(datetime.datetime.now().year)  + '-' + str(bordereau_.id) + '.pdf'
-
+        self.filename ='Bordereau_'+str(bordereau_.id)+'_Avance_'+bordereau_.credit.avance.code_avance+'_Exercice_'+bordereau_.credit.avance.exercice.annee_budg+'_' + str(datetime.datetime.now().year) + '.pdf'
         return context
+
+
+                   #######################################Code Inventaire#################################################
+
+@login_required
+@transaction.atomic
+def ImmobilierCreate(request):
+    FAMILLE=(
+        ('01','Logiciels et Applicatifs'),
+        ('02','Materiel informatique'),
+        ('03','Materiel et Mobilier de bureau et d''enseingement '),
+        ('04','Materiel de securite'),
+        ('05','Climatisation'),
+        ('06','Agencement et Amenagement'),
+        ('07','Equipement menager'),
+        ('08','Materiel automobile'),
+        ('09','Materiel supervision systeme'),
+        ('10','Autres'),
+        ('11','Logiciels de securite'),
+        ('12','Materiel archivage'),
+        ('13','Materiel detection intrusion'),
+        ('14','Logiciels detection intrusion'),
+        ('15','Materiel Reseau VSAT'),
+        ('16','Logiciel Archivage Test'),
+        ('17','Logiciels archivage'),
+        ('18','Materiel messagerie'),
+        ('19','Logiciels messagerie'),
+        ('20','Materiel archivage Backup'),
+        ('21','Materiel archivage Test'),
+        ('22','Logiciel Archivage Backup'),
+        ('23','Materiel de sport'),
+        ('24','Audio visuelle '),
+        ('25','Materiel medical '))
+    benificaires=Personnel.objects.all()
+    #blocs=Bloc.objects.all()
+
+    bureaux = Bureau.objects.all()
+   
+    context = {'FAMILLE': FAMILLE,'benificaires':benificaires,'bureaux':bureaux}
+    if request.method == 'POST' and request.FILES.get('facture', False) and request.FILES['facture']: 
+        benificaire_id=request.POST.get('benificaire')
+        bureau_id=request.POST.get('bureau')
+        #bloc_id=request.POST.get('bloc')
+        
+      #  bureaux=Bureau.objects.filter(bloc_id=bloc_id)
+        
+        
+        if request.POST.get('valeur') == '': 
+          
+           valeur = 0
+        else : 
+           valeur=request.POST['valeur']
+        immobilier = Immobilier(
+            code_barre=request.POST['code_barre'],
+            deseingnation=request.POST['desingnation'],
+            famille=request.POST['famille'],  
+            fournisseur=request.POST['fournisseur'],
+            num_inventaire=request.POST['num_inventaire'],  
+            valeur=valeur,
+            benificaire=Personnel.objects.get(id=benificaire_id),
+            #bloc=Bloc.objects.get(id=bloc_id),
+            bureau=Bureau.objects.get(id=bureau_id),
+            Num_facture=request.POST['Num_facture'],
+            Num_chassis=request.POST['Num_chassis'],
+            matricule=request.POST['matricule'],    
+            marque=request.POST['marque'],  
+            date_facture=request.POST['date_facture'],  
+            duree_garantie=request.POST['duree_garantie'],  
+            observation=request.POST['observation'],  
+            facture=request.FILES['facture'],
+        )
+        try : 
+            immobilier.save()
+            messages.success(request, 'Immobilier enregistrأ© avec succأ©s')
+        except Exception:
+            messages.error(request,
+                             'Erreur: Vأ©rifier les donnأ©es introduites... ')
+   
+    return render(request, 'scolar/add_immobilier.html', context)
+
+@login_required
+def ImmobilierShow(request):
+    
+    filtred_immobiliers = ImmobilierFilter(
+        request.POST,
+        queryset=Immobilier.objects.all()      
+       )
+    
+    paginated_filtred_immobiliers = Paginator(filtred_immobiliers.qs, 20) # Show 20 immobiliers par page.
+    page_number = request.GET.get('page', 1)
+    immobilier_page_obj = paginated_filtred_immobiliers.get_page(page_number)
+
+    return render(request, 'scolar/show_immobilier.html', {'filtred_immobiliers':filtred_immobiliers,'immobilier_page_obj': immobilier_page_obj})
+
+@login_required
+def ImmobilierShowFilter(request):
+    
+    filtred_immobiliers = ImmobilierFilter(
+        request.POST,
+        queryset=Immobilier.objects.all()
+       
+        )
+    paginated_filtred_immobiliers = Paginator(filtred_immobiliers.qs, 20) # Show 20 immobiliers par page.
+    page_number = request.GET.get('page', 1)
+    immobilier_page_obj = paginated_filtred_immobiliers.get_page(page_number)
+
+    return render(request, 'scolar/show_filter_immobilier.html', {'filtred_immobiliers':filtred_immobiliers, 'immobilier_page_obj':immobilier_page_obj})
+
+@login_required
+def ImmobilierDelete(request, id):
+    immobilier = Immobilier.objects.get(id=id)
+    delete = 5
+    if request.method == "POST":
+        immobilier.delete()
+        messages.success(request, 'Immobilier supprimأ©.')
+        return redirect('/scolar/ImmobilierShow')
+    return render(request, 'scolar/delete_item.html', {'delete': delete})
+
+@login_required
+def ImmobilierEdit(request, id):
+    immobilier = Immobilier.objects.get(id=id)
+    
+    FAMILLE=(
+        ('01','Logiciels et Applicatifs'),
+        ('02','Materiel informatique'),
+        ('03','Materiel et Mobilier de bureau et d''enseingement '),
+        ('04','Materiel de securite'),
+        ('05','Climatisation'),
+        ('06','Agencement et Amenagement'),
+        ('07','Equipement menager'),
+        ('08','Materiel automobile'),
+        ('09','Materiel supervision systeme'),
+        ('10','Autres'),
+        ('11','Logiciels de securite'),
+        ('12','Materiel archivage'),
+        ('13','Materiel detection intrusion'),
+        ('14','Logiciels detection intrusion'),
+        ('15','Materiel Reseau VSAT'),
+        ('16','Logiciel Archivage Test'),
+        ('17','Logiciels archivage'),
+        ('18','Materiel messagerie'),
+        ('19','Logiciels messagerie'),
+        ('20','Materiel archivage Backup'),
+        ('21','Materiel archivage Test'),
+        ('22','Logiciel Archivage Backup'),
+        ('23','Materiel de sport'),
+        ('24','Audio visuelle '),
+        ('25','Materiel medical '))
+    benificaires=Personnel.objects.all()
+    bureaux = Bureau.objects.all()
+
+    if request.method == 'POST' and request.FILES.get('facture', False) and request.FILES['facture']: 
+       
+        benificaire_id=request.POST.get('benificaire')
+        bureau_id=request.POST.get('bureau')
+        print ('________________________________________')
+        print (benificaire_id)
+        print ('________________________________________')
+        
+        if request.POST.get('valeur') == '': 
+          
+           valeur = 0
+        else : 
+           valeur=request.POST['valeur']
+
+        immobilier.code_barre=request.POST['code_barre']
+        immobilier.deseingnation=request.POST['desingnation']
+        immobilier.famille=request.POST['famille']  
+        immobilier.fournisseur=request.POST['fournisseur']
+        immobilier.num_inventaire=request.POST['num_inventaire']
+        immobilier.valeur=valeur
+        
+        immobilier.benificaire_id=Personnel.objects.get(id=benificaire_id).id
+        immobilier.bureau_id=Bureau.objects.get(id=bureau_id).id
+        immobilier.Num_facture=request.POST['Num_facture']
+        immobilier.Num_chassis=request.POST['Num_chassis']
+        immobilier.matricule=request.POST['matricule']  
+        immobilier.marque=request.POST['marque'] 
+        immobilier.date_facture=request.POST['date_facture'] 
+        immobilier.duree_garantie=request.POST['duree_garantie']
+        immobilier.observation=request.POST['observation']
+        immobilier.facture=request.FILES['facture']
+        
+        try : 
+            immobilier.save()
+            messages.success(request, 'Immobilier modifiأ© avec succأ©s')
+            return redirect('/scolar/ImmobilierShow')
+        except Exception:
+            messages.error(request,
+                             'Erreur: Vأ©rifier les donnأ©es introduites... ')
+   
+    return render(request, 'scolar/edit_immobilier.html' ,{'immobilier': immobilier,'FAMILLE': FAMILLE,'benificaires':benificaires,'bureaux':bureaux})
+
 

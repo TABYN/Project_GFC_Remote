@@ -10,6 +10,16 @@
  {% block content %}
 <form id="demoForm1" method="post"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
    <div class="content-wrapper">
       <div class="row">
          <div class="col-md-12 grid-margin stretch-card">
@@ -17,8 +27,10 @@
                <div class="card-body">
                   <h3>Suivi des achats par régits </h3>
                    <p class="lead font-italic">Listes des Imputations </p>
+                   <p class="lead font-italic">Exercice : {{pavc.exercice.annee_budg}}</p>
+                   <p class="lead font-italic">Avance :  {{pavc.code_avance}}</p>
                      <hr class="my-4">
-                     <table class="table table-borderless">
+                     <table class="table table-striped" >
                          <thead class="border-bottom font-weight-bold">
                          <tr>
                              <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">code_chapitre</th>
@@ -47,17 +59,18 @@
                                {% with taux=100|sub:answer1 %} 
                                	{% if taux == 100 %}
                                 <td style="border: 1px solid black; padding: 0px; border-radius: 0px; background-color:#FF0000;">
-                           {{ taux }}    %
+                        
+                           {{ taux|floatformat:2 }} %
                                </td>            
 	                           {% endif %}	
 	                           {% if taux >= 50 and taux < 100 %}
-                                < <td style="border: 1px solid black; padding: 0px; border-radius: 0px; background-color:#FF8A33;">
-                           {{ taux }}    %
+                               <td style="border: 1px solid black; padding: 0px; border-radius: 0px; background-color:#FF8A33;">
+                           {{ taux|floatformat:2 }} %
                                </td>            
 	                           {% endif %}
 	                           {% if taux >= 0 and taux < 50 %}
                                 <td style="border: 1px solid black; padding: 0px; border-radius: 0px; background-color:#00FF00;">
-                           {{ taux }}    %
+                           {{ taux|floatformat:2 }} %
                                </td>            
 	                           {% endif %}
                               {% endwith %}

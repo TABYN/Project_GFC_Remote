@@ -10,6 +10,16 @@
 
  <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
 	<div class="content-wrapper">
 		<div class="row">
 			<div class="col-md-12 grid-margin stretch-card" >
@@ -17,17 +27,42 @@
 					<div class="card-body" >
 						<h3>Suivi des achats par régits </h3>
 						<br>
-						<p class="lead font-italic">Allocation des crédits</p>
+						<p class="lead font-italic">Allocation des crédits pour l'avance :  {{pavc.code_avance}}  Exercice :{{exe}}</p>
 						<hr class="my-4">
-						<table class="table table-borderless">
+										<table class="table table-striped" >
+									<thead class="border-bottom font-weight-bold">
+								<tr>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Crédit réservé pour 	Avance</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Reste crédit non alloué</th>
+
+
+							</tr>
+							
+							</thead>
+							<tbody>
+												<tr style="border: 1px solid black; padding: 0px; border-radius: 0px;">
+								
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{pavc.total}} DA</td>
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{pavc.credit_non_allouee.amount}} DA</td>
+
+							  </tr>
+							<tbody>
+						</table>
+						
+						<table class="table table-striped" >
 							<thead class="border-bottom font-weight-bold">
+						
 							<tr>
-								<th name="chapitre">Code_chapitre</th>
-								<th name="article">Code_Article</th>
-								<th>Libelle_Article_FR</th>
-								<th>Libelle_Article_AR</th>
-								<th>Crédit</th>
-								<th>Allocation_crédit</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Code_chapitre</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Code_Article</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Libelle_Article_FR</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Libelle_Article_AR</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Crédit</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Reste</th>
+								
+								{% if pavc.encours == True %}	
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Allocation_crédit</th>
+								{% endif %}	
 							</tr>
 							</thead>
 							<tbody>
@@ -39,25 +74,46 @@
 								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{art.libelle_art_AR}}</td>
 								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
 									{% for crd in crdt %}
-									{% if crd.article == art %}
+									{% if crd.article == art  and crd.avance_id == pavc.id %}
 									{{crd.credit_allouee}}
 									{% else %}
 									{% endif %}
 									{% endfor %}
 								</td>
-								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
-									<a style="padding-left:30px;" href="{% url 'CreditAssociate' art.id %}" class="d-inline" > <i class="fa fa-file-alt fa-lg"></i> </a>
+								
+								
+									<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
 									{% for crd in crdt %}
-									{% if crd.article == art %}
-									<a style="padding-left:30px;" href="{% url 'CreditDelete' art.id %}" class="d-inline" > <i class="fa fa-trash-alt fa-lg "></i> </a>
+									{% if crd.article == art  and crd.avance_id == pavc.id %}
+									{{crd.credit_reste}}
 									{% else %}
 									{% endif %}
 									{% endfor %}
 								</td>
+								
+					       {% if pavc.encours == True %}	
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
+									<a style="padding-left:30px;" href="{% url 'CreditAssociate'  pavc.id art.id %}" class="d-inline" > <i class="fa fa-file-alt fa-lg"></i> </a>
+									{% for crd in crdt  %}
+									{% if crd.article == art and crd.avance_id == pavc.id %}
+									<a style="padding-left:30px;" href="{% url 'CreditDelete'  pavc.id art.id %}" class="d-inline" > <i class="fa fa-trash-alt fa-lg "></i> </a> 
+									
+									{% endif %}
+									{% endfor %}
+									
+								</td>
+					     {% endif %}
 							</tr>
 							{% endfor %}
+							
+		
+							
+							
 							</tbody>
 						</table>
+		
+						
+						
 					</div>
 				</div>
 			</div>
@@ -66,7 +122,7 @@
  </form>
 <form id="demoForm2" method="POST"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
-	 <a href="{% url 'aa_pdf' %}" download target="_blank" class="btn btn-secondary btn-block">
+	 <a href="{% url 'aa_avance_PDFView' pavc.id %}" download target="_blank" class="btn btn-secondary btn-block">
 		 <i class="fas fa-print"></i>  Imprimer l'avance</a>
 	 </div>
  </form>

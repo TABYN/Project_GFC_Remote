@@ -9,16 +9,40 @@
  {% block content %}
  <form id="demoForm1" method="post"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
 
 	 <div class="content-wrapper">
 		<div class="row">
 			<div class="col-md-12 grid-margin stretch-card">
 				<div class="card">
 					<div class="card-body">
-						<h3>Ajouter les pieces au bordereau courant :  {{pi.deseingnation}} </h3>
+					{% if pi.cloture == False and pavc.encours == True %}
+					   <h3>Ajout des pieces au le bordereau :  {{pi.id}}</h3>
+					   <h4>      Date de creation du borderau :  {{ pi.date_borderau|date:"d M Y" }}</h4>
+						<h4>     Exercice: {{pi.credit.avance.exercice.annee_budg}}/Avance: {{pi.credit.avance.code_avance}}</h4>
+						<h4>     Chapitre: {{pi.credit.article.chapitre.code_chap}}:{{pi.credit.article.chapitre.libelle_chap_FR}}</h4>
+						<h4>     Article: {{pi.credit.article.code_art}}:{{pi.credit.article.libelle_art_FR}}</h4>
+							{% else %}
+						<h3>     Liste des pieces inclues dans le bordereau  :  {{pi.id}}</h3>
+						<h4>     Exercice: {{pi.credit.avance.exercice.annee_budg}}/Avance: {{pi.credit.avance.code_avance}}</h4>
+						<h4>     Chapitre: {{pi.credit.article.chapitre.code_chap}}:{{pi.credit.article.chapitre.libelle_chap_FR}}</h4>
+						<h4>     Article: {{pi.credit.article.code_art}}:{{pi.credit.article.libelle_art_FR}}</h4>
+					{% endif %}
+					
+		
+						
 						<br>
 						<form class="forms-sample">
-							{% if pi.cloture == False %}
+							{% if pi.cloture == False and pavc.encours == True %}
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group row">
@@ -37,23 +61,32 @@
 									</div>
 								</div>
 							</div>
-							{% else %}
-							{% endif %}
-							<div class="row">
+												<div class="row">
 								<div class="col-md-4">
-									<a href="{% url 'LitImput' %}" class="btn btn-secondary btn-block">
+									<a href="{% url 'BordereauCreate' pi.credit.id %}" class="btn btn-secondary btn-block">
 										<i class="fa fa-list"></i>  Retour
 									</a>
 								</div>
 								<div class="col-md-4" >
 									{% if pi.cloture == False %}
 									<button type="submit" class="btn btn-primary btn-block"  name="Enregistrer" >
-										<i class="fa fa-database" ></i>  Enregistrer</button>
+										<i class="fa fa-database" ></i>  Ajouter Nouvelle Pièce</button>
 									{% else %}
 									{% endif %}
 
 								</div>
 							</div>
+							{% else %}
+												<div class="row">
+								<div class="col-md-4">
+									<a href="{% url 'BordereauCreate' pi.credit.id %}" class="btn btn-secondary btn-block">
+										<i class="fa fa-list"></i>  Retour
+									</a>
+								</div>
+							</div>
+							
+							{% endif %}
+		
 						</form>
 						<div class="content-wrapper">
 							<div class="row">
@@ -86,7 +119,7 @@
 													<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
 														{% csrf_token %}
 														<div class="content-wrapper">
-															{% if pi.cloture == False %}
+															{% if pi.cloture == False and pavc.encours == True  %}
 															<a style="padding-left:30px;" href="{% url 'PieceDelete' piece.id %}" class="d-inline" >
 																<i class="fa fa-trash-alt fa-lg "></i>
 															</a>
@@ -124,18 +157,25 @@
  {% csrf_token %}
 	<div class="content-wrapper">
 		{% if pi.cloture == False %}
+		 <br><br>
 		<div class="col-md-12">
 			<button type="submit" class="btn btn-primary btn-block" name="Cloturer" enabled><i  class="fas fa-ban" ></i>  Clôturer le bordereau</button>
 		</div>
 		{% else %}
+			 <a href="{% url 'aa_bordereau_pdf' pi.id %}" download target="_blank" class="btn btn-secondary btn-block">
+		 <i class="fas fa-print"></i>  Imprimer le bordereau</a>
+		 
+
 	    {% endif %}
-	    {% if pi.cloture == True %}
-	</div>
+	    {% if pi.etat_borderau == True and  pi.cloture == True %}
+	    <br><br>
+       <div class="col-md-12">
+			<button type="submit" class="btn btn-primary btn-block" name="Rejeter" enabled><i  class="fas fa-ban" ></i>  Rejeter le bordereau</button>
+		</div>
 		{% else %}
 	    {% endif %}
-	 <a href="{% url 'aa_bordereau_pdf' pi.id %}" download target="_blank" class="btn btn-secondary btn-block">
-		 <i class="fas fa-print"></i>  Imprimer le bordereau</a>
-	 </div>
+	</div>
+
  </form>
 </html>
 {% endblock %}

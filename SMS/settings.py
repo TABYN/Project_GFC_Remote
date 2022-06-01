@@ -199,6 +199,7 @@ SOCIAL_AUTH_STORAGE = 'social_django.models.DjangoStorage'  # new
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '788698204337-hf38104m1m42tte4t87aoklf29uedl82.apps.googleusercontent.com' # new
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'qWHKbQlOynagtGQarIZ2mdhn'   # new
 
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 

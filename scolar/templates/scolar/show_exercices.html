@@ -1,0 +1,75 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+{% load dictionary %}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+<form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+  	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+   <div class="content-wrapper">
+      <div class="row">
+         <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+               <div class="card-body">
+                  <h3>Suivi des achats par régits </h3>
+                   <p class="lead font-italic">Listes des Exercices </p>
+                     <hr class="my-4">
+                     <table class="table table-striped" >
+                         <thead class="border-bottom font-weight-bold">
+                         <tr>
+                             <th>Année Budgétaire</th>
+                             <th>Date début</th>
+                             <th>Date fin</th>
+                             <th>
+                                 <a href="{% url 'ExerciceCreate' %}"
+                                              class="btn btn-outline-success d-inline">
+                                     <i class="fa fa-plus">Ajouter exercice</i>
+                                 </a>
+                             </th>
+                         </tr>
+                         </thead>
+                         <tbody>
+                         {% for exe in exercices %}
+                         <tr>
+                             <td>{{exe.annee_budg}}</td>
+                             <td>{{exe.debut}}</td>
+                             <td>{{exe.fin}}</td>
+                             <td>             
+                                 <a style="padding-left:30px;" href="{% url 'AvanceCreate' exe.id %}" class="d-inline" data-toggle="tooltip" data-placement="bottom" title="Cliquer ici pour ajouter des avances.">
+                                     <i class="fas fa-link fa-lg"  style="color:black" ></i>
+                                 </a>
+                             </td>
+                         </tr>
+                         {% endfor %}
+                         </tbody>
+                     </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   
+          <script>
+     
+     $(function () {
+    	  $('[data-toggle="tooltip"]').tooltip()
+    	})
+     
+     </script>   
+</form>
+</html>
+
+{% endblock %}

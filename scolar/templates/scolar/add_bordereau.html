@@ -9,50 +9,60 @@
  {% block content %}
  <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
 	<div class="content-wrapper">
 		<div class="row">
 			<div class="col-md-12 grid-margin stretch-card">
 				<div class="card">
 					<div class="card-body">
-						<h3>Creation des Bordereaux</h3>
+					
+					{% if pavc.encours == True %}	
+					  
+						<h3>Creation des Bordereaux : Avance :{{pavc.code_avance}}/Exercice :{{pavc.exercice.annee_budg}} </h3>
 						<br>
 						<form class="forms-sample">
 							<div class="row">
+							
 								<div class="col-md-6">
 									<div class="form-group row">
-										<label class="col-sm-3 col-form-label">Désignation</label>
-										<div class="col-sm-9">
-											<input type="text" class="form-control" name="deseingnation" />
-										</div>
-									</div>
-								</div>
-<!-- 								<div class="col-md-6"> -->
-<!-- 									<div class="form-group row"> -->
-<!-- 										<label class="col-sm-3 col-form-label">Regisseur</label> -->
-<!-- 										<div class="col-sm-9"> -->
-<!-- 											<input type="text" class="form-control" name="regisseur" /> -->
-<!-- 										</div> -->
-<!-- 									</div> -->
-<!-- 								</div>		 -->
-								<div class="col-md-6">
-									<div class="form-group row">
-										<label class="col-sm-3 col-form-label">{{user.prenom}}</label>
+										<label class="col-sm-3 col-form-label">Régisseur : {{user.prenom}}</label>
 									
 									</div>
 								</div>			
 							</div>
 							<div class="row">
 								<div class="col-md-4">
-									<a href="{% url 'LitImput' %}" class="btn btn-secondary btn-block">
+									<a href="{% url 'LitImput' pavc.id %}" class="btn btn-secondary btn-block">
 										<i class="fa fa-list"></i> Retour
 									</a>
 								</div>
 								<div class="col-md-4">
 									<button type="submit" class="btn btn-primary btn-block" >
-										<i class="fa fa-database"></i>Enregistrer</button>
+										<i class="fa fa-database"></i> Ajouter Nouveau Bordereau</button>
 								</div>
 							</div>
 						</form>
+						{% else %}
+						<h3>Historique des Bordereaux : Avance :{{pavc.code_avance}}/Exercice :{{pavc.exercice.annee_budg}} </h3>
+									<div class="row">
+								<div class="col-md-4">
+									<a href="{% url 'LitImput' pavc.id %}" class="btn btn-secondary btn-block">
+										<i class="fa fa-list"></i> Retour
+									</a>
+								</div>
+							</div>
+							
+						{% endif %}
+							
 						<div class="content-wrapper">
 							<div class="row">
 								<div class="col-md-12 grid-margin stretch-card">
@@ -66,9 +76,11 @@
 													<th>Bordreau</th>
 													<th>Chapitre</th>
 													<th>Article</th>
-													<th>Désignation</th>
+												
 													<th>Regisseur</th>
-													<th>Ajout des Pieces</th>
+													<th>Cloturé?</th>
+													<th>Rejeté?</th>
+													<th>Gestion des Pièces</th>
 												</tr>
 												</thead>
 												<tbody>
@@ -77,8 +89,24 @@
 													<td>{{bord.id}}</td>
 													<td>{{bord.credit.chapitre.code_chap}}</td>
 													<td>{{bord.credit.article.code_art}}</td>
-													<td>{{bord.deseingnation}}</td>
+											
+												
 													<td>{{user.last_name}}&nbsp{{user.first_name }}</td>
+												{% if bord.cloture == 1 %}	
+												
+													<td>Oui</td>
+												{% else %}
+												<td>Non</td>
+												{% endif %}
+												
+												{% if bord.etat_borderau == 1 %}	
+												
+													<td>Non</td>
+												{% else %}
+												<td>Oui</td>
+												{% endif %}
+												
+
 													<td>
                                                    <a style="padding-left:30px;" href="{% url 'PieceCreate' bord.id %}" class="d-inline" > <i class="fas fa-plus-square"></i></a>
 													</td>

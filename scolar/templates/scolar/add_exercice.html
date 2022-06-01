@@ -1,0 +1,83 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+{% load static %}
+   <link rel="stylesheet" href="{% static 'css/bootstrap-multiselect.css' %}">
+   <script src="{% static 'js/bootstrap-multiselect.js' %}"></script>
+   <script src="{% static 'js/bootstrap-multiselect.min.js' %}"></script>
+   
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+ <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+	<div class="content-wrapper">
+		<div class="row">
+			<div class="col-md-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<h3>Suivi des achats par régits </h3>
+						<p class="lead font-italic">Ajout des exercices budgétaires </p>
+						<br>
+						<form class="forms-sample">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label" for="number1" >Année Budgétaire</label>
+										<div class="col-sm-5">
+											<input type="text" class="form-control" name="annee_budg" id="number1"  required />
+										</div>
+									</div>
+								</div>
+								</div>
+
+											<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Date Début</label>
+										<div class="col-sm-9">
+										<input id="datefield" type='date' name="debut"  required></input>
+										</div>
+									</div>									
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Date Fin</label>
+										<div class="col-sm-9">
+											<input id="datefield" type='date' name="fin"  required></input>
+										</div>
+									</div>
+								</div>	
+
+							<div class="row">
+									<div class="col-md-4">
+						 		    <a href="{% url 'ExerciceShow'  %}" class="btn btn-secondary btn-block">
+										<i class="fa fa-list"></i> Retour
+									</a>  
+								</div>
+								<div class="col-md-4">
+									<button type="submit" class="btn btn-primary btn-block" >
+										<i class="fa fa-database"></i>Enregistrer</button>
+								</div>
+							</div>
+					
+						</form>
+			
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+ </form>
+</html>
+
+{% endblock %}

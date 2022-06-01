@@ -1,0 +1,178 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+ <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+	<div class="content-wrapper">
+		<div class="row">
+			<div class="col-md-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<h3>Ajout des immobiliers </h3>
+						<br>
+						<form class="forms-sample">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label" for="number1" >Code barre</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="code_barre" id="number1" required />
+										</div>
+									</div>
+									
+								</div>
+									<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label" for="number1" >Numéro d'inventaire</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="num_inventaire" id="number1"  required/>
+										</div>
+									</div>
+									
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Désingnation</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="desingnation" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Famille</label>
+									<div class="col-sm-9">
+								        <select id="famille" name="famille">
+										{% for f in FAMILLE %} <option value="{{f.0}}" class="form-control">{{f.1}} </option>{% endfor %}
+										</select>
+									</div>
+									</div>
+								</div>
+							</div>
+							
+								<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Fournisseur</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="fournisseur" required/>
+										</div>
+									</div>
+								</div>
+								
+									<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Numéro de facture</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="Num_facture" required/>
+										</div>
+									</div>
+								</div>
+						
+							</div>
+							
+							
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Marque</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="marque" required/>
+										</div>
+									</div>
+								</div>
+								
+									<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Numéro de chassis</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="Num_chassis" />
+										</div>
+									</div>
+								</div>
+								
+									
+									<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Matricule</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="matricule" />
+										</div>
+									</div>
+								</div>
+
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Valeur</label>
+										<div class="col-sm-9">
+											<input type="number" class="form-control" name="valeur" pattern="[0-9]"   min="0" required/>
+										</div>
+									</div>
+								</div>
+								
+									<div class="col-md-6">
+										<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Bénéficaire</label>
+									<div class="col-sm-9">
+								        <select  name="benificaire">
+										{% for benificaire in benificaires %} <option  value="{{benificaire.id}}" > {{benificaire.nom}}  {{benificaire.prenom}}</option>{% endfor %}
+										</select>
+									</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									
+								   <div class="form-group row">
+                                                 <label class="col-sm-3 col-form-label">Facture</label>
+                                                 <div class="col-sm-9">
+                                                     <div class="custom-file">
+                                                         <input type="file" class="custom-file-input" id="Facture_File" name="facture" />
+                                                         <label class="custom-file-label" for="Facture_File" data-browse="Upload"></label>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                         <script>
+                                         // Add the following code if you want the name of the file appear on select
+                            $(".custom-file-input").on("change", function() {
+                            var Facture_File = $(this).val().split("\\").pop();
+                            $(this).siblings(".custom-file-label").addClass("selected").html(Facture_File);
+                            });
+                                         </script>
+
+							</div>
+							</div>
+							
+							
+							
+							<div class="row">
+								<div class="col-md-4">
+									<a href="{% url 'ImmobilierShow' %}" class="btn btn-secondary btn-block">
+										<i class="fa fa-list"></i> Retour
+									</a>
+								</div>
+								<div class="col-md-4">
+									<button type="submit" class="btn btn-primary btn-block" >
+										<i class="fa fa-database"></i>Enregistrer</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+</html>
+
+{% endblock %}

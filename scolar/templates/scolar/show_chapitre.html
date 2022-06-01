@@ -9,6 +9,16 @@
  {% block content %}
 <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
    <div class="content-wrapper">
       <div class="row">
          <div class="col-md-12 grid-margin stretch-card">
@@ -17,7 +27,7 @@
                   <h3>Suivi des achats par régits </h3>
                    <p class="lead font-italic">Listes des chapitres </p>
                      <hr class="my-4">
-                     <table class="table table-borderless">
+                     <table class="table table-striped" >
                          <thead class="border-bottom font-weight-bold">
                          <tr>
                              <th>code_chapitre</th>

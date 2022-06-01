@@ -9,6 +9,16 @@
  {% load djmoney %}
  <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
 	<div class="content-wrapper">
 		<div class="row">
 			<div class="col-md-12 grid-margin stretch-card">
@@ -29,9 +39,9 @@
 							</div>
 							<div class="row">
 								<div class="col-md-4">
-								    <a href="{% url 'CreditCreate' %}" class="btn btn-secondary btn-block">
+						 		    <a href="{% url 'CreditCreate'  pavc.id %}" class="btn btn-secondary btn-block">
 										<i class="fa fa-list"></i> Retour
-									</a>
+									</a>  
 								</div>
 								<div class="col-md-4">
 									<button type="submit" class="btn btn-primary btn-block" >

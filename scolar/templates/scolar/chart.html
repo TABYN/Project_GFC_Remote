@@ -1,0 +1,222 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+{% load djmoney %}
+{% load static icons %}
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
+
+ <!-- Required meta tags -->
+
+ {% block content %}
+ <h2>Dashboard Régit</h2>
+  <br>
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#reste&consomme">Crédit reste et consommé</a>
+    </li>
+
+    </ul>
+<div class="tab-content">
+    <div id="reste&consomme" class="container tab-pane active"><br>
+    
+	<div class="row" >
+	
+	 <div class="col-sm-3" >
+
+		<div class="card border-primary  mb"  >
+			  	<div class="card-header text-center border-primary" style="background-color:#E6E6FA ; " >
+			  		<h5 class="card-title">Informations</h5>
+			  	</div>
+			  	<div class="card-body text-center">
+			    	<p class="card-title">Exercice : {{exercice}}</p>
+			    	<p class="card-title">Avance : {{avance}}</p>
+			  	</div>
+			  	 	</div>
+			  	 	
+		<div class="card border-primary  mb" >
+			  	<div class="card-header text-center border-primary" style="background-color:#E6E6FA ; " >
+			  		<h5 class="card-title">Total Bordereaux</h5>
+			  	</div>
+			  	<div class="card-body text-center">
+			    	<p class="card-title">{{nb_brds}}</p>
+			  	</div>
+			  	 	</div>
+			  	 
+			  	 
+			  	 		 <div class="card border-primary  mb" >
+			  	<div class="card-header text-center border-primary" style="background-color:#E6E6FA ; " >
+			  		<h5 class="card-title">Total avance en DA</h5>
+			  	</div>
+			  	<div class="card-body text-center">
+			    	<p class="card-title">{{sum_credit}}</p>
+			  	</div>
+			  	
+			</div>	
+			 <div class="card border-primary  mb" >
+			  	<div class="card-header text-center border-primary" style="background-color:#E6E6FA ; " >
+			  		<h5 class="card-title">Consommation de l'avance</h5>
+			  	</div>
+			  	<div class="card-body text-center">
+			    	<p class="card-title">{{pourcent_reste}} %</p>
+			  	</div>
+			</div>
+		
+		</div>
+	
+			
+			
+	<div class="col-lg-9">
+        <div class="bg-white">
+            <div class="card-body">
+                <canvas id="myChart1" width="400" height="300"></canvas>
+                <script>
+                    
+                    var ctx = document.getElementById('myChart1').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        labels: [{% for credit in Credits %} '{{credit.article.code_art}} {{credit.article.libelle_art_FR}}', {% endfor %}],
+                    datasets: [{
+                        label: 'Crédit Consommé',
+                        data:  [{% for ratio_reste in Ratio_reste %} {{ratio_reste}}, {% endfor %}],
+                        backgroundColor:  [{% for credit in Credits %}    'rgb(255, 0, 0)',  {% endfor %}],
+
+                        borderColor:  [{% for credit in Credits %}     'rgb(255, 0, 0)',  {% endfor %}],
+
+                                borderWidth: 1
+                    }]
+                        },
+                    options: {
+                    	legend: {
+                            labels: {
+                                // This more specific font property overrides the global property
+                            	  fontSize:16,
+                            	 
+                            }
+                        },
+                    
+                    	responsive: true,
+                        tooltips: {
+                            callbacks: {
+                               label: function(t, d) {
+                                  var xLabel = d.datasets[t.datasetIndex].label;
+                                  var yLabel = t.yLabel.toString()+'%';
+                                  return xLabel + ': ' + yLabel;
+                               } 
+                               }
+                            },
+                    	
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                	   callback: function(value, index, values) {
+                                  
+                                              return  value+'%';
+                                         
+                                        },
+                                    beginAtZero: true,
+                             
+                                },
+                            scaleLabel: {
+                                display: true,
+                                fontFamily: 'sans-serif',
+                                fontSize:'16',
+                                labelString: 'Consommation en %'
+                              }
+                            }]
+                        }
+                     
+                    },
+            
+
+          
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+
+	</div>
+
+</div>
+
+
+	<div class="row" >
+    <div class="col-lg-6">
+        <div class="bg-white">
+            <div class="card-body">
+                <canvas id="myChart" width="400" height="300"></canvas>
+                <script >
+        
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        	labels: [{% for credit in Credits %} '{{credit.article.code_art}} {{credit.article.libelle_art_FR}}', {% endfor %}],
+                    datasets: [{
+                        label: 'Crédit Reste',
+                        data:  [{% for credit in Credits %} '{{credit.credit_reste.amount}}'  , {% endfor %}],
+                        backgroundColor:  [{% for credit in Credits %}   'rgba(54, 100, 235, 1)' ,  {% endfor %}],
+
+                        borderColor:  [{% for credit in Credits %}   'rgba(54, 100, 235, 1)' ,  {% endfor %}],
+                       
+                                borderWidth: 1
+                    }]
+                        },
+                    options: {
+                     	legend: {
+                            labels: {
+                                // This more specific font property overrides the global property
+                            	  fontSize:16,
+                            }
+                        },
+                    	
+                        tooltips: {
+                            callbacks: {
+                               label: function(t, d) {
+                                  var xLabel = d.datasets[t.datasetIndex].label;
+                                  var yLabel = t.yLabel >= 1000 ? t.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") +' DZD'  :  t.yLabel +' DZD';
+                                  return xLabel + ': ' + yLabel;
+                               } 
+                               }
+                            },
+                            labels : {
+                            	render: 'percentage',
+                            	
+                            },
+                    	
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                	   callback: function(value, index, values) {
+                                           if (parseInt(value) >= 1000) {
+                                              return  value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+' DZD';
+                                           } else {
+                                              return  value+' DZD';
+                                           }
+                                        },
+                                    beginAtZero: true,
+                             
+                                },
+                            scaleLabel: {
+                                display: true,
+                                
+                                fontSize:'16',
+                                labelString: 'Reste des imputations en dinars'
+                              }
+                            }]
+                        }
+                    }
+                    });
+                    
+                </script>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+{% endblock  %}

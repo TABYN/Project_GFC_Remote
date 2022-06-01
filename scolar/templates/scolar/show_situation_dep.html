@@ -1,0 +1,79 @@
+
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% load mathfilters %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+<form id="demoForm1" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+   <div class="content-wrapper">
+      <div class="row">
+         <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+               <div class="card-body">
+                  <h3>Suivi des achats par régits </h3>
+                   <p class="lead font-italic">Listes des Imputations </p>
+                     <p class="lead font-italic">Exercice : {{pexe.annee_budg}}</p>
+
+                     <hr class="my-4">
+                     <table class="table table-striped" >
+                         <thead class="border-bottom font-weight-bold">
+                         <tr>
+                             <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">code_chapitre</th>
+                             <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">libelle_chapitre_FR</th>
+                             <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">code_article</th>
+                             <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">libelle_article_FR</th>
+                             <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Avance</th>
+                             
+                             <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Dépence realisée</th>
+                             
+                             
+                             <th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Solde</th>
+                           
+                      
+                   
+                         </tr>
+                         </thead>
+                         <tbody>
+                         {% for vect in vect %}
+                         	
+                         <tr>
+                             <td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{vect.chapitre.code_chap}}</td>
+                             <td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{vect.chapitre.libelle_chap_FR}}</td>
+                             <td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{vect.article.code_art}}</td>
+                             <td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{vect.article.libelle_art_FR}}</td>
+                             <td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{vect.credit_allouee}}</td>
+                             
+                             <td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{vect.credit_allouee|sub:vect.credit_reste }} </td>
+                             
+                             <td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{vect.credit_reste}}</td>
+              
+                  
+                          
+                         </tr>
+                         {% endfor %}
+                         </tbody>
+                     </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</form>
+</html>
+
+{% endblock %}

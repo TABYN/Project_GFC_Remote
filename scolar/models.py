@@ -14,6 +14,7 @@ from random import randint
 from django.core.exceptions import ValidationError
 import re
 from djmoney.models.fields import MoneyField
+import os
 
 from django.template.defaultfilters import default
 
@@ -79,6 +80,18 @@ class User(AbstractUser):
             return Inscription.objects.filter(etudiant=self.etudiant, formation__annee_univ__encours=True)
         else:
             return Inscription.objects.none()
+        
+    def exercice_list(self):
+        if self.is_regisseur() or self.is_top_management():
+            return Exercice.objects.all()
+        else:
+            return Exercice.objects.none()
+        
+    def avance_list(self):
+         if self.is_regisseur() or self.is_top_management():
+            return Avance.objects.all()
+         else:
+            return Avance.objects.none()
 
     def is_top_management(self):
         group_admin=get_object_or_404(Group, name='top-management')
@@ -216,9 +229,6 @@ class Matiere(models.Model):
             return self.code +' '+self.precision
         else:
             return self.code 
-
-
-
 
     
 class Specialite(models.Model):
@@ -2055,7 +2065,7 @@ class NoteCompetenceElement(models.Model):
             models.UniqueConstraint(fields=['evaluation_competence_element','note_globale'], name="evaluation_competence_element_note_globale")
         ]
 
-################################################# MODELS Reget
+################################################# MODELS Reget #############################################
 
 class Regisseur(models.Model):
         user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -2082,28 +2092,120 @@ class Article(models.Model):
         libelle_art_AR = models.CharField(max_length=100, null=True, blank=True)
        
 
-class Credit(models.Model):
-        article = models.ForeignKey(Article, on_delete=CASCADE)
-        chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE)
-        credit_allouee = MoneyField(decimal_places=2, max_digits=9, default_currency='DZD')
-        credit_reste = MoneyField(decimal_places=2, max_digits=9, default_currency='DZD')
-        class Meta:
-         constraints = [
-            models.UniqueConstraint(fields=['chapitre', 'article'], name="chapitre-article")
-        ]
+class Exercice(models.Model):
+    '''
+    Annee Budgetaire qui comprend plusieurs avances
+    '''
+    annee_budg=models.CharField(max_length=4, unique=True)
+    debut=models.DateField()
+    fin=models.DateField()
+    
+    def __str__(self):
+        return self.annee_budg
 
+class Avance(models.Model):
+        code_avance = models.CharField(max_length=12)
+        chapitres = models.ManyToManyField(Chapitre)
+        exercice = models.ForeignKey(Exercice, on_delete=CASCADE, default='')
+        encours=models.BooleanField(default='False',  blank=True)
+        total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
+        credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
+        
+        
+        def str_encours(self):       
+          if self.encours :
+            return 'OUI'
+          else : 
+            return 'NON'
+        
+class Credit(models.Model):
+        avance = models.ForeignKey(Avance, on_delete=CASCADE,default='' )
+        article = models.ForeignKey(Article, on_delete=CASCADE)
+        chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
+        credit_allouee = MoneyField(decimal_places=2, max_digits=9)
+        credit_reste = MoneyField(decimal_places=2, max_digits=9)
+
+        
 class Bordereau(models.Model):
         credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
         deseingnation = models.CharField(max_length=200, null=True, blank=True)
         regisseur = models.CharField(max_length=50, null=True, blank=True)
         cloture = models.BooleanField(default=False)
+        date_borderau = models.DateField(null=True, blank=True)
+        etat_borderau = models.BooleanField(default=True, null=True, blank=True)  #Rejeté ou accepté
 
 class Piece(models.Model):
         credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
         bordreau = models.ForeignKey(Bordereau, on_delete=CASCADE, default='')
         deseingnation = models.CharField(max_length=200, null=True, blank=True)
-        montant = MoneyField(decimal_places=2, max_digits=9, default_currency='DZD')
+        montant = MoneyField(decimal_places=2, max_digits=9)
+        
+#################################### THIS PART FOR INVENTAIRE GESTION ###############################################
 
-
-
-
+class Bloc(models.Model):
+        Num_blc = models.CharField(max_length=10)
+        libelle_blc = models.CharField(max_length=200)
+    
+        
+class Bureau(models.Model):
+        code_bur = models.CharField(max_length=10)
+        bloc = models.ForeignKey(Bloc, on_delete=CASCADE, default='', null=True, blank=True,related_name="bureaux")
+        libelle_bureau = models.CharField(max_length=200)
+        
+class Immobilier(models.Model):
+        code_barre = models.CharField(max_length=10, null=False,blank=False)
+        deseingnation = models.CharField(max_length=200, null=True, blank=True)
+        FAMILLE=(
+        ('01','Logiciels et Applicatifs'),
+        ('02','Materiel informatique'),
+        ('03','Materiel et Mobilier de bureau et d''enseingement '),
+        ('04','Materiel de securite'),
+        ('05','Climatisation'),
+        ('07','Equipement menager'),
+        ('08','Materiel automobile'),
+        ('09','Materiel supervision systeme'),
+        ('10','Autres'),
+        ('11','Logiciels de securite'),
+        ('12','Materiel archivage'),
+        ('13','Materiel detection intrusion'),
+        ('14','Logiciels detection intrusion'),
+        ('15','Materiel Reseau VSAT'),
+        ('16','Logiciel Archivage Test'),
+        ('17','Logiciels archivage'),
+        ('18','Materiel messagerie'),
+        ('19','Logiciels messagerie'),
+        ('20','Materiel archivage Backup'),
+        ('21','Materiel archivage Test'),
+        ('22','Logiciel Archivage Backup'),
+        ('23','Materiel de sport'),
+        ('24','Audio visuelle '),
+        ('25','Materiel medical '))
+        
+        famille = models.CharField(max_length = 2, choices = FAMILLE)   
+        fournisseur = models.CharField(max_length=200, null=True, blank=True) 
+        num_inventaire = models.CharField(max_length=20) 
+        valeur = models.DecimalField(decimal_places=2, max_digits=9,default=0.0)
+        benificaire = models.ForeignKey(Personnel, on_delete=models.SET_NULL, null=True, blank=True)
+        Num_facture = models.CharField(max_length=20)  
+        Num_chassis = models.CharField(max_length=30) 
+        matricule = models.CharField(max_length=15) 
+        marque = models.CharField(max_length=15, null=True, blank=True) 
+        date_facture = models.DateField(null=True, blank=True)
+        duree_garantie=models.IntegerField(null=True) 
+       
+        bureau = models.ForeignKey(Bureau, on_delete=models.SET_NULL, null=True, blank=True, default='01')
+        
+        observation = models.TextField(max_length=300, null=True, blank=True) 
+        
+        facture=models.FileField(upload_to='invent_files', null=True)
+               
+        def lib_field(self):
+           try:
+            a=os.path.basename(self.facture.file.name)
+           except :
+            a=""
+           return a
+       
+       #################################### THIS PART FOR BUDGET GESTION###############################################
+       
+        
