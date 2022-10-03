@@ -150,6 +150,16 @@
 		{% endif %}
 		
 		
+				{% if request.user|has_group:"budget" %}
+			<ul class="nav list-group">
+				<li>
+				<strong>Banques et Fournisseurs</strong>
+				
+				  <a class="list-group-item"  href="banque_list">{% icon 'tasks' %} Banques</a>
+				  <a class="list-group-item"  href="#">{% icon 'tasks' %} Fournisseurs</a>
+				</li>
+   			</ul>
+		{% endif %}
 		
 	
 	

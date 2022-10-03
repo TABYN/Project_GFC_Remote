@@ -1072,3 +1072,33 @@ class SeanceTable(tables.Table):
         model=Seance
         template_name="django_tables2/bootstrap4.html"
         
+########################################section 2
+class BanqueTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "banque_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "banque_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Banque
+        fields = ['code', 'nom', 'abreviation', 'nom_a']
+        template_name= "django_tables2/bootstrap4.html"
+        
+
+class BanqueFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='Code')
+    nom = django_filters.CharFilter(field_name='nom', lookup_expr='icontains', label='Nom')
+    abreviation = django_filters.CharFilter(field_name='abreviation', lookup_expr='icontains', label='Abreviation')
+   
+    class Meta:
+        model = Banque
+        fields = ['code', 'nom', 'abreviation']
+        
+
+
+
+###########################################fin section2        
+        
+        
+        
