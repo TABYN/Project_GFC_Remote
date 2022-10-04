@@ -12655,4 +12655,6 @@ def ImmobilierEdit(request, id):
    
     return render(request, 'scolar/edit_immobilier.html' ,{'immobilier': immobilier,'FAMILLE': FAMILLE,'benificaires':benificaires,'bureaux':bureaux})
 
+#//*******//
+
 
