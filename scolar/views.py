@@ -35,7 +35,8 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ModuleTable, ChargeEnseignantTable, PVTable, PVEnseignantTable, \
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
-    PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter
+    PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
+    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import EmailMessage, send_mass_mail
@@ -12656,5 +12657,146 @@ def ImmobilierEdit(request, id):
     return render(request, 'scolar/edit_immobilier.html' ,{'immobilier': immobilier,'FAMILLE': FAMILLE,'benificaires':benificaires,'bureaux':bureaux})
 
 #//*******//
+##########################################################budget
+class ChapitresListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ChapitresListView, self).get_context_data(**kwargs)
+
+        filter_ = ChapitreFilter(self.request.GET, queryset=Chapitre.objects.all())
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = ChapitreTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des chapitres '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+                'Ajouter chapitre': reverse('chapitre_create')
+                
+            }
+        return context
+    
+class ChapitreCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_chapitre'
+    model = Chapitre
+    fields = ['code_chap', 'libelle_chap_FR', 'libelle_chap_AR']
+    template_name = 'scolar/create.html'
+    success_message = "Le chapitre a ete ajoute avec succes!"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('chapitres_list')
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super(ChapitreCreateView, self).get_context_data(**kwargs)
+        titre = 'Ajouter un nouveau chapitre'
+        context['titre'] = titre
+        return context
+
+
+class ChapitreUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_chapitre'
+    model = Chapitre
+    fields = ['code_chap', 'libelle_chap_FR', 'libelle_chap_AR']
+    template_name = 'scolar/update.html'
+    success_message = "Le chapitre a ete modifie avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('chapitres_list')
+        return form
+ 
+ 
+class ChapitreDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Chapitre
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_chapitre'
+    success_message = "Le chapitre a bien ete supprime"
+ 
+    def get_success_url(self):
+        return reverse('chapitres_list')
+
+class FournisseursListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(FournisseursListView, self).get_context_data(**kwargs)
+
+        filter_ = FournisseurFilter(self.request.GET, queryset=Fournisseur.objects.all())
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = FournisseurTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des fournisseurs '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+                'Ajouter fournisseur': reverse('fournisseur_create')
+                
+            }
+        return context
+    
+class FournisseurCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_fournisseur'
+    model = Fournisseur
+    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
+    template_name = 'scolar/create.html'
+    success_message = "Le fournisseur a ete ajoute avec succes!"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('fournisseurs_list')
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super(FournisseurCreateView, self).get_context_data(**kwargs)
+        titre = 'Ajouter un nouveau fournisseur'
+        context['titre'] = titre
+        return context
+
+
+class FournisseurUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_fournisseur'
+    model = Fournisseur
+    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
+    template_name = 'scolar/update.html'
+    success_message = "Le fournisseur a ete modifie avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('fournisseurs_list')
+        return form
+ 
+ 
+class FournisseurDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Fournisseur
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_fournisseur'
+    success_message = "Le fournisseur a bien ete supprime"
+ 
+    def get_success_url(self):
+        return reverse('fournisseurs_list')
+     
 
 

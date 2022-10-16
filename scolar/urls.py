@@ -328,6 +328,17 @@ urlpatterns = [
     path('ImmobilierShowFilter', views.ImmobilierShowFilter, name='ImmobilierShowFilter'),
     path('ImmobilierDelete/<int:id>/', views.ImmobilierDelete, name='ImmobilierDelete'),
     path('ImmobilierEdit/<int:id>/', views.ImmobilierEdit, name='ImmobilierEdit'),
- 
+    
+#############################################budget
+
+    path('chapitres_list', views.ChapitresListView.as_view(), name='chapitres_list'),
+    path('chapitre_create', views.ChapitreCreateView.as_view(), name='chapitre_create'),
+    re_path(r'^chapitre_update/(?P<pk>\d+)/$',views.ChapitreUpdateView.as_view(), name='chapitre_update'),
+    re_path(r'^chapitre_delete/(?P<pk>\d+)/$',views.ChapitreDeleteView.as_view(), name='chapitre_delete'),
+
+    path('fournisseurs_list', views.FournisseursListView.as_view(), name='fournisseurs_list'),
+    path('fournisseur_create', views.FournisseurCreateView.as_view(), name='fournisseur_create'),
+    re_path(r'^fournisseur_update/(?P<pk>\d+)/$',views.FournisseurUpdateView.as_view(), name='fournisseur_update'),
+    re_path(r'^fournisseur_delete/(?P<pk>\d+)/$',views.FournisseurDeleteView.as_view(), name='fournisseur_delete'), 
     
     ]

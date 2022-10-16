@@ -149,6 +149,52 @@
    			</ul>
 		{% endif %}
 		
+		{% if request.user|has_group:"budget" %}
+			<ul class="nav list-group">
+			<li>
+			<strong>CHAPITRES ET ARTICLES</strong>
+			</li>
+			<li>
+			 <a class="list-group-item" href="{% url 'chapitres_list' %}">{% icon 'tasks' %} Chapitres</a>
+			</li>
+			<li>
+			 <a class="list-group-item" href="">{% icon 'tasks' %} Articles</a>
+			</li>
+			<li>
+			<strong>Credits</strong>
+			</li>
+			<li>
+			 <a  class="list-group-item" href="">{% icon 'tasks' %} Credit alouer</a>
+			</li>
+			<li>
+			<strong>Engagement</strong>
+			</li>
+			<li>
+			 <a  class="list-group-item" href="">{% icon 'tasks' %} Engagement</a>
+			</li>  
+			                <li>
+			 <a  class="list-group-item" href="">{% icon 'tasks' %} Mondat</a>
+			</li>    
+			<li>
+			 <a  class="list-group-item" href="">{% icon 'tasks' %} Transfert</a>
+			</li>  
+			<li>
+			<strong>Benificiares et Banques</strong>
+			</li>
+			<li>
+			 <a  class="list-group-item" href="{% url 'fournisseurs_list' %}">{% icon 'tasks' %} Liste benificiares</a>
+			</li>  
+			                <li>
+			 <a  class="list-group-item" href="">{% icon 'tasks' %} Liste banques</a>
+			</li>    
+			<li>  
+			 
+			
+			
+			    </ul>
+			{% endif %}
+		
+		
 		
 		
 	
