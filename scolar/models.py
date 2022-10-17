@@ -2104,6 +2104,8 @@ class Exercice(models.Model):
     annee_budg=models.CharField(max_length=4, unique=True)
     debut=models.DateField()
     fin=models.DateField()
+    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
     
     def __str__(self):
         return self.annee_budg
@@ -2223,6 +2225,20 @@ class Banque(models.Model):
         
     def __str__(self):
         return  self.nom + ' : ' + self.abreviation
+    
+class Credit_S2(models.Model):
+    exercice = models.ForeignKey(Exercice, on_delete=CASCADE,default='' )
+    article = models.ForeignKey(Article, on_delete=CASCADE)
+    chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
+    credit_allouee = MoneyField(decimal_places=2, max_digits=9)
+    credit_reste = MoneyField(decimal_places=2, max_digits=9)
+    
+class Engagement_S2(models.Model):
+    code = models.CharField(max_length=3)
+    nature = models.CharField(max_length=150)
+    def __str__(self):
+        return  self.code + ' : ' + self.nature
+ 
 
 
 
