@@ -36,7 +36,10 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
-    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable
+    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter
+
+    
+
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import EmailMessage, send_mass_mail
@@ -12656,7 +12659,7 @@ def ImmobilierEdit(request, id):
    
     return render(request, 'scolar/edit_immobilier.html' ,{'immobilier': immobilier,'FAMILLE': FAMILLE,'benificaires':benificaires,'bureaux':bureaux})
 
-#//*******//
+
 ##########################################################budget
 class ChapitresListView(TemplateView):
     template_name = 'scolar/filter_list.html'
@@ -12798,5 +12801,88 @@ class FournisseurDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
     def get_success_url(self):
         return reverse('fournisseurs_list')
      
+
+class BanqueListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(BanqueListView, self).get_context_data(**kwargs)
+
+        filter_ = BanqueFilter(self.request.GET, queryset=Banque.objects.all().order_by('code'))
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = BanqueTable(filter_.qs, exclude=exclude_columns_)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Banques '
+        if self.request.user.is_staff_only():
+            context['btn_list'] = {
+            'Creer Banque': reverse('banque_create'),
+                
+            }
+        return context
+
+
+class BanqueCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_banque'
+    model = Banque
+    fields = ['code', 'nom', 'abreviation', 'nom_a']
+    template_name = 'scolar/create.html'
+    success_message = "La Banque a ete creer avec succe!"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+#         form.fields['pays'] = forms.ModelChoiceField(queryset=Pays.objects.all().order_by('nom'), initial='DZ',
+#                                                      required=True)
+        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('banque_list')
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super(BanqueCreateView, self).get_context_data(**kwargs)
+        titre = 'Creer une nouvelle Banque'
+        context['titre'] = titre
+        return context
+
+
+class BanqueUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_banque'
+    model = Banque
+    fields = ['code', 'nom', 'abreviation', 'nom_a']
+    template_name = 'scolar/update.html'
+    success_message = "La Banque a ete modifiee avec succe"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        #form.fields['sigle'].widget.attrs['readonly'] = True
+        form.fields['code'].required = False
+        form.fields['nom'].required = False
+        form.fields['abreviation'].required = False
+        form.fields['nom_a'].required = False
+#         form.fields['pays'] = forms.ModelChoiceField(queryset=Pays.objects.all().order_by('nom'), initial='DZ',
+#                                                      required=True)
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('banque_list')
+        return form
+
+
+class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Banque
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_banque'
+    success_message = "La Banque a bien ete supprimee"
+
+    def get_success_url(self):
+        return reverse('banque_list')
+
+
+
 
 

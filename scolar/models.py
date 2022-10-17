@@ -149,9 +149,14 @@ class User(AbstractUser):
                 return False
         else:
             return self.is_direction()
+        
+    def is_budget(self):
+        group_budget=get_object_or_404(Group, name='budget')
+        return group_budget in self.groups.all()
+        
     
     def is_staff_only(self):
-        return self.is_direction() or self.is_scolarite() or self.is_surveillance() or self.is_stage() or self.is_top_management()
+        return self.is_direction() or self.is_scolarite() or self.is_surveillance() or self.is_stage() or self.is_top_management() or self.is_budget()
          
     def is_staff_or_student_himself(self, etudiant_pk):
         if self.is_staff_only() or self.is_enseignant():
@@ -2221,5 +2226,21 @@ class Fournisseur(models.Model):
         num_cmpt_fournisseur = models.IntegerField(null=True)
         cle_cmpt_fournisseur = models.IntegerField(null=True) 
         
+
         def __str__(self):
             return self.code_fournisseur+' '+ self.nom_fournisseur       
+
+class Banque(models.Model):
+    code = models.CharField(max_length=3)
+    abreviation = models.CharField(max_length=20)
+    nom = models.CharField(max_length=100)
+    nom_a = models.CharField(max_length=100,blank=True)
+        
+    def __str__(self):
+        return  self.nom + ' : ' + self.abreviation
+
+
+
+
+
+

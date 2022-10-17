@@ -328,6 +328,7 @@ urlpatterns = [
     path('ImmobilierShowFilter', views.ImmobilierShowFilter, name='ImmobilierShowFilter'),
     path('ImmobilierDelete/<int:id>/', views.ImmobilierDelete, name='ImmobilierDelete'),
     path('ImmobilierEdit/<int:id>/', views.ImmobilierEdit, name='ImmobilierEdit'),
+
     
 #############################################budget
 
@@ -341,4 +342,12 @@ urlpatterns = [
     re_path(r'^fournisseur_update/(?P<pk>\d+)/$',views.FournisseurUpdateView.as_view(), name='fournisseur_update'),
     re_path(r'^fournisseur_delete/(?P<pk>\d+)/$',views.FournisseurDeleteView.as_view(), name='fournisseur_delete'), 
     
+ 
+    path('banque_list', views.BanqueListView.as_view(), name='banque_list'),
+    path('banque_create', views.BanqueCreateView.as_view(), name='banque_create'),
+    re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
+    re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
+
+       
+
     ]
