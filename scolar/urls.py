@@ -347,7 +347,13 @@ urlpatterns = [
     path('banque_create', views.BanqueCreateView.as_view(), name='banque_create'),
     re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
     re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
+    
+    path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
+    path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
+    path('engagement_S2_list', views.EngagementListView.as_view(), name='engagement_S2_list'),
+    path('engagement_S2_create', views.EngagementCreateView.as_view(), name='engagement_S2_create'),
+    re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.EngagementUpdateView.as_view(), name='engagement_S2_update'),
+    re_path(r'^engagement_S2_delete/(?P<pk>[ -_&@\w]+)/$', views.EngagementDeleteView.as_view(), name='engagement_S2_delete'),
 
-       
 
     ]

@@ -1138,4 +1138,24 @@ class BanqueFilter(django_filters.FilterSet):
         fields = ['code', 'nom', 'abreviation']
         
 
+class Engagement_S2Table(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "engagement_S2_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_S2_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Engagement_S2
+        fields = ['code', 'nature']
+        template_name= "django_tables2/bootstrap4.html"
+    
+
+class Engagement_S2Filter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+    nature = django_filters.CharFilter(field_name='nature', lookup_expr='icontains', label='nature')
+   
+    class Meta:
+        model = Engagement_S2
+        fields = ['code', 'nature']
 

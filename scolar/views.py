@@ -36,7 +36,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
-    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter
+    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Engagement_S2Filter ,Engagement_S2Table
 
     
 
@@ -12881,8 +12881,177 @@ class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
 
     def get_success_url(self):
         return reverse('banque_list')
+    
+@login_required
+def CreditCreate_S2(request,exe):
+    article = Article.objects.all()
+    exercices = Exercice.objects.all()
+    pexe = Exercice.objects.get(pk=exe)
+   
+    if request.method == 'POST':
+        credit = Credit(
+            chapitre_id=request.POST['chapitre'],
+            article_id=request.POST['article'],
+            credit_allouee=request.POST['credit_allouee'],
+            credit_reste=request.POST['credit_allouee'],
+        )
+        credit.save()
+        messages.success(request, 'Credit enregistre pour section 2.')
+        return redirect(request.path_info)
+    else:
+        article = Article.objects.all()
+        crdt = Credit_S2.objects.all()
+    return render(request, 'scolar/add_credit_S2.html', {'article': article, 'crdt': crdt, 'exercices': exercices,'pexe' :pexe})
+
+
+@login_required
+def CreditAssociate_S2(request,exe,art):
+    pi = Article.objects.get(pk=art)
+    pexe= Exercice.objects.get(pk=exe)
+    article = Article.objects.all()
+    if request.method == 'POST' and Credit_S2.objects.filter(article=pi, exercice=exe).count()==0 :
+        credit_S2 = Credit_S2(
+            article=Article.objects.get(pk=art),
+            chapitre=Chapitre.objects.get(pk=pi.chapitre_id),
+            exercice=Exercice.objects.get(pk=exe),
+            credit_allouee=request.POST['credit_allouee'],
+            credit_reste=request.POST['credit_allouee'],
+        )
+        try:
+            credit_deja_alloue = Credit_S2.objects.filter(article=pi, exercice=pexe).count()
+            crdt = Credit.objects.all()
+            if credit_deja_alloue == 0:
+                
+                  if pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount) >=0:
+                            credit_S2.save()          
+                            messages.success(request, 'credit enregistree.')
+                            messages.success(request, 'Il reste comme credit Non alloue : ' + str(
+                                  pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)) + "DZD")
+                            
+                            pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)
+                            pexe.save(update_fields=['credit_non_allouee'])
+                            return render(request, 'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe})
+                  else : 
+                            messages.error(request, 'Vous ne pouvez pas allouer ce credit ,il ne reste comme credit dans cet exercice que:' + str(
+                                  pexe.credit_non_allouee.amount) + "DZD") 
+                            return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                            return redirect(request.path_info)
+            else :
+                messages.error(request, 'Vous ne pouvez pas allouer un credi plusieurs fois au meme article ... ') 
+                return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                return redirect(request.path_info)
+     
+        except IntegrityError:     
+            messages.error(request, "Erreur dans lenregistrement")
+            return redirect(request.path_info)
+    
+    
+    elif request.method == 'POST'  and Credit_S2.objects.filter(article=pi, exercice=pexe).count()>0 :
+            vect=[]
+            crs=Credit_S2.objects.filter(article=pi, exercice=pexe)
+            crdt = Credit_S2.objects.all()
+            for cr in crs :
+                vect.append(cr.id)
+        
+            credit_S2 = Credit_S2.objects.get(id=vect[0])
+            Ancien_crdt=credit_S2.credit_allouee.amount
+            consom= credit_S2.credit_allouee.amount - credit_S2.credit_reste.amount
+            if float(request.POST['credit_allouee'])>=consom :
+                credit_S2.credit_reste=float(request.POST['credit_allouee']) - float(consom)
+                credit_S2.credit_allouee=request.POST['credit_allouee']
+                credit_S2.save()
+                pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount +(Ancien_crdt-credit_S2.credit_allouee.amount)
+                pexe.save(update_fields=['credit_non_allouee'])
+                messages.success(request, 'Credit modifie avec suuces.')
+                messages.success(request, 'Il reste comme credit Non alloue : ' + str(pexe.credit_non_allouee.amount) + "DZD")
+                return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                return redirect(request.path_info)
+            else:
+ 
+                messages.error(request, 'Vous etes entrain de faire un transfert pour un credit insuffisant ... ' + str(credit_S2) ) 
+                return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                return redirect(request.path_info)
+    
+    return render(request, 'scolar/ads_credit_S2.html', {'pi': pi,'pexe':pexe})
+
+
+class EngagementListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EngagementListView, self).get_context_data(**kwargs)
+
+        filter_ = Engagement_S2Filter(self.request.GET, queryset=Engagement_S2.objects.all().order_by('code'))
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Engagement_S2Table(filter_.qs, exclude=exclude_columns_)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Natures des engagements '
+        if self.request.user.is_staff_only():
+            context['btn_list'] = {
+            'Creer Nature eng': reverse('engagement_S2_create'),
+                
+            }
+        return context
 
 
 
+class EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_engagement_S2'
+    model = Engagement_S2
+    fields = ['code', 'nature']
+    template_name = 'scolar/create.html'
+    success_message = "Nature d'engagement a ete cree avec succes!"
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+#         form.fields['pays'] = forms.ModelChoiceField(queryset=Pays.objects.all().order_by('nom'), initial='DZ',
+#                                                      required=True)
+        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('engagement_S2_list')
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super(EngagementCreateView, self).get_context_data(**kwargs)
+        titre = 'Creer une nouvelle Nature d''Engagement'
+        context['titre'] = titre
+        return context
+    
+class EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_engegement_S2'
+    model = Engagement_S2
+    fields = ['code', 'nature']
+    template_name = 'scolar/update.html'
+    success_message = "La Nature dengagement a ete modifiee avec succe"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        #form.fields['sigle'].widget.attrs['readonly'] = True
+        form.fields['code'].required = True
+        form.fields['nature'].required = True
+
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('engegement_S2_list')
+        return form
+
+class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Engagement_S2
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_engagement_S2'
+    success_message = "La nature dengagement a bien ete supprimee"
+
+    def get_success_url(self):
+        return reverse('engagement_S2_list')
+
+
+
+                                            
 
