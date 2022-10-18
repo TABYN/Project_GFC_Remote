@@ -24,3 +24,5 @@ __pycache__/
 /execution.bat
 /DB-*.json
 *.sqlite3
+db.sqlite3
+*.sqlite3
