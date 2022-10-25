@@ -2089,18 +2089,12 @@ class Chapitre(models.Model):
         code_chap = models.CharField(max_length=10)
         libelle_chap_FR = models.CharField(max_length=100)
         libelle_chap_AR = models.CharField(max_length=100, null=True, blank=True)
-        
-        def __str__(self):
-            return self.code_chap+' '+ self.libelle_chap_FR 
 
 class Article(models.Model):
         code_art = models.CharField(max_length=10)
         chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE, default='', related_name="articles")
         libelle_art_FR = models.CharField(max_length=100)
         libelle_art_AR = models.CharField(max_length=100, null=True, blank=True)
-        
-        def __str__(self):
-            return self.code_art+' '+ self.libelle_art_FR 
        
 
 class Exercice(models.Model):
@@ -2220,18 +2214,9 @@ class Immobilier(models.Model):
            return a
        
        #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################
-
-class Fournisseur(models.Model):
-        code_fournisseur = models.CharField(max_length=10, null=True)
-        nom_fournisseur = models.CharField(max_length=200, null=True)
-        adresse_fournisseur = models.CharField(max_length=200, null=True)
-        num_cmpt_fournisseur = models.IntegerField(null=True)
-        cle_cmpt_fournisseur = models.IntegerField(null=True) 
+       
         
-
-        def __str__(self):
-            return self.code_fournisseur+' '+ self.nom_fournisseur       
-
+#############################################Section 2#####################
 class Banque(models.Model):
     code = models.CharField(max_length=3)
     abreviation = models.CharField(max_length=20)
@@ -2247,16 +2232,12 @@ class Credit_S2(models.Model):
     chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
     credit_allouee = MoneyField(decimal_places=2, max_digits=9)
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
-     
+    epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
+    
 class Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
     nature = models.CharField(max_length=150)
     def __str__(self):
         return  self.code + ' : ' + self.nature
  
-
-
-
-
-
-
+###############################################fin section 2###########################

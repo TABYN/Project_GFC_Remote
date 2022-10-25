@@ -36,10 +36,8 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
-    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Engagement_S2Filter ,Engagement_S2Table
-
+    BanqueTable, BanqueFilter ,Engagement_S2Filter ,Engagement_S2Table
     
-
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import EmailMessage, send_mass_mail
@@ -12659,148 +12657,7 @@ def ImmobilierEdit(request, id):
    
     return render(request, 'scolar/edit_immobilier.html' ,{'immobilier': immobilier,'FAMILLE': FAMILLE,'benificaires':benificaires,'bureaux':bureaux})
 
-
-##########################################################budget
-class ChapitresListView(TemplateView):
-    template_name = 'scolar/filter_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ChapitresListView, self).get_context_data(**kwargs)
-
-        filter_ = ChapitreFilter(self.request.GET, queryset=Chapitre.objects.all())
-
-        filter_.form.helper = FormHelper()
-        exclude_columns_ = exclude_columns(self.request.user)
-        table = ChapitreTable(filter_.qs)
-        RequestConfig(self.request).configure(table)
-
-        context['filter'] = filter_
-        context['table'] = table
-        context['titre'] = 'Liste des chapitres '
-        #if self.request.user.is_staff_only():
-        context['btn_list'] = {
-                'Ajouter chapitre': reverse('chapitre_create')
-                
-            }
-        return context
-    
-class ChapitreCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
-    permission_required = 'scolar.add_chapitre'
-    model = Chapitre
-    fields = ['code_chap', 'libelle_chap_FR', 'libelle_chap_AR']
-    template_name = 'scolar/create.html'
-    success_message = "Le chapitre a ete ajoute avec succes!"
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.helper = FormHelper()
-        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
-        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        self.success_url = reverse('chapitres_list')
-        return form
-
-    def get_context_data(self, **kwargs):
-        context = super(ChapitreCreateView, self).get_context_data(**kwargs)
-        titre = 'Ajouter un nouveau chapitre'
-        context['titre'] = titre
-        return context
-
-
-class ChapitreUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
-    permission_required = 'scolar.change_chapitre'
-    model = Chapitre
-    fields = ['code_chap', 'libelle_chap_FR', 'libelle_chap_AR']
-    template_name = 'scolar/update.html'
-    success_message = "Le chapitre a ete modifie avec succes!"
- 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.helper = FormHelper()
-        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
-        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        self.success_url = reverse('chapitres_list')
-        return form
- 
- 
-class ChapitreDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
-    model = Chapitre
-    template_name = 'scolar/delete.html'
-    permission_required = 'scolar.delete_chapitre'
-    success_message = "Le chapitre a bien ete supprime"
- 
-    def get_success_url(self):
-        return reverse('chapitres_list')
-
-class FournisseursListView(TemplateView):
-    template_name = 'scolar/filter_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(FournisseursListView, self).get_context_data(**kwargs)
-
-        filter_ = FournisseurFilter(self.request.GET, queryset=Fournisseur.objects.all())
-
-        filter_.form.helper = FormHelper()
-        exclude_columns_ = exclude_columns(self.request.user)
-        table = FournisseurTable(filter_.qs)
-        RequestConfig(self.request).configure(table)
-
-        context['filter'] = filter_
-        context['table'] = table
-        context['titre'] = 'Liste des fournisseurs '
-        #if self.request.user.is_staff_only():
-        context['btn_list'] = {
-                'Ajouter fournisseur': reverse('fournisseur_create')
-                
-            }
-        return context
-    
-class FournisseurCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
-    permission_required = 'scolar.add_fournisseur'
-    model = Fournisseur
-    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
-    template_name = 'scolar/create.html'
-    success_message = "Le fournisseur a ete ajoute avec succes!"
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.helper = FormHelper()
-        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
-        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        self.success_url = reverse('fournisseurs_list')
-        return form
-
-    def get_context_data(self, **kwargs):
-        context = super(FournisseurCreateView, self).get_context_data(**kwargs)
-        titre = 'Ajouter un nouveau fournisseur'
-        context['titre'] = titre
-        return context
-
-
-class FournisseurUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
-    permission_required = 'scolar.change_fournisseur'
-    model = Fournisseur
-    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
-    template_name = 'scolar/update.html'
-    success_message = "Le fournisseur a ete modifie avec succes!"
- 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.helper = FormHelper()
-        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
-        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        self.success_url = reverse('fournisseurs_list')
-        return form
- 
- 
-class FournisseurDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
-    model = Fournisseur
-    template_name = 'scolar/delete.html'
-    permission_required = 'scolar.delete_fournisseur'
-    success_message = "Le fournisseur a bien ete supprime"
- 
-    def get_success_url(self):
-        return reverse('fournisseurs_list')
-     
+######################################Section 2##############################
 
 class BanqueListView(TemplateView):
     template_name = 'scolar/filter_list.html'
@@ -12887,9 +12744,10 @@ def CreditCreate_S2(request,exe):
     article = Article.objects.all()
     exercices = Exercice.objects.all()
     pexe = Exercice.objects.get(pk=exe)
-    
-    if request.method == 'POST':
-        credit = Credit(
+    list_credits= Credit_S2.objects.filter(exercice_id=pexe.id)
+   
+    if request.method == 'POST' and 'Enregistrer' in request.POST:
+        credit = Credit_S2(
             chapitre_id=request.POST['chapitre'],
             article_id=request.POST['article'],
             credit_allouee=request.POST['credit_allouee'],
@@ -12898,12 +12756,21 @@ def CreditCreate_S2(request,exe):
         credit.save()
         messages.success(request, 'Credit enregistre pour section 2.')
         return redirect(request.path_info)
-    else:
-        article = Article.objects.all()
-        crdt = Credit_S2.objects.all()
+    elif request.method == 'POST' and 'Engager' in request.POST:
+        id_list=request.POST.getlist('boxes')
+        list_credits.update(epc=False)
+        for x in id_list : 
+            Credit_S2.objects.filter(pk=int(x)).update(epc=True)
+        print(exercices)
+      
+        
+
+  
+    article = Article.objects.all()
+    crdt = Credit_S2.objects.all()
     return render(request, 'scolar/add_credit_S2.html', {'article': article, 'crdt': crdt, 'exercices': exercices,'pexe' :pexe})
- 
- 
+
+
 @login_required
 def CreditAssociate_S2(request,exe,art):
     pi = Article.objects.get(pk=art)
@@ -12921,13 +12788,13 @@ def CreditAssociate_S2(request,exe,art):
             credit_deja_alloue = Credit_S2.objects.filter(article=pi, exercice=pexe).count()
             crdt = Credit.objects.all()
             if credit_deja_alloue == 0:
-                 
+                
                   if pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount) >=0:
                             credit_S2.save()          
                             messages.success(request, 'credit enregistree.')
                             messages.success(request, 'Il reste comme credit Non alloue : ' + str(
                                   pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)) + "DZD")
-                             
+                            
                             pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)
                             pexe.save(update_fields=['credit_non_allouee'])
                             return render(request, 'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe})
@@ -12940,19 +12807,19 @@ def CreditAssociate_S2(request,exe,art):
                 messages.error(request, 'Vous ne pouvez pas allouer un credi plusieurs fois au meme article ... ') 
                 return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
                 return redirect(request.path_info)
-      
+     
         except IntegrityError:     
             messages.error(request, "Erreur dans lenregistrement")
             return redirect(request.path_info)
-     
-     
+    
+    
     elif request.method == 'POST'  and Credit_S2.objects.filter(article=pi, exercice=pexe).count()>0 :
             vect=[]
             crs=Credit_S2.objects.filter(article=pi, exercice=pexe)
             crdt = Credit_S2.objects.all()
             for cr in crs :
                 vect.append(cr.id)
-         
+        
             credit_S2 = Credit_S2.objects.get(id=vect[0])
             Ancien_crdt=credit_S2.credit_allouee.amount
             consom= credit_S2.credit_allouee.amount - credit_S2.credit_reste.amount
@@ -12967,46 +12834,52 @@ def CreditAssociate_S2(request,exe,art):
                 return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
                 return redirect(request.path_info)
             else:
-  
+ 
                 messages.error(request, 'Vous etes entrain de faire un transfert pour un credit insuffisant ... ' + str(credit_S2) ) 
                 return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
                 return redirect(request.path_info)
-     
+    
     return render(request, 'scolar/ads_credit_S2.html', {'pi': pi,'pexe':pexe})
 
 
 class EngagementListView(TemplateView):
     template_name = 'scolar/filter_list.html'
- 
+
     def get_context_data(self, **kwargs):
         context = super(EngagementListView, self).get_context_data(**kwargs)
- 
+
         filter_ = Engagement_S2Filter(self.request.GET, queryset=Engagement_S2.objects.all().order_by('code'))
- 
+
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
         table = Engagement_S2Table(filter_.qs, exclude=exclude_columns_)
         RequestConfig(self.request).configure(table)
- 
+
         context['filter'] = filter_
         context['table'] = table
         context['titre'] = 'Liste des Natures des engagements '
-        if self.request.user.is_staff_only():
-            context['btn_list'] = {
+        #=======================================================================
+        # if self.request.user.is_staff_only():
+        #     context['btn_list'] = {
+        #     'Creer Nature eng': reverse('engagement_S2_create'),
+        #         
+        #     }
+        #=======================================================================
+        context['btn_list'] = {
             'Creer Nature eng': reverse('engagement_S2_create'),
-                 
+                
             }
         return context
- 
- 
- 
+
+
+
 class EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_engagement_S2'
     model = Engagement_S2
     fields = ['code', 'nature']
     template_name = 'scolar/create.html'
     success_message = "Nature d'engagement a ete cree avec succes!"
- 
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.helper = FormHelper()
@@ -13016,42 +12889,67 @@ class EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse('engagement_S2_list')
         return form
- 
+
     def get_context_data(self, **kwargs):
         context = super(EngagementCreateView, self).get_context_data(**kwargs)
         titre = 'Creer une nouvelle Nature d''Engagement'
         context['titre'] = titre
         return context
-     
+    
 class EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'scolar.change_engegement_S2'
     model = Engagement_S2
     fields = ['code', 'nature']
     template_name = 'scolar/update.html'
     success_message = "La Nature dengagement a ete modifiee avec succe"
- 
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.helper = FormHelper()
         #form.fields['sigle'].widget.attrs['readonly'] = True
         form.fields['code'].required = True
         form.fields['nature'].required = True
- 
+
         form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
         self.success_url = reverse('engegement_S2_list')
         return form
- 
+
 class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
     model = Engagement_S2
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_engagement_S2'
     success_message = "La nature dengagement a bien ete supprimee"
- 
+
     def get_success_url(self):
         return reverse('engagement_S2_list')
+    
+
+class Prise_en_chargeS2_PDFView(PDFTemplateView):
+    template_name = 'scolar/Prise en charge.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+
+    def get_context_data(self, **kwargs):
+        credit_S2_ = Credit_S2.objects.get(id=self.kwargs.get('credit_S2_pk'))
+        credit_S2_letter = num2words(credit_S2_.credit_allouee.amount, lang='fr')
+        print (credit_S2_letter)
+        
+       
+
+        pieces = {}
+        context = {}
+        context['credit_S2_'] = credit_S2_
+        context['credit_S2_letter'] = credit_S2_letter
+  
+        self.filename ='credit_S2_'+str(credit_S2_.id) + '.pdf'
+        return context
 
 
 
                                             
 
+##########################fin section 2#####################

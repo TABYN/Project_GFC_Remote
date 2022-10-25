@@ -58,11 +58,13 @@
 				  <a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'tasks' %} Nomenclatures</a>
 				  <div class="dropdown-menu">	
 				    <a class="dropdown-item" href="{% url 'ExerciceShow' %}">{% icon 'book' %} Exercices & Avances</a>		  
-				  	<a class="dropdown-item" href="{% url 'ChapitreShow' %}">{% icon 'book' %} Chapitres</a>											  	
+				  	<a class="dropdown-item" href="{% url 'ChapitreShow' %}">{% icon 'book' %} Chapitres</a>
+				  	<a class="list-group-item"  href="engagement_S2_list">{% icon 'tasks' %} Nature des Engagements</a>
+									  	
 				  </div>	
 				</li>
 					<li class="list-group-item">
-				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'briefcase' %} Allocation des credits</a>
+				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'briefcase' %} Allocation des crédits</a>
 				  		<div class="dropdown-menu">		  
 	{% for exercice in user.exercice_list %}
 				  	 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">Exercice {{exercice.annee_budg}}</a></br>
@@ -110,7 +112,7 @@
 				
 				
 						<li class="list-group-item">
-				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'comment-dollar' %} Situation depences</a>
+				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'comment-dollar' %} Situation dépences</a>
 				  		<div class="dropdown-menu">		  
 	{% for exercice in user.exercice_list %}
 				  	 		<a class="dropdown-item"    href="{% url 'LitImput_for_exercice' exercice.id %}">Exercice {{exercice.annee_budg}}</a></br>
@@ -149,45 +151,16 @@
    			</ul>
 		{% endif %}
 		
-		{% if request.user|has_group:"budget" %}
+		
+				{% if request.user|has_group:"budget" %}
 			<ul class="nav list-group">
-			<li>
-			<strong>CHAPITRES ET ARTICLES</strong>
-			</li>
-			<li>
-			 <a class="list-group-item" href="{% url 'chapitres_list' %}">{% icon 'tasks' %} Chapitres</a>
-			</li>
-			<li>
-			 <a class="list-group-item" href="">{% icon 'tasks' %} Articles</a>
-			</li>
-			<li>
-			<strong>Engagement</strong>
-			</li>
-			<li class="list-group-item">
-				  <a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'tasks' %} Engagement</a>
-				  <div class="dropdown-menu">	
-				    <a class="dropdown-item" href="{% url 'engagement_S2_list' %}">{% icon 'book' %} Liste Natures Engagements</a>		  
-				  </div>	
+				<li>
+				<strong>Banques et Fournisseurs</strong>
+				
+				  <a class="list-group-item"  href="banque_list">{% icon 'tasks' %} Banques</a>
+				  <a class="list-group-item"  href="#">{% icon 'tasks' %} Fournisseurs</a>
 				</li>
-			 
-			 <li>
-			 <a  class="list-group-item" href="">{% icon 'tasks' %} Mondat</a>
-			</li>    
-			<li>
-			 <a  class="list-group-item" href="">{% icon 'tasks' %} Transfert</a>
-			</li>  
-			<li>
-			<strong>Benificiares et Banques</strong>
-			</li>
-			<li>
-			 <a  class="list-group-item" href="{% url 'fournisseurs_list' %}">{% icon 'tasks' %} Liste benificiares</a>
-			</li>  
-			                <li>
-			 <a  class="list-group-item" href="{% url 'banque_list' %}">{% icon 'tasks' %} Liste banques</a>
-			</li>    
-			<li>
-			
-			<li>
+					<li>
 				<strong>Repartition des credits</strong>
 				
 				  {% for exercice in user.exercice_list %}
@@ -207,14 +180,11 @@
 		        	{% endfor %}	
 				
 				  
-				</li>  
-			 
-			
-			
-			    </ul>
-			{% endif %}
-		
-		
+				</li>
+				
+				
+   			</ul>
+		{% endif %}
 		
 	
 	
@@ -234,7 +204,9 @@
 {% block content %}
 	<div align="center">
 		<h3></h3>
-		<img src="{{ institution.illustration_cursus.url }}" alt="Les achats a l'ESI" width="60%" >
+		<img src="{{ institution.illustration_cursus.url }}" alt="Les achats à l'ESI" width="60%" >
 	</div>
 
 {% endblock %}
+
+
