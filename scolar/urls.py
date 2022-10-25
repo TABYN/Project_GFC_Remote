@@ -342,6 +342,7 @@ urlpatterns = [
     path('engagement_S2_create', views.EngagementCreateView.as_view(), name='engagement_S2_create'),
     re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.EngagementUpdateView.as_view(), name='engagement_S2_update'),
     re_path(r'^engagement_S2_delete/(?P<pk>[ -_&@\w]+)/$', views.EngagementDeleteView.as_view(), name='engagement_S2_delete'),
+    path('Prise_en_chargeS2_PDFView/<credit_S2_pk>/', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),
 
         
     ]

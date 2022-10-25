@@ -12744,9 +12744,10 @@ def CreditCreate_S2(request,exe):
     article = Article.objects.all()
     exercices = Exercice.objects.all()
     pexe = Exercice.objects.get(pk=exe)
+    list_credits= Credit_S2.objects.filter(exercice_id=pexe.id)
    
-    if request.method == 'POST':
-        credit = Credit(
+    if request.method == 'POST' and 'Enregistrer' in request.POST:
+        credit = Credit_S2(
             chapitre_id=request.POST['chapitre'],
             article_id=request.POST['article'],
             credit_allouee=request.POST['credit_allouee'],
@@ -12755,9 +12756,18 @@ def CreditCreate_S2(request,exe):
         credit.save()
         messages.success(request, 'Credit enregistre pour section 2.')
         return redirect(request.path_info)
-    else:
-        article = Article.objects.all()
-        crdt = Credit_S2.objects.all()
+    elif request.method == 'POST' and 'Engager' in request.POST:
+        id_list=request.POST.getlist('boxes')
+        list_credits.update(epc=False)
+        for x in id_list : 
+            Credit_S2.objects.filter(pk=int(x)).update(epc=True)
+        print(exercices)
+      
+        
+
+  
+    article = Article.objects.all()
+    crdt = Credit_S2.objects.all()
     return render(request, 'scolar/add_credit_S2.html', {'article': article, 'crdt': crdt, 'exercices': exercices,'pexe' :pexe})
 
 
@@ -12848,8 +12858,14 @@ class EngagementListView(TemplateView):
         context['filter'] = filter_
         context['table'] = table
         context['titre'] = 'Liste des Natures des engagements '
-        if self.request.user.is_staff_only():
-            context['btn_list'] = {
+        #=======================================================================
+        # if self.request.user.is_staff_only():
+        #     context['btn_list'] = {
+        #     'Creer Nature eng': reverse('engagement_S2_create'),
+        #         
+        #     }
+        #=======================================================================
+        context['btn_list'] = {
             'Creer Nature eng': reverse('engagement_S2_create'),
                 
             }
@@ -12907,6 +12923,30 @@ class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
 
     def get_success_url(self):
         return reverse('engagement_S2_list')
+    
+
+class Prise_en_chargeS2_PDFView(PDFTemplateView):
+    template_name = 'scolar/Prise en charge.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+
+    def get_context_data(self, **kwargs):
+        credit_S2_ = Credit_S2.objects.get(id=self.kwargs.get('credit_S2_pk'))
+        credit_S2_letter = num2words(credit_S2_.credit_allouee.amount, lang='fr')
+        print (credit_S2_letter)
+        
+       
+
+        pieces = {}
+        context = {}
+        context['credit_S2_'] = credit_S2_
+        context['credit_S2_letter'] = credit_S2_letter
+  
+        self.filename ='credit_S2_'+str(credit_S2_.id) + '.pdf'
+        return context
 
 
 

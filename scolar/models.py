@@ -2232,6 +2232,7 @@ class Credit_S2(models.Model):
     chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
     credit_allouee = MoneyField(decimal_places=2, max_digits=9)
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
+    epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
     
 class Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
@@ -2239,9 +2240,4 @@ class Engagement_S2(models.Model):
     def __str__(self):
         return  self.code + ' : ' + self.nature
  
-
-
-
-
-
 ###############################################fin section 2###########################
