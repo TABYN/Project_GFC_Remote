@@ -130,6 +130,10 @@ class User(AbstractUser):
         group_regisseur=get_object_or_404(Group, name='regisseur')
         return group_regisseur in self.groups.all()
     
+    def is_budget(self):
+        group_budget=get_object_or_404(Group, name='budget')
+        return group_budget in self.groups.all()
+    
     def is_not_etudiant(self):
         return not self.is_etudiant()
     
@@ -2248,15 +2252,23 @@ class Credit_S2(models.Model):
     credit_allouee = MoneyField(decimal_places=2, max_digits=9)
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
      
-class Engagement_S2(models.Model):
+class Type_Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
     nature = models.CharField(max_length=150)
     def __str__(self):
         return  self.code + ' : ' + self.nature
  
+class Engagement(models.Model):
+    num = models.IntegerField(null = True)
+    date=models.DateField(null=True, blank=True)
+    chapitre = models.ForeignKey(Chapitre, related_name='chapitre',on_delete= models.SET_NULL, null = True, blank = True)
+    article = models.ForeignKey(Article,related_name='article' , null= True, blank=True, on_delete=models.SET_NULL)
+    type_engagement=models.ForeignKey(Type_Engagement_S2, related_name='type_engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    observation = models.CharField(max_length=300, default='')
+    annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
 
-
-
+    def __str__(self):
+        return "Engagement "+ str(self.num)+' '+str(self.type_engagement.nature)
 
 
 

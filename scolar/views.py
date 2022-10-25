@@ -36,7 +36,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
-    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Engagement_S2Filter ,Engagement_S2Table
+    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, EngagementTable, EngagementFilter
 
     
 
@@ -58,7 +58,8 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     CommissionValidationCreateForm, ExamenCreateForm, SeanceSallesReservationForm, SurveillanceUpdateForm, \
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
-    AffichageExamenSelectForm, CreditForm
+    AffichageExamenSelectForm, CreditForm, \
+    EngagementCreateForm, EngagementUpdateForm, EngagementDetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -12975,17 +12976,17 @@ def CreditAssociate_S2(request,exe,art):
     return render(request, 'scolar/ads_credit_S2.html', {'pi': pi,'pexe':pexe})
 
 
-class EngagementListView(TemplateView):
+class Type_EngagementListView(TemplateView):
     template_name = 'scolar/filter_list.html'
  
     def get_context_data(self, **kwargs):
-        context = super(EngagementListView, self).get_context_data(**kwargs)
+        context = super(Type_EngagementListView, self).get_context_data(**kwargs)
  
-        filter_ = Engagement_S2Filter(self.request.GET, queryset=Engagement_S2.objects.all().order_by('code'))
+        filter_ = Type_Engagement_S2Filter(self.request.GET, queryset=Type_Engagement_S2.objects.all().order_by('code'))
  
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
-        table = Engagement_S2Table(filter_.qs, exclude=exclude_columns_)
+        table = Type_Engagement_S2Table(filter_.qs, exclude=exclude_columns_)
         RequestConfig(self.request).configure(table)
  
         context['filter'] = filter_
@@ -13000,9 +13001,9 @@ class EngagementListView(TemplateView):
  
  
  
-class EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+class Type_EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_engagement_S2'
-    model = Engagement_S2
+    model = Type_Engagement_S2
     fields = ['code', 'nature']
     template_name = 'scolar/create.html'
     success_message = "Nature d'engagement a ete cree avec succes!"
@@ -13018,14 +13019,14 @@ class EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
         return form
  
     def get_context_data(self, **kwargs):
-        context = super(EngagementCreateView, self).get_context_data(**kwargs)
+        context = super(Type_EngagementCreateView, self).get_context_data(**kwargs)
         titre = 'Creer une nouvelle Nature d''Engagement'
         context['titre'] = titre
         return context
      
-class EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+class Type_EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'scolar.change_engegement_S2'
-    model = Engagement_S2
+    model = Type_Engagement_S2
     fields = ['code', 'nature']
     template_name = 'scolar/update.html'
     success_message = "La Nature dengagement a ete modifiee avec succe"
@@ -13039,11 +13040,11 @@ class EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
  
         form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        self.success_url = reverse('engegement_S2_list')
+        self.success_url = reverse('engagement_S2_list')
         return form
  
-class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
-    model = Engagement_S2
+class Type_EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Type_Engagement_S2
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_engagement_S2'
     success_message = "La nature dengagement a bien ete supprimee"
@@ -13051,7 +13052,207 @@ class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRe
     def get_success_url(self):
         return reverse('engagement_S2_list')
 
+class EngagementListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+  
+    def get_context_data(self, **kwargs):
+        context = super(EngagementListView, self).get_context_data(**kwargs)
+  
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.all().order_by('num'))
+  
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = EngagementTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+  
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des engagements '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+            'Ajouter nouvel engagement': reverse('engagement_create'),
+                  
+            }
+        return context
+  
+@login_required
+def engagement_create_view(request):
 
 
-                                            
+    
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = EngagementCreateForm(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
 
+                engagement_=Engagement.objects.create(
+                    chapitre=data['chapitre'],
+                    article=data['article'],
+                    type_engagement=data['type_engagement'],
+                    num=data['num'],
+                    date=data['date'],
+                    observation=data['observation'],
+                    annee_budg=data['annee_budg']
+                    )                         
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la création de l'engagement. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('engagement_list'))
+                    
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = EngagementCreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvel engagement")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+#source type User
+#cible de type User ou Etudiant ou Enseignant ou n'importe quel autre modèle, si le modèle de Cible n'a pas d'attribut User alors la cible sera automatiquement None
+#action de type texte
+def trace_create(source, cible, action):
+    try :
+        if source :
+            source_text_=source.nom()+' '+source.prenom()
+        else :
+            source_text_=""
+        if cible :
+            cible_class=cible.__class__
+            if cible_class.__name__ == "User" :
+                cible_text_=cible.nom()+' '+cible.prenom()
+            else :
+                if hasattr(cible_class, 'user') and cible.user :
+                    cible_text_=cible.user.nom()+' '+cible.user.prenom()
+                    cible=cible.user
+                else :
+                    if cible_class.__name__ == "Etudiant" :
+                        cible_text_=cible.nom+' '+cible.prenom
+                    else :
+                        cible_text_=str(cible)
+                    cible=None
+        else :
+            cible_text_=""
+        trace_= Trace.objects.create(
+            source=source,
+            source_text=source_text_,
+            cible=cible,
+            cible_text=cible_text_,
+            action=str(action),
+                             )
+        return trace_
+        
+    except Exception :
+        return False 
+    
+class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    #permission_required = 'scolar.fonctionnalite_postgraduation_gestionseminaires'
+    model = Engagement
+    template_name = 'scolar/delete.html'
+    success_message = "Engagement a bien supprime."
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+
+    def delete(self, *args, **kwargs):
+        object_=self.get_object()
+        trace_create(self.request.user, None, "Suppression Engagement: "+str(object_))
+        return super(EngagementDeleteView, self).delete(*args, **kwargs)
+        
+    def get_success_url(self):
+        return reverse('engagement_list')
+    
+@login_required
+def engagement_update_view(request, engagement_pk):
+    engagement_=get_object_or_404(Engagement, id=engagement_pk)
+    if request.user.is_budget():
+         pass       
+    else :
+         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+         return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['engagement']=engagement_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = EngagementUpdateForm(engagement_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                      
+                engagement_.annee_budg=data['annee_budg']
+                engagement_.chapitre=data['chapitre']
+                engagement_.article=data['article']
+                engagement_.type_engagement=data['type_engagement']
+                engagement_.date=data['date']
+                engagement_.num=data['num']
+                engagement_.observation=data['observation']
+                
+                engagement_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du l'engagement. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('engagement_list'))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = EngagementUpdateForm(engagement_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier l'engagement")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
+  
+class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/engagement_detail.html'
+
+    def test_func(self): 
+        engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))   
+        return self.request.user.is_budget()
+#         permission_=False
+#         if self.request.user.has_perm('scolar.fonctionnalitenav_postgraduation_visualisationseminaires') :
+#             permission_ = permission_ | True
+#         if self.request.user.is_etudiant() :
+#             permission_ = permission_ | SeminaireSuivi.objects.filter(id=seminaire_.id, inscriptions__etudiant__in=[self.request.user.etudiant]).exists()
+#             
+#         return permission_
+        
+    def get_context_data(self, **kwargs):
+        context = super(EngagementDetailView, self).get_context_data(**kwargs)
+        titre='Engagement N: '+ self.kwargs.get("pk")
+        context['titre'] = titre
+
+        engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
+        
+        context['engagement_form'] = EngagementDetailForm(engagement_pk=engagement_.id)
+        
+        exclude_columns_=[]
+        if not self.request.user.is_authenticated:
+            exclude_columns_.append('expert')
+            exclude_columns_.append('action')
+            exclude_columns_.append('edit')
+            exclude_columns_.append('admin')
+        else :
+            if (not self.request.user.is_budget()):
+                exclude_columns_.append('edit')
+                exclude_columns_.append('admin')
+                exclude_columns_.append('expert')
+                  
+        return context
