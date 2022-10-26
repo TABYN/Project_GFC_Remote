@@ -192,19 +192,8 @@
 			<li>
 				<strong>Repartition des credits</strong>
 				
-				  {% for exercice in user.exercice_list %}
-	
-				 	  	<li class="list-group-item">
-						  <a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'tasks' %} Exercice {{exercice.annee_budg}}</a>
-						  <div class="dropdown-menu">
-						  	<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  >{% icon 'comment-dollar' %} Allocation des credits</a>
-						  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'comment-dollar' %} Engagements</a>
-								  <div class="dropdown-menu">
-								  	<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  >{% icon 'comment-dollar' %} Engagements1</a>
-								  	<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  >{% icon 'comment-dollar' %} Engagements2</a>
-								  </div>
-						  </div>
-						</li>
+					{% for exercice in user.exercice_list %}
+		 	  				<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  ">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
 				
 		        	{% endfor %}	
 				

@@ -59,9 +59,10 @@ table {
 								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Libelle_Article_AR</th>
 								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Crédit</th>
 								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Reste</th>
-								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Prise en charge ?</th>
-								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Action</th>
-					
+								
+						<!-- 		{% if pavc.encours == True %}	
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Allocation_crédit</th>
+								{% endif %}	 -->
 							</tr>
 							</thead>
 							<tbody>
@@ -79,6 +80,8 @@ table {
 									{% endif %}
 									{% endfor %}
 								</td>
+								
+								
 									<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
 									{% for crd in crdt %}
 									{% if crd.article == art  and crd.exercice_id == pexe.id %}
@@ -87,51 +90,30 @@ table {
 									{% endif %}
 									{% endfor %}
 								</td>
-
-								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
-																
-								{% for crd in crdt  %}
-									{% if crd.article == art and crd.exercice_id == pexe.id %}
-									 {%  if crd.epc %}
-					
-								      
-								      
-									<div class="form-check">
-								      <input type="checkbox" class="form-check-input" id="materialUnchecked" checked="checked" value={{crd.id}} name="boxes">
-			
-								    </div> 	
-								    <div>
-								     <a href="{% url 'Prise_en_chargeS2_PDFView' crd.id %}" download target="_blank" class="btn btn-secondary btn-block">
-		                             <i class="fas fa-print"></i>Print PC_S2</a>	
-		                             </div> 							      
-								    {% else %}
-								    
-								        <div class="form-check">
-								      <input type="checkbox" class="form-check-input" id="materialChecked" type="checkbox" value={{crd.id}} name="boxes">
 								
-								    </div>
-								    
-								 							    
-									{% endif %}
-									{% endif %}
-									{% endfor %}	
-						
-															
-								</td> 
+					   
 								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
-											<a style="padding-left:60px;" href="{% url 'CreditAssociate_S2'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-file-alt fa-lg"></i> </a>
-									<a style="padding-left:50px;" href="{% url 'CreditDelete'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-trash-alt fa-lg "></i> </a> 
+									<a style="padding-left:30px;" href="{% url 'CreditAssociate_S2'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-file-alt fa-lg"></i> </a>
+									{% for crd in crdt  %}
+									{% if crd.article == art and crd.exercie_id == pexe.id %}
+									<a style="padding-left:30px;" href="{% url 'CreditDelete'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-trash-alt fa-lg "></i> </a> 
+									
+									{% endif %}
+									{% endfor %}
+									
 								</td>
-								
-								 
+					     
 							</tr>
-							{% endfor %}	
+							{% endfor %}
+							
+		
+							
+							
 							</tbody>
 						</table>
-                        	<div class="col-md-4" >
-									<button type="submit" name="Engager" class="btn btn-primary btn-block" style="text-align:center;">
-										<i class="fa fa-database"></i>Appliquer les mise à jour</button>
-								</div>
+		
+						
+						
 					</div>
 				</div>
 			</div>

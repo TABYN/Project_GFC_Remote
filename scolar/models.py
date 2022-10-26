@@ -2251,6 +2251,8 @@ class Credit_S2(models.Model):
     chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
     credit_allouee = MoneyField(decimal_places=2, max_digits=9)
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
+    epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
+
      
 class Type_Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
@@ -2266,7 +2268,8 @@ class Engagement(models.Model):
     type_engagement=models.ForeignKey(Type_Engagement_S2, related_name='type_engagement',on_delete= models.SET_NULL, null = True, blank = True)
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
-
+    credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
+    
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type_engagement.nature)
 
