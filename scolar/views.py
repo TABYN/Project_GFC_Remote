@@ -13259,3 +13259,29 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                   
         return context
 
+
+class Prise_en_chargeS2_PDFView(PDFTemplateView):
+    template_name = 'scolar/Prise en charge.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+
+    def get_context_data(self, **kwargs):
+        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
+#         engagement_letter = num2words(engagement_.credit_allouee.amount, lang='fr')
+#         print (engagement_letter)
+#         
+       
+
+        pieces = {}
+        context = {}
+        context['engagement_'] = engagement_
+#         context['engagement_letter'] = engagement_letter
+  
+        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        return context
+
+
+
