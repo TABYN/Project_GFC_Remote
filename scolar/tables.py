@@ -1169,7 +1169,9 @@ class EngagementFilter(django_filters.FilterSet):
         fields = ['num']
         
 class EngagementTable(tables.Table):
-
+    #credit_alloue__credit_allouee = tables.Column(verbose_name="credit_allouee")
+    credit_alloue=tables.Column(empty_values=(), orderable=False)
+    
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "engagement_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
@@ -1182,8 +1184,14 @@ class EngagementTable(tables.Table):
     action= '<a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
     Imprimer=tables.TemplateColumn(action, orderable=False)
       
+#     def render_credit_alloue(self,value,record):
+#         if record.credit_alloue :
+#             if record.credit_alloue.article:
+#                 return str(record.credit_alloue.article)
+#         else :
+#             return '/' 
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num', 'chapitre','article','type_engagement','date']
+        fields = ['annee_budg','num', 'chapitre','article','type_engagement__nature','date']
         template_name= "django_tables2/bootstrap4.html"
     

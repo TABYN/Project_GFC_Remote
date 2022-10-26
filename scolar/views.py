@@ -13228,13 +13228,6 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     def test_func(self): 
         engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))   
         return self.request.user.is_budget()
-#         permission_=False
-#         if self.request.user.has_perm('scolar.fonctionnalitenav_postgraduation_visualisationseminaires') :
-#             permission_ = permission_ | True
-#         if self.request.user.is_etudiant() :
-#             permission_ = permission_ | SeminaireSuivi.objects.filter(id=seminaire_.id, inscriptions__etudiant__in=[self.request.user.etudiant]).exists()
-#             
-#         return permission_
         
     def get_context_data(self, **kwargs):
         context = super(EngagementDetailView, self).get_context_data(**kwargs)
@@ -13259,6 +13252,30 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                   
         return context
 
+    
+# class Prise_en_chargeS2_PDFView(PDFTemplateView):
+#     template_name = 'scolar/Prise en charge.html'
+#     cmd_options = {
+#         'orientation': 'Landscape',
+#         'page-size': 'A3',
+#     }
+# 
+# 
+#     def get_context_data(self, **kwargs):
+#         credit_S2_ = Credit_S2.objects.get(id=self.kwargs.get('credit_S2_pk'))
+#         credit_S2_letter = num2words(credit_S2_.credit_allouee.amount, lang='fr')
+#         print (credit_S2_letter)
+#         
+#        
+# 
+#         pieces = {}
+#         context = {}
+#         context['credit_S2_'] = credit_S2_
+#         context['credit_S2_letter'] = credit_S2_letter
+#   
+#         self.filename ='credit_S2_'+str(credit_S2_.id) + '.pdf'
+#         return context
+
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
     template_name = 'scolar/Prise en charge.html'
@@ -13270,18 +13287,16 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
 
     def get_context_data(self, **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-#         engagement_letter = num2words(engagement_.credit_allouee.amount, lang='fr')
-#         print (engagement_letter)
-#         
+        #engagement_letter = num2words(engagement_.credit_allouee.amount, lang='fr')
+        #print (engagement_letter)
+        
        
 
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
-#         context['engagement_letter'] = engagement_letter
+        #context['engagement_letter'] = engagement_letter
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
-
-
 
