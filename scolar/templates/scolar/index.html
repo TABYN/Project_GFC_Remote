@@ -209,7 +209,7 @@
 				<strong>Repartition des credits</strong>
 				
 					{% for exercice in user.exercice_list %}
-		 	  				<a class="dropdown-item"  href="">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
+		 	  				<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
 				
 		        	{% endfor %}	
 				

@@ -2093,13 +2093,16 @@ class Chapitre(models.Model):
         code_chap = models.CharField(max_length=10)
         libelle_chap_FR = models.CharField(max_length=100)
         libelle_chap_AR = models.CharField(max_length=100, null=True, blank=True)
+        def __str__(self):
+            return self.code_chap+' '+ self.libelle_chap_FR 
 
 class Article(models.Model):
         code_art = models.CharField(max_length=10)
         chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE, default='', related_name="articles")
         libelle_art_FR = models.CharField(max_length=100)
         libelle_art_AR = models.CharField(max_length=100, null=True, blank=True)
-       
+        def __str__(self):
+            return self.code_art+' '+ self.libelle_art_FR        
 
 class Exercice(models.Model):
     '''

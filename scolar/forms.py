@@ -1432,7 +1432,30 @@ class MatiereFormHelper(FormHelper):
     )
 
 
+class CreditForm(forms.Form):
+    class Meta:
+         model = Credit
+         fields = ['chapitre', 'article', 'credit_allouee']
+    chapitre = forms.ModelChoiceField(
+        queryset=Chapitre.objects.all(),
+        label=u"Credit",
+        widget=ModelSelect2Widget(attrs={'style':'width:800px; height:10px;'},
+            model=Credit,
+            search_fields=['code_chap__icontains'],
+            dependent_fields={'article': 'articles'},
+        )
+    )
+    article = forms.ModelChoiceField(
+        queryset=Article.objects.all(),
+        label=u"Credit",
+        widget=ModelSelect2Widget(
+            model=Credit,
+            search_fields=['code_art__icontains'],
+            dependent_fields={'chapitre' : 'chapitre'},
+            attrs={'style': 'width:800px; height:10px;'},
+        )
 
+    )
          
 
     
