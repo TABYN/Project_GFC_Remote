@@ -1072,7 +1072,49 @@ class SeanceTable(tables.Table):
         model=Seance
         template_name="django_tables2/bootstrap4.html"
         
-########################################section 2
+
+################################################budget
+class ChapitreFilter(django_filters.FilterSet):
+    code_chap = django_filters.CharFilter(field_name='code_chap', lookup_expr='icontains', label='Code chapitre')
+    libelle_chap_FR = django_filters.CharFilter(field_name='libelle_chap_FR', lookup_expr='icontains', label='Libelle chapitre')
+
+    class Meta:
+        model = Chapitre
+        fields = ['code_chap', 'libelle_chap_FR']
+
+class ChapitreTable(tables.Table):
+    action = '{% load icons %}\
+                <a href="{% url "chapitre_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>\
+                <a href="{% url "chapitre_delete" pk=record.id %}" > {% icon "trash" %} </a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+    action= '<a href="{% url "ArticleCreate" chap=record.id %}" class="btn btn-info" role="button"> Articles</a>'
+    Article=tables.TemplateColumn(action, orderable=False)
+    class Meta:
+        model =Chapitre
+        fields=('code_chap', 'libelle_chap_FR', 'libelle_chap_AR')
+        template_name= "django_tables2/bootstrap4.html"   
+        
+
+class FournisseurFilter(django_filters.FilterSet):
+    code_fournisseur = django_filters.CharFilter(field_name='code_fournisseur', lookup_expr='icontains', label='Code fournisseur')
+    nom_fournisseur = django_filters.CharFilter(field_name='nom_fournisseur', lookup_expr='icontains', label='Nom de fournisseur')
+   
+    class Meta:
+        model = Fournisseur
+        fields = ['code_fournisseur', 'nom_fournisseur']    
+        
+class FournisseurTable(tables.Table):
+    action = '{% load icons %}\
+                <a href="{% url "fournisseur_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>\
+                <a href="{% url "fournisseur_delete" pk=record.id %}" > {% icon "trash" %} </a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model =Fournisseur
+        fields=('code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur')
+        template_name= "django_tables2/bootstrap4.html"        
+                    
+
 class BanqueTable(tables.Table):
     action='{% load icons %}\
             <a href="{% url "banque_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
@@ -1096,7 +1138,7 @@ class BanqueFilter(django_filters.FilterSet):
         fields = ['code', 'nom', 'abreviation']
         
 
-class Engagement_S2Table(tables.Table):
+class Type_Engagement_S2Table(tables.Table):
     action='{% load icons %}\
             <a href="{% url "engagement_S2_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
             <a href="{% url "engagement_S2_delete" pk=record.id %}" > {% icon "trash" %}</a>'
@@ -1104,20 +1146,45 @@ class Engagement_S2Table(tables.Table):
     edit   = tables.TemplateColumn(action, orderable=False)
     
     class Meta:
-        model= Engagement_S2
+        model= Type_Engagement_S2
         fields = ['code', 'nature']
         template_name= "django_tables2/bootstrap4.html"
     
 
-class Engagement_S2Filter(django_filters.FilterSet):
+class Type_Engagement_S2Filter(django_filters.FilterSet):
     code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
     nature = django_filters.CharFilter(field_name='nature', lookup_expr='icontains', label='nature')
    
     class Meta:
-        model = Engagement_S2
+        model = Type_Engagement_S2
         fields = ['code', 'nature']
 
-###########################################fin section2        
+class EngagementFilter(django_filters.FilterSet):
+    num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero d'engagement")
+   
+    class Meta:
+        model = Engagement
+        fields = ['num']
         
-        
-        
+class EngagementTable(tables.Table):
+
+    date = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "engagement_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    action= '{% load icons %}\
+            <a href=" {% url "detail_engagement" pk=record.id %}" > {% icon "eye" %}</a> '
+               
+    detail   = tables.TemplateColumn(action, orderable=False)
+   # action= '<a href="" class="btn btn-info" role="button"> Imprimer</a>'
+    action= '<a  href="{% url "Prise_en_chargeS2_PDFView" pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
+    
+   
+    Imprimer=tables.TemplateColumn(action, orderable=False)
+      
+    class Meta:
+        model= Engagement
+        fields = ['id','annee_budg','num', 'chapitre','article','type_engagement','date']
+        template_name= "django_tables2/bootstrap4.html"
+    

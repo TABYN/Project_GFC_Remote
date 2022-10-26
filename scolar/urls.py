@@ -335,14 +335,22 @@ urlpatterns = [
     path('banque_create', views.BanqueCreateView.as_view(), name='banque_create'),
     re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
     re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
-    
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
-    path('engagement_S2_list', views.EngagementListView.as_view(), name='engagement_S2_list'),
-    path('engagement_S2_create', views.EngagementCreateView.as_view(), name='engagement_S2_create'),
-    re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.EngagementUpdateView.as_view(), name='engagement_S2_update'),
-    re_path(r'^engagement_S2_delete/(?P<pk>[ -_&@\w]+)/$', views.EngagementDeleteView.as_view(), name='engagement_S2_delete'),
-    path('Prise_en_chargeS2_PDFView/<credit_S2_pk>/', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),
+    #===========================================================================
+    # path('engagement_S2_list', views.EngagementListView.as_view(), name='engagement_S2_list'),
+    # path('engagement_S2_create', views.EngagementCreateView.as_view(), name='engagement_S2_create'),
+    # re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.EngagementUpdateView.as_view(), name='engagement_S2_update'),
+    # re_path(r'^engagement_S2_delete/(?P<pk>[ -_&@\w]+)/$', views.EngagementDeleteView.as_view(), name='engagement_S2_delete'),
+    #===========================================================================
+      path('engagement_S2_list', views.Type_EngagementListView.as_view(), name='engagement_S2_list'),
+    path('engagement_S2_create', views.Type_EngagementCreateView.as_view(), name='engagement_S2_create'),
+    re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.Type_EngagementUpdateView.as_view(), name='engagement_S2_update'),
+    re_path(r'^engagement_S2_delete/(?P<pk>[ -_&@\w]+)/$', views.Type_EngagementDeleteView.as_view(), name='engagement_S2_delete'),
 
-        
-    ]
+    path('engagement_list', views.EngagementListView.as_view(), name='engagement_list'),
+    path('engagement_create', views.engagement_create_view, name='engagement_create'),
+    re_path(r'^engagement_delete/(?P<pk>\d+)/$', views.EngagementDeleteView.as_view(), name='engagement_delete'),
+    re_path(r'^engagement_update/(?P<engagement_pk>\d+)/$', views.engagement_update_view, name='engagement_update'),
+    re_path(r'^detail_engagement/(?P<pk>\d+)/$', views.EngagementDetailView.as_view(), name='detail_engagement'),
+    re_path(r'^Prise_en_chargeS2_PDFView/(?P<pk>[ -_&@\w]+)/$', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),]
