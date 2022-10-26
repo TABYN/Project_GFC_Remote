@@ -1140,8 +1140,50 @@ class BanqueFilter(django_filters.FilterSet):
         
 
 
+class Type_Engagement_S2Table(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "engagement_S2_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_S2_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Type_Engagement_S2
+        fields = ['code', 'nature']
+        template_name= "django_tables2/bootstrap4.html"
+    
 
-###########################################fin section2        
+class Type_Engagement_S2Filter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+    nature = django_filters.CharFilter(field_name='nature', lookup_expr='icontains', label='nature')
+   
+    class Meta:
+        model = Type_Engagement_S2
+        fields = ['code', 'nature']
+
+class EngagementFilter(django_filters.FilterSet):
+    num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero d'engagement")
+   
+    class Meta:
+        model = Engagement
+        fields = ['num']
         
-        
-        
+class EngagementTable(tables.Table):
+
+    date = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "engagement_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    action= '{% load icons %}\
+            <a href=" {% url "detail_engagement" pk=record.id %}" > {% icon "eye" %}</a> '
+               
+    detail   = tables.TemplateColumn(action, orderable=False)
+    action= '<a href="" class="btn btn-info" role="button"> Imprimer</a>'
+    Imprimer=tables.TemplateColumn(action, orderable=False)
+      
+    class Meta:
+        model= Engagement
+        fields = ['annee_budg','num', 'chapitre','article','type_engagement','date']
+        template_name= "django_tables2/bootstrap4.html"
+    

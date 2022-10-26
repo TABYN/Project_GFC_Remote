@@ -1432,4 +1432,183 @@ class MatiereFormHelper(FormHelper):
     )
 
 
-                
+
+         
+
+    
+class EngagementCreateForm(forms.Form):
+    
+    def __init__(self, request, *args, **kwargs):
+        super(EngagementCreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+#             annee_en_cours_qs=AnneeUniv.objects.filter(encours=True)
+#             annee_en_cours=None
+#             if annee_en_cours_qs.exists() :
+#                 annee_en_cours=annee_en_cours_qs.first()
+            self.fields['annee_budg']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Année budgetaire",
+                #required = False,
+                #initial=annee_en_cours
+            )   
+            self.fields['chapitre'] = forms.ModelChoiceField(
+                queryset=Chapitre.objects.all(),
+                label=u"Chapitre",
+                widget=ModelSelect2Widget(
+                        model=Chapitre,
+                        search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
+                    ),
+                help_text = "Tapez le code du chapitre, ou tappez 2 lettres ou plus du libelle du chapitre",
+                #required = False
+            ) 
+            self.fields['article'] = forms.ModelChoiceField(
+                queryset=Article.objects.all(),
+                label=u"Article",
+                widget=ModelSelect2Widget(
+                        model=Article,
+                        search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+                        #dependent_fields={'chapitre':'chapitre'},
+                    ),
+                help_text = "Tapez le code de l'article, ou tappez 2 lettres ou plus du libelle de l'article",                                           
+                #required = False
+            ) 
+            self.fields['type_engagement']=forms.ModelChoiceField(
+                queryset=Type_Engagement_S2.objects.all(),
+                label=u"Nature engagement",
+                widget=ModelSelect2Widget(
+                        model=Type_Engagement_S2,
+                        search_fields=['nature__icontains',],
+                    ),
+                help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
+                #required = False,
+            )    
+            self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
+            self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
+
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'engagement. Merci de le signaler à l'administrateur")    
+    
+class EngagementUpdateForm(forms.Form):
+    
+    def __init__(self, engagement_pk, request, *args, **kwargs):
+        super(EngagementUpdateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:  
+            engagement_= get_object_or_404(Engagement, id=engagement_pk)
+
+            self.fields['annee_budg']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Annee budgetaire",
+                required = False,
+                initial=engagement_.annee_budg
+            )  
+            self.fields['chapitre'] = forms.ModelChoiceField(
+                queryset=Chapitre.objects.all(),
+                label=u"Chapitre",
+                widget=ModelSelect2Widget(
+                        model=Chapitre,
+                        search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
+                    ),
+                required = False,
+                initial=engagement_.chapitre
+            )  
+            self.fields['article'] = forms.ModelChoiceField(
+                queryset=Article.objects.all(),
+                label=u"Article",
+                widget=ModelSelect2Widget(
+                        model=Article,
+                        search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+                    ),
+                required = False,
+                initial=engagement_.article
+            ) 
+            self.fields['type_engagement']=forms.ModelChoiceField(
+                queryset=Type_Engagement_S2.objects.all(),
+                label=u"Nature engagement",
+                widget=ModelSelect2Widget(
+                        model=Type_Engagement_S2,
+                        search_fields=['nature__icontains',],
+                    ),
+                required = False,
+                initial=engagement_.type_engagement
+            ) 
+            self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=engagement_.date)
+            self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
+            self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
+    
+             
+            self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification d'engagement. Merci de le signaler à l'administrateur")
+ 
+class EngagementDetailForm(forms.Form):
+
+    def __init__(self, engagement_pk, *args, **kwargs):
+        super(EngagementDetailForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try : 
+            engagement_= get_object_or_404(Engagement, id=engagement_pk)
+            self.fields['annee_budg']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Annee budgetaire",
+                required = False,
+                initial=engagement_.annee_budg
+            )   
+            
+            self.fields['chapitre']=forms.ModelChoiceField(
+                queryset = Chapitre.objects.all(),
+                widget=ModelSelect2Widget(
+                    model=Chapitre,
+                    search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
+                ),
+                required=False,
+                initial=engagement_.chapitre   
+             )
+            self.fields['article']=forms.ModelChoiceField(
+                queryset = Article.objects.all(),
+                widget=ModelSelect2Widget(
+                    model=Article,
+                    search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+                ),
+                required=False,
+                initial=engagement_.article   
+             )
+            self.fields['type_engagement']=forms.ModelChoiceField(
+                queryset=Type_Engagement_S2.objects.all(),
+                label=u"Nature engagement",
+                widget=ModelSelect2Widget(
+                        model=Type_Engagement_S2,
+                        search_fields=['nature__icontains',],
+                    ),
+                required = False,
+                initial=engagement_.type_engagement
+            ) 
+            
+            self.fields['date']=forms.DateField(label="Date", required=False, initial=engagement_.date)
+            self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
+            self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
+            
+            for key_ in self.fields.keys():
+                self.fields[key_].disabled=True
+                            
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation d'engagement")
+ 
+         
+

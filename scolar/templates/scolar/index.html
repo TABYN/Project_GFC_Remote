@@ -180,8 +180,10 @@
 			<li class="list-group-item">
 				  <a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'tasks' %} Engagement</a>
 				  <div class="dropdown-menu">	
-				    <a class="dropdown-item" href="">{% icon 'book' %} Liste Natures Engagements</a>		  
-				 	<a class="dropdown-item" href="">{% icon 'book' %} Liste des engagements</a>		  
+
+				    <a class="dropdown-item" href="{% url 'engagement_S2_list' %}">{% icon 'book' %} Liste Natures Engagements</a>		  
+				 	<a class="dropdown-item" href="{% url 'engagement_list' %}">{% icon 'book' %} Liste des engagements</a>		  
+
 				 
 				  </div>	
 				</li>

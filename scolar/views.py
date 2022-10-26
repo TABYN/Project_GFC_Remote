@@ -36,7 +36,9 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
-    FournisseurFilter, FournisseurTable , BanqueTable, BanqueFilter
+    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, EngagementTable, EngagementFilter
+
+
     
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -56,8 +58,9 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     CommissionValidationCreateForm, ExamenCreateForm, SeanceSallesReservationForm, SurveillanceUpdateForm, \
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
-    AffichageExamenSelectForm
-    
+    AffichageExamenSelectForm, CreditForm, \
+    EngagementCreateForm, EngagementUpdateForm, EngagementDetailForm
+
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -12883,6 +12886,376 @@ class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     def get_success_url(self):
         return reverse('banque_list')
 
+    
+@login_required
+def CreditCreate_S2(request,exe):
+    article = Article.objects.all()
+    exercices = Exercice.objects.all()
+    pexe = Exercice.objects.get(pk=exe)
+    
+    if request.method == 'POST':
+        credit = Credit(
+            chapitre_id=request.POST['chapitre'],
+            article_id=request.POST['article'],
+            credit_allouee=request.POST['credit_allouee'],
+            credit_reste=request.POST['credit_allouee'],
+        )
+        credit.save()
+        messages.success(request, 'Credit enregistre pour section 2.')
+        return redirect(request.path_info)
+    else:
+        article = Article.objects.all()
+        crdt = Credit_S2.objects.all()
+    return render(request, 'scolar/add_credit_S2.html', {'article': article, 'crdt': crdt, 'exercices': exercices,'pexe' :pexe})
+ 
+ 
+@login_required
+def CreditAssociate_S2(request,exe,art):
+    pi = Article.objects.get(pk=art)
+    pexe= Exercice.objects.get(pk=exe)
+    article = Article.objects.all()
+    if request.method == 'POST' and Credit_S2.objects.filter(article=pi, exercice=exe).count()==0 :
+        credit_S2 = Credit_S2(
+            article=Article.objects.get(pk=art),
+            chapitre=Chapitre.objects.get(pk=pi.chapitre_id),
+            exercice=Exercice.objects.get(pk=exe),
+            credit_allouee=request.POST['credit_allouee'],
+            credit_reste=request.POST['credit_allouee'],
+        )
+        try:
+            credit_deja_alloue = Credit_S2.objects.filter(article=pi, exercice=pexe).count()
+            crdt = Credit.objects.all()
+            if credit_deja_alloue == 0:
+                 
+                  if pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount) >=0:
+                            credit_S2.save()          
+                            messages.success(request, 'credit enregistree.')
+                            messages.success(request, 'Il reste comme credit Non alloue : ' + str(
+                                  pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)) + "DZD")
+                             
+                            pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)
+                            pexe.save(update_fields=['credit_non_allouee'])
+                            return render(request, 'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe})
+                  else : 
+                            messages.error(request, 'Vous ne pouvez pas allouer ce credit ,il ne reste comme credit dans cet exercice que:' + str(
+                                  pexe.credit_non_allouee.amount) + "DZD") 
+                            return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                            return redirect(request.path_info)
+            else :
+                messages.error(request, 'Vous ne pouvez pas allouer un credi plusieurs fois au meme article ... ') 
+                return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                return redirect(request.path_info)
+      
+        except IntegrityError:     
+            messages.error(request, "Erreur dans lenregistrement")
+            return redirect(request.path_info)
+     
+     
+    elif request.method == 'POST'  and Credit_S2.objects.filter(article=pi, exercice=pexe).count()>0 :
+            vect=[]
+            crs=Credit_S2.objects.filter(article=pi, exercice=pexe)
+            crdt = Credit_S2.objects.all()
+            for cr in crs :
+                vect.append(cr.id)
+         
+            credit_S2 = Credit_S2.objects.get(id=vect[0])
+            Ancien_crdt=credit_S2.credit_allouee.amount
+            consom= credit_S2.credit_allouee.amount - credit_S2.credit_reste.amount
+            if float(request.POST['credit_allouee'])>=consom :
+                credit_S2.credit_reste=float(request.POST['credit_allouee']) - float(consom)
+                credit_S2.credit_allouee=request.POST['credit_allouee']
+                credit_S2.save()
+                pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount +(Ancien_crdt-credit_S2.credit_allouee.amount)
+                pexe.save(update_fields=['credit_non_allouee'])
+                messages.success(request, 'Credit modifie avec suuces.')
+                messages.success(request, 'Il reste comme credit Non alloue : ' + str(pexe.credit_non_allouee.amount) + "DZD")
+                return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                return redirect(request.path_info)
+            else:
+  
+                messages.error(request, 'Vous etes entrain de faire un transfert pour un credit insuffisant ... ' + str(credit_S2) ) 
+                return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                return redirect(request.path_info)
+     
+    return render(request, 'scolar/ads_credit_S2.html', {'pi': pi,'pexe':pexe})
 
 
-##########################fin section 2#####################
+class Type_EngagementListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+ 
+    def get_context_data(self, **kwargs):
+        context = super(Type_EngagementListView, self).get_context_data(**kwargs)
+ 
+        filter_ = Type_Engagement_S2Filter(self.request.GET, queryset=Type_Engagement_S2.objects.all().order_by('code'))
+ 
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Type_Engagement_S2Table(filter_.qs, exclude=exclude_columns_)
+        RequestConfig(self.request).configure(table)
+ 
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Natures des engagements '
+        if self.request.user.is_staff_only():
+            context['btn_list'] = {
+            'Creer Nature eng': reverse('engagement_S2_create'),
+                 
+            }
+        return context
+ 
+ 
+ 
+class Type_EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_engagement_S2'
+    model = Type_Engagement_S2
+    fields = ['code', 'nature']
+    template_name = 'scolar/create.html'
+    success_message = "Nature d'engagement a ete cree avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+#         form.fields['pays'] = forms.ModelChoiceField(queryset=Pays.objects.all().order_by('nom'), initial='DZ',
+#                                                      required=True)
+        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('engagement_S2_list')
+        return form
+ 
+    def get_context_data(self, **kwargs):
+        context = super(Type_EngagementCreateView, self).get_context_data(**kwargs)
+        titre = 'Creer une nouvelle Nature d''Engagement'
+        context['titre'] = titre
+        return context
+     
+class Type_EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_engegement_S2'
+    model = Type_Engagement_S2
+    fields = ['code', 'nature']
+    template_name = 'scolar/update.html'
+    success_message = "La Nature dengagement a ete modifiee avec succe"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        #form.fields['sigle'].widget.attrs['readonly'] = True
+        form.fields['code'].required = True
+        form.fields['nature'].required = True
+ 
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('engagement_S2_list')
+        return form
+ 
+class Type_EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Type_Engagement_S2
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_engagement_S2'
+    success_message = "La nature dengagement a bien ete supprimee"
+ 
+    def get_success_url(self):
+        return reverse('engagement_S2_list')
+
+
+class EngagementListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+  
+    def get_context_data(self, **kwargs):
+        context = super(EngagementListView, self).get_context_data(**kwargs)
+  
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.all().order_by('num'))
+  
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = EngagementTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+  
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des engagements '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+            'Ajouter nouvel engagement': reverse('engagement_create'),
+                  
+            }
+        return context
+  
+@login_required
+def engagement_create_view(request):  
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = EngagementCreateForm(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+
+                engagement_=Engagement.objects.create(
+                    chapitre=data['chapitre'],
+                    article=data['article'],
+                    type_engagement=data['type_engagement'],
+                    num=data['num'],
+                    date=data['date'],
+                    observation=data['observation'],
+                    annee_budg=data['annee_budg']
+                    )                         
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la création de l'engagement. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('engagement_list'))
+                    
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = EngagementCreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvel engagement")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+#source type User
+#cible de type User ou Etudiant ou Enseignant ou n'importe quel autre modèle, si le modèle de Cible n'a pas d'attribut User alors la cible sera automatiquement None
+#action de type texte
+def trace_create(source, cible, action):
+    try :
+        if source :
+            source_text_=source.nom()+' '+source.prenom()
+        else :
+            source_text_=""
+        if cible :
+            cible_class=cible.__class__
+            if cible_class.__name__ == "User" :
+                cible_text_=cible.nom()+' '+cible.prenom()
+            else :
+                if hasattr(cible_class, 'user') and cible.user :
+                    cible_text_=cible.user.nom()+' '+cible.user.prenom()
+                    cible=cible.user
+                else :
+                    if cible_class.__name__ == "Etudiant" :
+                        cible_text_=cible.nom+' '+cible.prenom
+                    else :
+                        cible_text_=str(cible)
+                    cible=None
+        else :
+            cible_text_=""
+        trace_= Trace.objects.create(
+            source=source,
+            source_text=source_text_,
+            cible=cible,
+            cible_text=cible_text_,
+            action=str(action),
+                             )
+        return trace_
+        
+    except Exception :
+        return False 
+    
+class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    #permission_required = 'scolar.fonctionnalite_postgraduation_gestionseminaires'
+    model = Engagement
+    template_name = 'scolar/delete.html'
+    success_message = "Engagement a bien supprime."
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+
+    def delete(self, *args, **kwargs):
+        object_=self.get_object()
+        trace_create(self.request.user, None, "Suppression Engagement: "+str(object_))
+        return super(EngagementDeleteView, self).delete(*args, **kwargs)
+        
+    def get_success_url(self):
+        return reverse('engagement_list')
+    
+@login_required
+def engagement_update_view(request, engagement_pk):
+    engagement_=get_object_or_404(Engagement, id=engagement_pk)
+    if request.user.is_budget():
+         pass       
+    else :
+         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+         return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['engagement']=engagement_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = EngagementUpdateForm(engagement_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                      
+                engagement_.annee_budg=data['annee_budg']
+                engagement_.chapitre=data['chapitre']
+                engagement_.article=data['article']
+                engagement_.type_engagement=data['type_engagement']
+                engagement_.date=data['date']
+                engagement_.num=data['num']
+                engagement_.observation=data['observation']
+                
+                engagement_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du l'engagement. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('engagement_list'))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = EngagementUpdateForm(engagement_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier l'engagement")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
+  
+class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/engagement_detail.html'
+
+    def test_func(self): 
+        engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))   
+        return self.request.user.is_budget()
+#         permission_=False
+#         if self.request.user.has_perm('scolar.fonctionnalitenav_postgraduation_visualisationseminaires') :
+#             permission_ = permission_ | True
+#         if self.request.user.is_etudiant() :
+#             permission_ = permission_ | SeminaireSuivi.objects.filter(id=seminaire_.id, inscriptions__etudiant__in=[self.request.user.etudiant]).exists()
+#             
+#         return permission_
+        
+    def get_context_data(self, **kwargs):
+        context = super(EngagementDetailView, self).get_context_data(**kwargs)
+        titre='Engagement N: '+ self.kwargs.get("pk")
+        context['titre'] = titre
+
+        engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
+        
+        context['engagement_form'] = EngagementDetailForm(engagement_pk=engagement_.id)
+        
+        exclude_columns_=[]
+        if not self.request.user.is_authenticated:
+            exclude_columns_.append('expert')
+            exclude_columns_.append('action')
+            exclude_columns_.append('edit')
+            exclude_columns_.append('admin')
+        else :
+            if (not self.request.user.is_budget()):
+                exclude_columns_.append('edit')
+                exclude_columns_.append('admin')
+                exclude_columns_.append('expert')
+                  
+        return context
+

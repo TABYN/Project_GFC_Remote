@@ -130,6 +130,10 @@ class User(AbstractUser):
         group_regisseur=get_object_or_404(Group, name='regisseur')
         return group_regisseur in self.groups.all()
     
+    def is_budget(self):
+        group_budget=get_object_or_404(Group, name='budget')
+        return group_budget in self.groups.all()
+    
     def is_not_etudiant(self):
         return not self.is_etudiant()
     
@@ -2265,4 +2269,3 @@ class Engagement(models.Model):
 
 
 
-###############################################fin section 2###########################
