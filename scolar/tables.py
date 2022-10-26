@@ -1179,7 +1179,7 @@ class EngagementTable(tables.Table):
             <a href=" {% url "detail_engagement" pk=record.id %}" > {% icon "eye" %}</a> '
                
     detail   = tables.TemplateColumn(action, orderable=False)
-    action= '<a href="{% url "Prise_en_chargeS2_PDFView" credit_S2_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
+    action= '<a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
     Imprimer=tables.TemplateColumn(action, orderable=False)
       
     class Meta:
