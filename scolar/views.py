@@ -13184,16 +13184,17 @@ def engagement_create_view(request):
             try:
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
-                
+                credit_S21=data['credit_S2']
 
                 engagement_=Engagement.objects.create(
-                    chapitre=data['chapitre'],
-                    article=data['article'],
+                    credit_S2=data['credit_S2'],
+                    chapitre=credit_S21.chapitre,
+                    article=credit_S21.article,
                     type_engagement=data['type_engagement'],
                     num=data['num'],
                     date=data['date'],
                     observation=data['observation'],
-                    annee_budg=data['annee_budg']
+                  
                     )                         
                 
             except Exception:
@@ -13368,7 +13369,7 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
         print('________________________________________')
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
       
-        engagement_letter = num2words(engagement_.credit_allouee.amount, lang='fr')
+        engagement_letter = num2words(engagement_.credit_S2.credit_allouee.amount, lang='fr')
     
        
 
@@ -13377,7 +13378,7 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
         context['engagement'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement'+str(engagement_.id) + '.pdf'
+        self.filename ='Eng_'+str(engagement_.type_engagement.nature) +'_'+str(engagement_.num) +'.pdf'
         return context
 
 

@@ -353,4 +353,4 @@ urlpatterns = [
     re_path(r'^engagement_delete/(?P<pk>\d+)/$', views.EngagementDeleteView.as_view(), name='engagement_delete'),
     re_path(r'^engagement_update/(?P<engagement_pk>\d+)/$', views.engagement_update_view, name='engagement_update'),
     re_path(r'^detail_engagement/(?P<pk>\d+)/$', views.EngagementDetailView.as_view(), name='detail_engagement'),
-    re_path(r'^Prise_en_chargeS2_PDFView/(?P<pk>[ -_&@\w]+)/$', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),]
+    re_path(r'^Prise_en_chargeS2_PDFView/(?P<engagement_pk>\d+)/$', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),]

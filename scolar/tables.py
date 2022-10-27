@@ -1178,13 +1178,13 @@ class EngagementTable(tables.Table):
                
     detail   = tables.TemplateColumn(action, orderable=False)
    # action= '<a href="" class="btn btn-info" role="button"> Imprimer</a>'
-    action= '<a  href="{% url "Prise_en_chargeS2_PDFView" pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
+    action= '<a  href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
     
    
     Imprimer=tables.TemplateColumn(action, orderable=False)
       
     class Meta:
         model= Engagement
-        fields = ['id','annee_budg','num', 'chapitre','article','type_engagement','date']
+        fields = ['credit_S2__exercice','num', 'credit_S2__chapitre','credit_S2__article','credit_S2__credit_allouee','type_engagement','date']
         template_name= "django_tables2/bootstrap4.html"
     
