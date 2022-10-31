@@ -36,7 +36,8 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
-    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, EngagementTable, EngagementFilter
+    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, EngagementTable, EngagementFilter, \
+    ArticleFilter, ArticleTable
 
     
 
@@ -12096,11 +12097,6 @@ def ChapitreDelete(request, id):
     return render(request, 'scolar/delete_item.html', {'delete': delete})
 
 @login_required
-def ArticleShow(request):
-    article = Article.objects.all()
-    return render(request, 'scolar/show_article.html', {'article': article})
-
-@login_required
 def ArticleCreate(request, chap):
     pi = Chapitre.objects.get(pk=chap)
     if request.method == 'POST':
@@ -12667,6 +12663,29 @@ def ImmobilierEdit(request, id):
 
 
 ##########################################################budget
+class ArticlesListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ArticlesListView, self).get_context_data(**kwargs)
+
+        filter_ = ArticleFilter(self.request.GET, queryset=Article.objects.all())
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = ArticleTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des articles '
+        #if self.request.user.is_staff_only():
+#         context['btn_list'] = {
+#                 'Ajouter chapitre': reverse('chapitre_create')
+#                 
+#             }
+        return context
+
 class ChapitresListView(TemplateView):
     template_name = 'scolar/filter_list.html'
 
