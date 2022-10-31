@@ -1161,35 +1161,31 @@ class Type_Engagement_S2Filter(django_filters.FilterSet):
 
 class EngagementFilter(django_filters.FilterSet):
     num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero d'engagement")
-   
+    type_engagement = django_filters.ModelChoiceFilter(field_name='type_engagement', queryset = Type_Engagement_S2.objects.all(), empty_label ="Type d'engagement")    
+
     class Meta:
         model = Engagement
-        fields = ['num']
+        fields = ['num','type_engagement']
         
 class EngagementTable(tables.Table):
-    #credit_alloue__credit_allouee = tables.Column(verbose_name="credit_allouee")
-    credit_alloue=tables.Column(empty_values=(), orderable=False)
-    
+
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "engagement_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
             <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
+    
     action= '{% load icons %}\
             <a href=" {% url "detail_engagement" pk=record.id %}" > {% icon "eye" %}</a> '
                
     detail   = tables.TemplateColumn(action, orderable=False)
+    
     action= '<a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
     Imprimer=tables.TemplateColumn(action, orderable=False)
       
-#     def render_credit_alloue(self,value,record):
-#         if record.credit_alloue :
-#             if record.credit_alloue.article:
-#                 return str(record.credit_alloue.article)
-#         else :
-#             return '/' 
+
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num', 'chapitre','article','type_engagement__nature','date']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee']
         template_name= "django_tables2/bootstrap4.html"
     

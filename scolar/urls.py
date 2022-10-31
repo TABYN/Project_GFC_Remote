@@ -302,6 +302,7 @@ urlpatterns = [
 
     path('ArticleCreate/<int:chap>/', views.ArticleCreate, name="ArticleCreate"),
     path('ArticleDelete/<int:art>/', views.ArticleDelete, name="ArticleDelete"),
+    path('ArticleShow', views.ArticleShow, name='ArticleShow'),
 
     path('CreditCreate/<int:avc>/',views.CreditCreate, name="CreditCreate"),
     path('CreditAssociate/<int:avc>/<int:art>/', views.CreditAssociate, name="CreditAssociate"),

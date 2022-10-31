@@ -12096,6 +12096,11 @@ def ChapitreDelete(request, id):
     return render(request, 'scolar/delete_item.html', {'delete': delete})
 
 @login_required
+def ArticleShow(request):
+    article = Article.objects.all()
+    return render(request, 'scolar/show_article.html', {'article': article})
+
+@login_required
 def ArticleCreate(request, chap):
     pi = Chapitre.objects.get(pk=chap)
     if request.method == 'POST':
@@ -13078,8 +13083,6 @@ class EngagementListView(TemplateView):
 @login_required
 def engagement_create_view(request):
 
-
-    
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = EngagementCreateForm(request, request.POST)
@@ -13091,13 +13094,14 @@ def engagement_create_view(request):
                 
 
                 engagement_=Engagement.objects.create(
-                    chapitre=data['chapitre'],
-                    article=data['article'],
+                    #chapitre=data['chapitre'],
+                    #article=data['article'],
                     type_engagement=data['type_engagement'],
                     num=data['num'],
                     date=data['date'],
                     observation=data['observation'],
-                    annee_budg=data['annee_budg']
+                    annee_budg=data['annee_budg'],
+                    credit_alloue=data['credit_alloue']
                     )                         
                 
             except Exception:
@@ -13193,12 +13197,13 @@ def engagement_update_view(request, engagement_pk):
                 data=form.cleaned_data
                       
                 engagement_.annee_budg=data['annee_budg']
-                engagement_.chapitre=data['chapitre']
-                engagement_.article=data['article']
+                #engagement_.chapitre=data['chapitre']
+                #engagement_.article=data['article']
                 engagement_.type_engagement=data['type_engagement']
                 engagement_.date=data['date']
                 engagement_.num=data['num']
                 engagement_.observation=data['observation']
+                engagement_.credit_alloue=data['credit_alloue']
                 
                 engagement_.save()
                          
@@ -13250,28 +13255,6 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                   
         return context
     
-# class Prise_en_chargeS2_PDFView(PDFTemplateView):
-#     template_name = 'scolar/Prise en charge.html'
-#     cmd_options = {
-#         'orientation': 'Landscape',
-#         'page-size': 'A3',
-#     }
-# 
-# 
-#     def get_context_data(self, **kwargs):
-#         credit_S2_ = Credit_S2.objects.get(id=self.kwargs.get('credit_S2_pk'))
-#         credit_S2_letter = num2words(credit_S2_.credit_allouee.amount, lang='fr')
-#         print (credit_S2_letter)
-#         
-#        
-# 
-#         pieces = {}
-#         context = {}
-#         context['credit_S2_'] = credit_S2_
-#         context['credit_S2_letter'] = credit_S2_letter
-#   
-#         self.filename ='credit_S2_'+str(credit_S2_.id) + '.pdf'
-#         return context
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
     template_name = 'scolar/Prise en charge.html'
@@ -13283,15 +13266,15 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
 
     def get_context_data(self, **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-        #engagement_letter = num2words(engagement_.credit_allouee.amount, lang='fr')
-        #print (engagement_letter)
+        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+        print (engagement_letter)
         
        
 
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
-        #context['engagement_letter'] = engagement_letter
+        context['engagement_letter'] = engagement_letter
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context

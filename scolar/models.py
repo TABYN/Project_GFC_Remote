@@ -2247,13 +2247,17 @@ class Banque(models.Model):
     
 class Credit_S2(models.Model):
     exercice = models.ForeignKey(Exercice, on_delete=CASCADE,default='' )
-    article = models.ForeignKey(Article, on_delete=CASCADE)
+    article = models.ForeignKey(Article,related_name='article_credit' , on_delete=CASCADE)
     chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
     credit_allouee = MoneyField(decimal_places=2, max_digits=9)
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
     epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
-
+    
+    def __str__(self):
+        return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
+       
      
+    
 class Type_Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
     nature = models.CharField(max_length=150)
@@ -2275,3 +2279,6 @@ class Engagement(models.Model):
 
 
 
+
+    
+ 
