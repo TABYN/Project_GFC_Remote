@@ -1095,6 +1095,28 @@ class ChapitreTable(tables.Table):
         template_name= "django_tables2/bootstrap4.html"   
         
 
+class ArticleFilter(django_filters.FilterSet):
+    code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
+    libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
+
+    class Meta:
+        model = Article
+        fields = ['code_art', 'libelle_art_FR']
+
+class ArticleTable(tables.Table):
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.chapitre :
+            return str(record.chapitre)
+
+
+    class Meta:
+        model =Article
+        fields=('chapitre','code_art', 'libelle_art_FR', 'libelle_art_AR')
+        template_name= "django_tables2/bootstrap4.html"   
+
+
+
 class FournisseurFilter(django_filters.FilterSet):
     code_fournisseur = django_filters.CharFilter(field_name='code_fournisseur', lookup_expr='icontains', label='Code fournisseur')
     nom_fournisseur = django_filters.CharFilter(field_name='nom_fournisseur', lookup_expr='icontains', label='Nom de fournisseur')
