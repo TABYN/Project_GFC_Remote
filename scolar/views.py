@@ -12685,6 +12685,21 @@ class ArticlesListView(TemplateView):
 #                 
 #             }
         return context
+    
+class ArticleUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_article'
+    model = Article
+    fields = ['posteriori']
+    template_name = 'scolar/update.html'
+    success_message = "L'article a ete modifie avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        form.helper.add_input(Submit('submit', 'Enregictrer', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('articles_list')
+        return form
 
 class ChapitresListView(TemplateView):
     template_name = 'scolar/filter_list.html'

@@ -338,6 +338,8 @@ urlpatterns = [
     re_path(r'^chapitre_delete/(?P<pk>\d+)/$',views.ChapitreDeleteView.as_view(), name='chapitre_delete'),
 
     path('articles_list', views.ArticlesListView.as_view(), name='articles_list'),
+    re_path(r'^article_update/(?P<pk>\d+)/$',views.ArticleUpdateView.as_view(), name='article_update'),
+
 
     path('fournisseurs_list', views.FournisseursListView.as_view(), name='fournisseurs_list'),
     path('fournisseur_create', views.FournisseurCreateView.as_view(), name='fournisseur_create'),

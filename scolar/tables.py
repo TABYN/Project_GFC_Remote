@@ -1097,23 +1097,27 @@ class ChapitreTable(tables.Table):
 class ArticleFilter(django_filters.FilterSet):
     code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
     libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
-
+    posteriori = django_filters.BooleanFilter(field_name='posteriori')
+                                               
     class Meta:
         model = Article
-        fields = ['code_art', 'libelle_art_FR']
+        fields = ['code_art', 'libelle_art_FR', 'posteriori']
 
 class ArticleTable(tables.Table):
     chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
     def render_chapitre(self,value,record):
         if record.chapitre :
             return str(record.chapitre)
-
-
+    
+    action = '{% load icons %}\
+                <a href="{% url "article_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>'          
+    declarer_posteriori= tables.TemplateColumn(action, orderable=False)
     class Meta:
         model =Article
-        fields=('chapitre','code_art', 'libelle_art_FR', 'libelle_art_AR')
+        fields=('chapitre','code_art', 'libelle_art_FR', 'libelle_art_AR', 'posteriori')
         template_name= "django_tables2/bootstrap4.html"   
-                
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
+                                        else "background-color: #66ff33;"}        
 
 class FournisseurFilter(django_filters.FilterSet):
     code_fournisseur = django_filters.CharFilter(field_name='code_fournisseur', lookup_expr='icontains', label='Code fournisseur')
