@@ -1475,27 +1475,27 @@ class EngagementCreateForm(forms.Form):
                 #required = False,
                 #initial=annee_en_cours
             )   
-            self.fields['chapitre'] = forms.ModelChoiceField(
-                queryset=Chapitre.objects.all(),
-                label=u"Chapitre",
-                widget=ModelSelect2Widget(
-                        model=Chapitre,
-                        search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
-                    ),
-                help_text = "Tapez le code du chapitre, ou tappez 2 lettres ou plus du libelle du chapitre",
-                #required = False
-            ) 
-            self.fields['article'] = forms.ModelChoiceField(
-                queryset=Article.objects.all(),
+            self.fields['credit_alloue'] = forms.ModelChoiceField(
+                queryset=Credit_S2.objects.all(),
                 label=u"Article",
                 widget=ModelSelect2Widget(
-                        model=Article,
-                        search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
-                        #dependent_fields={'chapitre':'chapitre'},
+                        model=Credit_S2,
+                        search_fields=['article__code_art__icontains'],
                     ),
-                help_text = "Tapez le code de l'article, ou tappez 2 lettres ou plus du libelle de l'article",                                           
+                help_text = "Tapez le code de l'article.",
                 #required = False
             ) 
+#             self.fields['article'] = forms.ModelChoiceField(
+#                 queryset=Article.objects.all(),
+#                 label=u"Article",
+#                 widget=ModelSelect2Widget(
+#                         model=Article,
+#                         search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+#                         #dependent_fields={'chapitre':'chapitre'},
+#                     ),
+#                 help_text = "Tapez le code de l'article, ou tappez 2 lettres ou plus du libelle de l'article",                                           
+#                 #required = False
+#             ) 
             self.fields['type_engagement']=forms.ModelChoiceField(
                 queryset=Type_Engagement_S2.objects.all(),
                 label=u"Nature engagement",
@@ -1533,26 +1533,37 @@ class EngagementUpdateForm(forms.Form):
                 required = False,
                 initial=engagement_.annee_budg
             )  
-            self.fields['chapitre'] = forms.ModelChoiceField(
-                queryset=Chapitre.objects.all(),
-                label=u"Chapitre",
-                widget=ModelSelect2Widget(
-                        model=Chapitre,
-                        search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
-                    ),
-                required = False,
-                initial=engagement_.chapitre
-            )  
-            self.fields['article'] = forms.ModelChoiceField(
-                queryset=Article.objects.all(),
+#             self.fields['chapitre'] = forms.ModelChoiceField(
+#                 queryset=Chapitre.objects.all(),
+#                 label=u"Chapitre",
+#                 widget=ModelSelect2Widget(
+#                         model=Chapitre,
+#                         search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
+#                     ),
+#                 required = False,
+#                 initial=engagement_.chapitre
+#             )  
+#             self.fields['article'] = forms.ModelChoiceField(
+#                 queryset=Article.objects.all(),
+#                 label=u"Article",
+#                 widget=ModelSelect2Widget(
+#                         model=Article,
+#                         search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+#                     ),
+#                 required = False,
+#                 initial=engagement_.article
+#             ) 
+            self.fields['credit_alloue'] = forms.ModelChoiceField(
+                queryset=Credit_S2.objects.all(),
                 label=u"Article",
                 widget=ModelSelect2Widget(
-                        model=Article,
-                        search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+                        model=Credit_S2,
+                        search_fields=['article__code_art__icontains'],
                     ),
                 required = False,
-                initial=engagement_.article
-            ) 
+                initial=engagement_.credit_alloue
+            )
+              
             self.fields['type_engagement']=forms.ModelChoiceField(
                 queryset=Type_Engagement_S2.objects.all(),
                 label=u"Nature engagement",
@@ -1591,24 +1602,35 @@ class EngagementDetailForm(forms.Form):
                 initial=engagement_.annee_budg
             )   
             
-            self.fields['chapitre']=forms.ModelChoiceField(
-                queryset = Chapitre.objects.all(),
+#             self.fields['chapitre']=forms.ModelChoiceField(
+#                 queryset = Chapitre.objects.all(),
+#                 widget=ModelSelect2Widget(
+#                     model=Chapitre,
+#                     search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
+#                 ),
+#                 required=False,
+#                 initial=engagement_.chapitre   
+#              )
+#             self.fields['article']=forms.ModelChoiceField(
+#                 queryset = Article.objects.all(),
+#                 widget=ModelSelect2Widget(
+#                     model=Article,
+#                     search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+#                 ),
+#                 required=False,
+#                 initial=engagement_.article   
+#              )
+            self.fields['credit_alloue'] = forms.ModelChoiceField(
+                queryset=Credit_S2.objects.all(),
+                label=u"Article",
                 widget=ModelSelect2Widget(
-                    model=Chapitre,
-                    search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
-                ),
-                required=False,
-                initial=engagement_.chapitre   
-             )
-            self.fields['article']=forms.ModelChoiceField(
-                queryset = Article.objects.all(),
-                widget=ModelSelect2Widget(
-                    model=Article,
-                    search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
-                ),
-                required=False,
-                initial=engagement_.article   
-             )
+                        model=Credit_S2,
+                        search_fields=['article__code_art__icontains'],
+                    ),
+                required = False,
+                initial=engagement_.credit_alloue
+            )  
+
             self.fields['type_engagement']=forms.ModelChoiceField(
                 queryset=Type_Engagement_S2.objects.all(),
                 label=u"Nature engagement",

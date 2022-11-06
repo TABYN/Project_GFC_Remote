@@ -13117,13 +13117,14 @@ def engagement_create_view(request):
                 
 
                 engagement_=Engagement.objects.create(
-                    chapitre=data['chapitre'],
-                    article=data['article'],
+                    #chapitre=data['chapitre'],
+                    #article=data['article'],
                     type_engagement=data['type_engagement'],
                     num=data['num'],
                     date=data['date'],
                     observation=data['observation'],
-                    annee_budg=data['annee_budg']
+                    annee_budg=data['annee_budg'],
+                    credit_alloue=data['credit_alloue']
                     )                         
                 
             except Exception:
@@ -13219,12 +13220,13 @@ def engagement_update_view(request, engagement_pk):
                 data=form.cleaned_data
                       
                 engagement_.annee_budg=data['annee_budg']
-                engagement_.chapitre=data['chapitre']
-                engagement_.article=data['article']
+                #engagement_.chapitre=data['chapitre']
+                #engagement_.article=data['article']
                 engagement_.type_engagement=data['type_engagement']
                 engagement_.date=data['date']
                 engagement_.num=data['num']
                 engagement_.observation=data['observation']
+                engagement_.credit_alloue=data['credit_alloue']
                 
                 engagement_.save()
                          
@@ -13311,16 +13313,15 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
 
     def get_context_data(self, **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-        #engagement_letter = num2words(engagement_.credit_allouee.amount, lang='fr')
-        #print (engagement_letter)
+        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+        print (engagement_letter)
         
        
 
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
-        #context['engagement_letter'] = engagement_letter
+        context['engagement_letter'] = engagement_letter
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
-
