@@ -340,6 +340,10 @@ urlpatterns = [
     path('articles_list', views.ArticlesListView.as_view(), name='articles_list'),
 
 
+    path('articles_list', views.ArticlesListView.as_view(), name='articles_list'),
+    re_path(r'^article_update/(?P<pk>\d+)/$',views.ArticleUpdateView.as_view(), name='article_update'),
+
+
     path('fournisseurs_list', views.FournisseursListView.as_view(), name='fournisseurs_list'),
     path('fournisseur_create', views.FournisseurCreateView.as_view(), name='fournisseur_create'),
     re_path(r'^fournisseur_update/(?P<pk>\d+)/$',views.FournisseurUpdateView.as_view(), name='fournisseur_update'),

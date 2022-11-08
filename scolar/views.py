@@ -39,8 +39,6 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, EngagementTable, EngagementFilter, \
     ArticleFilter, ArticleTable
 
-
-
     
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -12688,6 +12686,46 @@ class ArticlesListView(TemplateView):
         return context
 
 
+
+##########################################################budget
+class ArticlesListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ArticlesListView, self).get_context_data(**kwargs)
+
+        filter_ = ArticleFilter(self.request.GET, queryset=Article.objects.all())
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = ArticleTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des articles '
+        #if self.request.user.is_staff_only():
+#         context['btn_list'] = {
+#                 'Ajouter chapitre': reverse('chapitre_create')
+#                 
+#             }
+        return context
+    
+class ArticleUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_article'
+    model = Article
+    fields = ['posteriori']
+    template_name = 'scolar/update.html'
+    success_message = "L'article a ete modifie avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        form.helper.add_input(Submit('submit', 'Enregictrer', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('articles_list')
+        return form
+
 class ChapitresListView(TemplateView):
     template_name = 'scolar/filter_list.html'
 
@@ -13105,7 +13143,10 @@ class EngagementListView(TemplateView):
         return context
   
 @login_required
-def engagement_create_view(request):  
+
+def engagement_create_view(request):
+
+
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = EngagementCreateForm(request, request.POST)
@@ -13279,28 +13320,6 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         return context
 
     
-# class Prise_en_chargeS2_PDFView(PDFTemplateView):
-#     template_name = 'scolar/Prise en charge.html'
-#     cmd_options = {
-#         'orientation': 'Landscape',
-#         'page-size': 'A3',
-#     }
-# 
-# 
-#     def get_context_data(self, **kwargs):
-#         credit_S2_ = Credit_S2.objects.get(id=self.kwargs.get('credit_S2_pk'))
-#         credit_S2_letter = num2words(credit_S2_.credit_allouee.amount, lang='fr')
-#         print (credit_S2_letter)
-#         
-#        
-# 
-#         pieces = {}
-#         context = {}
-#         context['credit_S2_'] = credit_S2_
-#         context['credit_S2_letter'] = credit_S2_letter
-#   
-#         self.filename ='credit_S2_'+str(credit_S2_.id) + '.pdf'
-#         return context
 
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):

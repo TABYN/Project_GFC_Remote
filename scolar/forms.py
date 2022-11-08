@@ -1474,6 +1474,7 @@ class EngagementCreateForm(forms.Form):
                 label=u"Année budgetaire",
                 #required = False,
                 #initial=annee_en_cours
+
             )   
             self.fields['credit_alloue'] = forms.ModelChoiceField(
                 queryset=Credit_S2.objects.all(),
@@ -1496,6 +1497,7 @@ class EngagementCreateForm(forms.Form):
 #                 help_text = "Tapez le code de l'article, ou tappez 2 lettres ou plus du libelle de l'article",                                           
 #                 #required = False
 #             ) 
+
             self.fields['type_engagement']=forms.ModelChoiceField(
                 queryset=Type_Engagement_S2.objects.all(),
                 label=u"Nature engagement",
@@ -1533,6 +1535,7 @@ class EngagementUpdateForm(forms.Form):
                 required = False,
                 initial=engagement_.annee_budg
             )  
+
 #             self.fields['chapitre'] = forms.ModelChoiceField(
 #                 queryset=Chapitre.objects.all(),
 #                 label=u"Chapitre",
@@ -1553,6 +1556,7 @@ class EngagementUpdateForm(forms.Form):
 #                 required = False,
 #                 initial=engagement_.article
 #             ) 
+
             self.fields['credit_alloue'] = forms.ModelChoiceField(
                 queryset=Credit_S2.objects.all(),
                 label=u"Article",
@@ -1562,6 +1566,7 @@ class EngagementUpdateForm(forms.Form):
                     ),
                 required = False,
                 initial=engagement_.credit_alloue
+
             )
               
             self.fields['type_engagement']=forms.ModelChoiceField(
@@ -1602,6 +1607,7 @@ class EngagementDetailForm(forms.Form):
                 initial=engagement_.annee_budg
             )   
             
+
 #             self.fields['chapitre']=forms.ModelChoiceField(
 #                 queryset = Chapitre.objects.all(),
 #                 widget=ModelSelect2Widget(
@@ -1631,6 +1637,7 @@ class EngagementDetailForm(forms.Form):
                 initial=engagement_.credit_alloue
             )  
 
+
             self.fields['type_engagement']=forms.ModelChoiceField(
                 queryset=Type_Engagement_S2.objects.all(),
                 label=u"Nature engagement",
@@ -1648,7 +1655,9 @@ class EngagementDetailForm(forms.Form):
             
             for key_ in self.fields.keys():
                 self.fields[key_].disabled=True
-                            
+        
+            self.helper.add_input(Button('cancel', 'Retour', css_class='btn-secondary', onclick="window.history.back()"))
+                    
         except Exception:
             if settings.DEBUG:
                 raise Exception
