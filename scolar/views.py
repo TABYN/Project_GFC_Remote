@@ -104,8 +104,8 @@ from googleapiclient.discovery import build
 from uuid import uuid4
 import pytz
 from builtins import Exception
-
-
+#from django.template.loader import get_template
+#from .utils import render_to_pdf
 
 def exclude_columns(user):
     exclude_ = []
@@ -13291,20 +13291,17 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
-    template_name = 'scolar/Prise en charge.html'
+    provision_template_name= 'scolar/Engagement de la provision.html'
+    prise_en_charge_template_name= 'scolar/Prise en charge.html'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
     }
 
-
-    def get_context_data(self, **kwargs):
+    def get_context_data(self,  **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
         engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
-        print (engagement_letter)
-        
-       
-
+ 
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
@@ -13312,5 +13309,12 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
+    
+    def get_template_names(self):
+        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
 
-       
+        if engagement_.credit_alloue.article.posteriori==False:
+            return [self.prise_en_charge_template_name]
+        else: 
+            return [self.provision_template_name]
+   

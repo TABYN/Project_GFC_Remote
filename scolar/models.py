@@ -2254,6 +2254,12 @@ class Credit_S2(models.Model):
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
     epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
     
+    def credit_article_posteriori(self):       
+        if self.article.posteriori==True :
+            return self.credit_allouee/2
+        else : 
+            return self.credit_allouee
+    
     def __str__(self):
         return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
        

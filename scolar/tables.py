@@ -1097,7 +1097,7 @@ class ChapitreTable(tables.Table):
 class ArticleFilter(django_filters.FilterSet):
     code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
     libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
-    posteriori = django_filters.BooleanFilter(field_name='posteriori')
+    posteriori = django_filters.BooleanFilter(field_name='posteriori', label='Posteriori')
                                                
     class Meta:
         model = Article

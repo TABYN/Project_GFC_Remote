@@ -366,4 +366,5 @@ urlpatterns = [
     re_path(r'^engagement_update/(?P<engagement_pk>\d+)/$', views.engagement_update_view, name='engagement_update'),
     re_path(r'^detail_engagement/(?P<pk>\d+)/$', views.EngagementDetailView.as_view(), name='detail_engagement'),
 
+
     ]
