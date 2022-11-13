@@ -2274,12 +2274,20 @@ class Type_Engagement_S2(models.Model):
 class Engagement(models.Model):
     num = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
-    #chapitre = models.ForeignKey(Chapitre, related_name='chapitre',on_delete= models.SET_NULL, null = True, blank = True)
-    #article = models.ForeignKey(Article,related_name='article' , null= True, blank=True, on_delete=models.SET_NULL)
     type_engagement=models.ForeignKey(Type_Engagement_S2, related_name='type_engagement',on_delete= models.SET_NULL, null = True, blank = True)
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    
+    def nouveau_solde(self): 
+        solde=0      
+        if self.montant_operation :
+            solde=solde+self.credit_alloue.credit_allouee-self.montant_operation
+            return solde
+        if self.nouveau_solde():
+            self.credit_alloue.credit_reste=solde
+   
     
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type_engagement.nature)

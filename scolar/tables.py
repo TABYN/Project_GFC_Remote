@@ -1204,12 +1204,20 @@ class EngagementTable(tables.Table):
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
-    action= '<a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
-    Imprimer=tables.TemplateColumn(action, orderable=False)
-      
+    action= '{% if not record.credit_alloue.article.posteriori %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
+            {% else %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
+            <a href="{% url "Engagement_de_la_provision_PDFView" engagement_pk=record.id %}" > Imprimer engagement provision</a>\
+            {% endif %}\
+            {% if  record.montant_operation %}\
+            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
 
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee','montant_operation', 'nouveau_solde']
         template_name= "django_tables2/bootstrap4.html"
-    
+ 

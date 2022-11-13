@@ -20,6 +20,7 @@ from scolar.admin import settings
 
 
 
+
 class ImportChargeForm(forms.ModelForm):
     
     class Meta:
@@ -1492,8 +1493,10 @@ class EngagementCreateForm(forms.Form):
                         search_fields=['nature__icontains',],
                     ),
                 help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-                #required = False,
-            )    
+                #required = True,
+            )
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, help_text = "Remplir ce champ si c'est une depence ")
+
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
             self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)

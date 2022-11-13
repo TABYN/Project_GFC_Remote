@@ -13093,7 +13093,6 @@ class Type_EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permiss
 
 class EngagementListView(TemplateView):
     template_name = 'scolar/filter_list.html'
-  
     def get_context_data(self, **kwargs):
         context = super(EngagementListView, self).get_context_data(**kwargs)
   
@@ -13102,6 +13101,7 @@ class EngagementListView(TemplateView):
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
         table = EngagementTable(filter_.qs)
+
         RequestConfig(self.request).configure(table)
   
         context['filter'] = filter_
@@ -13135,7 +13135,8 @@ def engagement_create_view(request):
                     date=data['date'],
                     observation=data['observation'],
                     annee_budg=data['annee_budg'],
-                    credit_alloue=data['credit_alloue']
+                    credit_alloue=data['credit_alloue'],
+                    montant_operation=data['montant_operation']
                     )                         
                 
             except Exception:
@@ -13291,8 +13292,8 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
-    provision_template_name= 'scolar/Engagement de la provision.html'
-    prise_en_charge_template_name= 'scolar/Prise en charge.html'
+    #provision_template_name= 'scolar/Engagement de la provision.html'
+    template_name= 'scolar/Prise en charge.html'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
@@ -13310,11 +13311,48 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
     
-    def get_template_names(self):
-        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
+#     def get_template_names(self):
+#         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
+#  
+#         if engagement_.credit_alloue.article.posteriori==True:
+#             return [self.provision_template_name]
+#         else: 
+#            return [self.prise_en_charge_template_name]
+class Engagement_de_la_provision_PDFView(PDFTemplateView):
+    template_name= 'scolar/Engagement de la provision.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
 
-        if engagement_.credit_alloue.article.posteriori==False:
-            return [self.prise_en_charge_template_name]
-        else: 
-            return [self.provision_template_name]
-   
+    def get_context_data(self,  **kwargs):
+        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
+        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['engagement_'] = engagement_
+        context['engagement_letter'] = engagement_letter
+  
+        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        return context
+
+class Depence_PDFView(PDFTemplateView):
+    template_name= 'scolar/Depence.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
+        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['engagement_'] = engagement_
+        context['engagement_letter'] = engagement_letter
+  
+        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        return context
+              
