@@ -1480,7 +1480,7 @@ class EngagementCreateForm(forms.Form):
                 label=u"Credit a Engager",
                 widget=ModelSelect2Widget(
                         model=Credit_S2,
-                        search_fields=['exercice__annee_budg'],
+                        search_fields=['article__code_art__icontains'],
    
                     ),
                 help_text = "Tapez le code de l Exercice pour afficher la liste des chapitre_article a engager , par exemple 2022 ",
