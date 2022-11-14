@@ -1238,3 +1238,34 @@ class EngagementTable(tables.Table):
         fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee']
         template_name= "django_tables2/bootstrap4.html"
     
+class MandatFilter(django_filters.FilterSet):
+    num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero Mandat")
+    fournisseur = django_filters.ModelChoiceFilter(field_name='fournisseur', queryset = Fournisseur.objects.all(), empty_label ="Fournisseur")    
+
+    class Meta:
+        model = Mandat
+        fields = ['num','fournisseur', 'date']
+        
+class MandatTable(tables.Table):#{% url "engagement_update" engagement_pk=record.id %}//{% url "engagement_delete" pk=record.id %}
+                                #{% url "detail_engagement" pk=record.id %}//{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}
+    date = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "mandat_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% load icons %}\
+            <a href=" " > {% icon "eye" %}</a> '
+               
+    detail   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '<a href="" class="btn btn-info" role="button"> Imprimer</a>'
+    Imprimer=tables.TemplateColumn(action, orderable=False)
+      
+
+    class Meta:
+        model= Mandat
+
+ #       fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee']
+        fields =['num', 'date', 'fournisseur__nom_fournisseur', 'engagement__num']
+        template_name= "django_tables2/bootstrap4.html"

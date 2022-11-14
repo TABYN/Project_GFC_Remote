@@ -368,6 +368,8 @@ urlpatterns = [
     re_path(r'^engagement_update/(?P<engagement_pk>\d+)/$', views.engagement_update_view, name='engagement_update'),
     re_path(r'^detail_engagement/(?P<pk>\d+)/$', views.EngagementDetailView.as_view(), name='detail_engagement'),
 
-
+    path('mandat_list', views.MandatListView.as_view(), name='mandat_list'),
+    path('mandat_create', views.mandat_create_view, name='mandat_create'),
+    re_path(r'^mandat_delete/(?P<pk>\d+)/$', views.MandatDeleteView.as_view(), name='mandat_delete'),
        
     ]

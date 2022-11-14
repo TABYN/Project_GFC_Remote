@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, EngagementTable, EngagementFilter, \
-    ArticleFilter, ArticleTable
+    ArticleFilter, ArticleTable, MandatFilter, MandatTable
 
     
 from functools import reduce
@@ -59,7 +59,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    EngagementCreateForm, EngagementUpdateForm, EngagementDetailForm
+    EngagementCreateForm, EngagementUpdateForm, EngagementDetailForm , MandatCreateForm
 
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
@@ -13190,39 +13190,6 @@ def engagement_create_view(request):
 #source type User
 #cible de type User ou Etudiant ou Enseignant ou n'importe quel autre modèle, si le modèle de Cible n'a pas d'attribut User alors la cible sera automatiquement None
 #action de type texte
-def trace_create(source, cible, action):
-    try :
-        if source :
-            source_text_=source.nom()+' '+source.prenom()
-        else :
-            source_text_=""
-        if cible :
-            cible_class=cible.__class__
-            if cible_class.__name__ == "User" :
-                cible_text_=cible.nom()+' '+cible.prenom()
-            else :
-                if hasattr(cible_class, 'user') and cible.user :
-                    cible_text_=cible.user.nom()+' '+cible.user.prenom()
-                    cible=cible.user
-                else :
-                    if cible_class.__name__ == "Etudiant" :
-                        cible_text_=cible.nom+' '+cible.prenom
-                    else :
-                        cible_text_=str(cible)
-                    cible=None
-        else :
-            cible_text_=""
-        trace_= Trace.objects.create(
-            source=source,
-            source_text=source_text_,
-            cible=cible,
-            cible_text=cible_text_,
-            action=str(action),
-                             )
-        return trace_
-        
-    except Exception :
-        return False 
     
 class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
     #permission_required = 'scolar.fonctionnalite_postgraduation_gestionseminaires'
@@ -13323,7 +13290,7 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
-    template_name = 'scolar/Prise en charge.html'
+    template_name = 'scolar/mandat de paiement.html'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
@@ -13344,3 +13311,93 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
+    
+    
+class MandatListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+  
+    def get_context_data(self, **kwargs):
+        context = super(MandatListView, self).get_context_data(**kwargs)
+  
+        filter_ = MandatFilter(self.request.GET, queryset=Mandat.objects.all().order_by('num'))
+  
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = MandatTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+  
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Mandats '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+            'Ajouter nouvelle Mandat': reverse('mandat_create'),
+                  
+            }
+        return context
+    
+    
+@login_required
+
+def mandat_create_view(request):
+
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = MandatCreateForm(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+
+                mandat_=Mandat.objects.create(
+                    #type_engagement=data['type_engagement'],
+                    num=data['num'],
+                    date=data['date'],
+                    #fournisseur=['fournisseur'],
+                    #engagement=['engagement']
+                    #observation=data['observation'],
+                    #annee_budg=data['annee_budg'],
+                    #credit_alloue=data['credit_alloue']
+                    )                         
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la création de Mandat. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('mandat_list'))
+                    
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = MandatCreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle Mandat")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+    
+  
+class MandatDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    #permission_required = 'scolar.fonctionnalite_postgraduation_gestionseminaires'
+    model = Mandat
+    template_name = 'scolar/delete.html'
+    success_message = "La Mandat est bien supprime."
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+
+    def delete(self, *args, **kwargs):
+        object_=self.get_object()
+        trace_create(self.request.user, None, "Suppression Mandat: "+str(object_))
+        return super(MandatDeleteView, self).delete(*args, **kwargs)
+        
+    def get_success_url(self):
+        return reverse('mandat_list')
+    

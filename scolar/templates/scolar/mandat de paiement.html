@@ -1,0 +1,211 @@
+
+<!DOCTYPE HTML>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	  {% load static %}
+	  {% load djmoney %}
+	  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+	   <style>
+table {
+  		page-break-inside:auto;
+ 		font-family: Arial, Helvetica, sans-serif;
+	}
+	th, td {
+	  border: 1px solid black;
+	  border-collapse: collapse;
+	}
+	td {
+		page-break-before:avoid;
+	}
+	tr {
+         page-break-inside:avoid;
+    }
+
+    </style>
+  </head>
+  
+  		  <table style="margin-top: 0; width: 100%;">
+				  <tr>
+				        <td style="margin-top: 0; width: 45%;border:none;" >
+                          <!-- <img src ="{% static 'eng.PNG' %}" alt="entete" width= "700" height="150" > -->
+                          <br><br>
+                          <table width="100%">
+                          <tr >
+                          <td>
+                          <p style="text-align:center;">DETAILS VENTILATION</p>
+                          </td>
+                           <td>
+                            <p style="text-align:center;">Montant</p>
+                          </td>
+                          
+                          </tr>
+                          
+                             <tr >
+                          <td style="border-bottom: none;">
+                          <p>{{engagement_.type_engagement.nature}}</p>
+                          <br>
+                          <p>{{engagement_.observation}}</p>
+                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                        
+                          
+                          </td>
+                           <td style="vertical-align: top;">
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                          </td>
+                          
+                          </tr>
+                          
+                           <tr >
+                          <td   style="border-top: none;">
+                        
+                        
+                          <p style="text-align: right;">TOTAL......... </p>
+                          
+                          </td>
+                           <td style="vertical-align: top;">
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                          </td>
+                          
+                          </tr>
+                          
+                                <tr >
+                          <td   style="border: none;">
+                        
+                        
+                          <p style="text-align: left;">Total en lettres:<br> {{engagement_letter}}  Dinars Algeriens</p>
+     
+                          </td>
+                       
+                          
+                          </tr>
+                          
+                          </table>
+					  </td>
+  
+
+		 <!--  <table style="margin-top: 0; width: 100%;">
+ -->
+						<table style="margin-top: 50px; width: 100%;">  
+						<tr style="height:30px;"> 
+							
+				        	<th colspan="2" style=" width: 80%;height:40;border-top: none;border-left: none;border-bottom: none;text-align:center;">MANDAT DE PAIEMENT</th>
+				        	<td style=" width: 30%;height:25;text-align:left;"><p>PIECE N°:................</p></td> 
+
+						</tr>
+						
+					  <tr style="height:40px;"> 
+							
+				        	<td colspan="2" style=" width: 40%;height:25;border-top: none;border-left: none;vertical-align: bottom;text-align:center;"><br><p>BUDGET-Année  {{engagement_.annee_budg}}</p></td>
+						    <td></td>
+					  </tr>
+						
+						<tr style="height:40px;">
+						<td style="border-right: none;text-align:center;">
+                          <p style="text-align:left;">Service Emetteur</p><br><p style="text-align:LEFT;">N° au registre des O.P:</p>
+                        </td>
+                         
+                        <td colspan="2" style="border-left: none;text-align:center;">
+                            <p style="text-align:LEFT;">Compte Bénéficiaire</p><br><p style="text-align:LEFT;">Libellé du Compte</p>
+                        </td>
+						</tr>
+						
+						
+						<tr style="height:40px;">
+						<td style="border-right: none;text-align:center;">
+                          <p style="text-align:left;">Montant en Lettres</p><br><p style="text-align:LEFT;">5000000</p>
+                        </td>
+                         
+                        <td colspan="2" style="text-align:center;">
+                            <p style="text-align:LEFT;">Date</p><br><p style="text-align:LEFT;">Montant en chiffre 5000000</p>
+                        </td>
+						</tr>
+						
+						<tr>
+						<td>
+                          <p style="text-align:center;">Bénéficiaire</p>
+                          </td>
+                          <td>
+                          <p style="text-align:center;">Objet du paiement</p>
+                          </td>
+                          <td>
+                          <p style="text-align:center;">Observation</p>
+                          </td>
+                         </tr>
+                          
+                       <tr >
+                          <td  style="border-bottom: none;">
+                          <p>{{engagement_.type_engagement.nature}}</p>
+                          <br>
+                          <p>{{engagement_.observation}}</p>
+                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                        
+                          
+                          </td>
+                           <td  style="border-bottom: none;vertical-align: top;">
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                          </td>
+                           <td style="vertical-align: top;border-bottom: none;">
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                          </td>
+						</tr>
+						
+					  <tr >
+                          <td   style="border-top: none;">
+                            <p style="text-align:left;">DOMICILIATION </p>
+                          </td>
+                          <td style="border-top: none;"></td>
+                          <td style="border-top: none;"></td>
+						
+						<tr >
+                          <td colspan="2" style="width: 60%;height:25;">
+                          <p style="text-align:left;">CREDITS ALLOUES:</p>
+                          </td>
+                           <td style="text-align:left;width: 40%;height:25;">
+                            <p>CREDITS DISPONIBLES:</p>
+                          </td>
+                         
+                        </tr>
+                          
+                          <tr>
+						<td>
+                          <p style="text-align:center;">VISA DU SERVICE EMETTEUR</p>
+                          </td>
+                          <td>
+                          <p style="text-align:center;">SIGNATURE DE L'ORDONNATEUR</p>
+                          </td>
+                          <td>
+                          <p style="text-align:center;">SIGNATURE DU COPMTABLE PAYEUR</p>
+                          </td>
+                         </tr>
+                         
+                         <tr>
+                         <td style="height:80;"><br><br><br><br><br><br></td>
+                         <td style="height:80;"><br><br><br><br><br><br></td>
+                         <td style="height:80;"><br><br><br><br><br><br></td>
+                         </tr>
+                         
+                         <tr>
+                         <td colspan="3"><p style="text-align:center;">REFERENCES DU REGLEMENT</p><br><p style="text-align:LEFT;">Chèque CCP N°  :</p>
+                         <br><p style="text-align:LEFT;">Trésore N°  :</p>
+                         <br><p style="text-align:LEFT;">Ordre de virement N°  :</p>
+                         <br><p style="text-align:LEFT;">Date  :</p>
+                         </td>
+						
+                         
+                         </tr>
+				
+						</table>  
+						<br>
+
+				  </tr>
+		  </table>
+
+						
+				  
+		  </table>
+				 
+
+</html>
