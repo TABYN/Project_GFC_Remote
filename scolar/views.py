@@ -12888,10 +12888,9 @@ def CreditCreate_S2(request,exe):
     article = Article.objects.all()
     exercices = Exercice.objects.all()
     pexe = Exercice.objects.get(pk=exe)
-
-   
-    if request.method == 'POST' and 'Enregistrer' in request.POST:
-        credit = Credit_S2(
+    
+    if request.method == 'POST':
+        credit = Credit(
             chapitre_id=request.POST['chapitre'],
             article_id=request.POST['article'],
             credit_allouee=request.POST['credit_allouee'],
@@ -12900,18 +12899,9 @@ def CreditCreate_S2(request,exe):
         credit.save()
         messages.success(request, 'Credit enregistre pour section 2.')
         return redirect(request.path_info)
-    elif request.method == 'POST' and 'Engager' in request.POST:
-        id_list=request.POST.getlist('boxes')
-        list_credits.update(epc=False)
-        for x in id_list : 
-            Credit_S2.objects.filter(pk=int(x)).update(epc=True)
-        print(exercices)
-      
-        
-
-  
-    article = Article.objects.all()
-    crdt = Credit_S2.objects.all()
+    else:
+        article = Article.objects.all()
+        crdt = Credit_S2.objects.all()
     return render(request, 'scolar/add_credit_S2.html', {'article': article, 'crdt': crdt, 'exercices': exercices,'pexe' :pexe})
  
  
@@ -12984,92 +12974,6 @@ def CreditAssociate_S2(request,exe,art):
                 return redirect(request.path_info)
      
     return render(request, 'scolar/ads_credit_S2.html', {'pi': pi,'pexe':pexe})
-
-#===============================================================================
-# 
-# class EngagementListView(TemplateView):
-#     template_name = 'scolar/filter_list.html'
-#  
-#     def get_context_data(self, **kwargs):
-#         context = super(EngagementListView, self).get_context_data(**kwargs)
-#  
-#         filter_ = Engagement_S2Filter(self.request.GET, queryset=Engagement_S2.objects.all().order_by('code'))
-#  
-#         filter_.form.helper = FormHelper()
-#         exclude_columns_ = exclude_columns(self.request.user)
-#         table = Engagement_S2Table(filter_.qs, exclude=exclude_columns_)
-#         RequestConfig(self.request).configure(table)
-#  
-#         context['filter'] = filter_
-#         context['table'] = table
-#         context['titre'] = 'Liste des Natures des engagements '
-#         #=======================================================================
-#         # if self.request.user.is_staff_only():
-#         #     context['btn_list'] = {
-#         #     'Creer Nature eng': reverse('engagement_S2_create'),
-#         #         
-#         #     }
-#         #=======================================================================
-#         context['btn_list'] = {
-#             'Creer Nature eng': reverse('engagement_S2_create'),
-#                  
-#             }
-#         return context
-#  
-#  
-#  
-# class EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
-#     permission_required = 'scolar.add_engagement_S2'
-#     model = Engagement_S2
-#     fields = ['code', 'nature']
-#     template_name = 'scolar/create.html'
-#     success_message = "Nature d'engagement a ete cree avec succes!"
-#  
-#     def get_form(self, form_class=None):
-#         form = super().get_form(form_class)
-#         form.helper = FormHelper()
-# #         form.fields['pays'] = forms.ModelChoiceField(queryset=Pays.objects.all().order_by('nom'), initial='DZ',
-# #                                                      required=True)
-#         form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
-#         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-#         self.success_url = reverse('engagement_S2_list')
-#         return form
-#  
-#     def get_context_data(self, **kwargs):
-#         context = super(EngagementCreateView, self).get_context_data(**kwargs)
-#         titre = 'Creer une nouvelle Nature d''Engagement'
-#         context['titre'] = titre
-#         return context
-#      
-# class EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
-#     permission_required = 'scolar.change_engegement_S2'
-#     model = Engagement_S2
-#     fields = ['code', 'nature']
-#     template_name = 'scolar/update.html'
-#     success_message = "La Nature dengagement a ete modifiee avec succe"
-#  
-#     def get_form(self, form_class=None):
-#         form = super().get_form(form_class)
-#         form.helper = FormHelper()
-#         #form.fields['sigle'].widget.attrs['readonly'] = True
-#         form.fields['code'].required = True
-#         form.fields['nature'].required = True
-#  
-#         form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
-#         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-#         self.success_url = reverse('engegement_S2_list')
-#         return form
-#  
-# class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
-#     model = Engagement_S2
-#     template_name = 'scolar/delete.html'
-#     permission_required = 'scolar.delete_engagement_S2'
-#     success_message = "La nature dengagement a bien ete supprimee"
-#  
-#     def get_success_url(self):
-#         return reverse('engagement_S2_list')
-#===============================================================================
-
 
 
 class Type_EngagementListView(TemplateView):
@@ -13184,17 +13088,16 @@ def engagement_create_view(request):
             try:
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
-                credit_S21=data['credit_S2']
+                
 
                 engagement_=Engagement.objects.create(
-                    credit_S2=data['credit_S2'],
-                    chapitre=credit_S21.chapitre,
-                    article=credit_S21.article,
+                    chapitre=data['chapitre'],
+                    article=data['article'],
                     type_engagement=data['type_engagement'],
                     num=data['num'],
                     date=data['date'],
                     observation=data['observation'],
-                  
+                    annee_budg=data['annee_budg']
                     )                         
                 
             except Exception:
@@ -13323,13 +13226,6 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     def test_func(self): 
         engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))   
         return self.request.user.is_budget()
-#         permission_=False
-#         if self.request.user.has_perm('scolar.fonctionnalitenav_postgraduation_visualisationseminaires') :
-#             permission_ = permission_ | True
-#         if self.request.user.is_etudiant() :
-#             permission_ = permission_ | SeminaireSuivi.objects.filter(id=seminaire_.id, inscriptions__etudiant__in=[self.request.user.etudiant]).exists()
-#             
-#         return permission_
         
     def get_context_data(self, **kwargs):
         context = super(EngagementDetailView, self).get_context_data(**kwargs)
@@ -13354,6 +13250,28 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                   
         return context
     
+# class Prise_en_chargeS2_PDFView(PDFTemplateView):
+#     template_name = 'scolar/Prise en charge.html'
+#     cmd_options = {
+#         'orientation': 'Landscape',
+#         'page-size': 'A3',
+#     }
+# 
+# 
+#     def get_context_data(self, **kwargs):
+#         credit_S2_ = Credit_S2.objects.get(id=self.kwargs.get('credit_S2_pk'))
+#         credit_S2_letter = num2words(credit_S2_.credit_allouee.amount, lang='fr')
+#         print (credit_S2_letter)
+#         
+#        
+# 
+#         pieces = {}
+#         context = {}
+#         context['credit_S2_'] = credit_S2_
+#         context['credit_S2_letter'] = credit_S2_letter
+#   
+#         self.filename ='credit_S2_'+str(credit_S2_.id) + '.pdf'
+#         return context
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
     template_name = 'scolar/Prise en charge.html'
@@ -13364,24 +13282,18 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
 
 
     def get_context_data(self, **kwargs):
-        print('________________________________________')
-        print(self.kwargs.get('engagement_pk'))
-        print('________________________________________')
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-      
-        engagement_letter = num2words(engagement_.credit_S2.credit_allouee.amount, lang='fr')
-    
+        #engagement_letter = num2words(engagement_.credit_allouee.amount, lang='fr')
+        #print (engagement_letter)
+        
        
 
         pieces = {}
         context = {}
-        context['engagement'] = engagement_
-        context['engagement_letter'] = engagement_letter
+        context['engagement_'] = engagement_
+        #context['engagement_letter'] = engagement_letter
   
-        self.filename ='Eng_'+str(engagement_.type_engagement.nature) +'_'+str(engagement_.num) +'.pdf'
+        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
 
-
-
-                                            
-
+       
