@@ -1093,7 +1093,31 @@ class ChapitreTable(tables.Table):
         model =Chapitre
         fields=('code_chap', 'libelle_chap_FR', 'libelle_chap_AR')
         template_name= "django_tables2/bootstrap4.html"   
-        
+
+class ArticleFilter(django_filters.FilterSet):
+    code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
+    libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
+    posteriori = django_filters.BooleanFilter(field_name='posteriori', label='Posteriori')
+                                               
+    class Meta:
+        model = Article
+        fields = ['code_art', 'libelle_art_FR', 'posteriori']
+
+class ArticleTable(tables.Table):
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.chapitre :
+            return str(record.chapitre)
+    
+    action = '{% load icons %}\
+                <a href="{% url "article_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>'          
+    declarer_posteriori= tables.TemplateColumn(action, orderable=False)
+    class Meta:
+        model =Article
+        fields=('chapitre','code_art', 'libelle_art_FR', 'libelle_art_AR', 'posteriori')
+        template_name= "django_tables2/bootstrap4.html"   
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
+                                        else "background-color: #66ff33;"}        
 
 class FournisseurFilter(django_filters.FilterSet):
     code_fournisseur = django_filters.CharFilter(field_name='code_fournisseur', lookup_expr='icontains', label='Code fournisseur')
@@ -1161,35 +1185,39 @@ class Type_Engagement_S2Filter(django_filters.FilterSet):
 
 class EngagementFilter(django_filters.FilterSet):
     num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero d'engagement")
-   
+    type_engagement = django_filters.ModelChoiceFilter(field_name='type_engagement', queryset = Type_Engagement_S2.objects.all(), empty_label ="Type d'engagement")    
+
     class Meta:
         model = Engagement
-        fields = ['num']
+        fields = ['num','type_engagement']
         
 class EngagementTable(tables.Table):
-    #credit_alloue__credit_allouee = tables.Column(verbose_name="credit_allouee")
-    credit_alloue=tables.Column(empty_values=(), orderable=False)
-    
+
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "engagement_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
             <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
+    
     action= '{% load icons %}\
             <a href=" {% url "detail_engagement" pk=record.id %}" > {% icon "eye" %}</a> '
                
     detail   = tables.TemplateColumn(action, orderable=False)
-    action= '<a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
-    Imprimer=tables.TemplateColumn(action, orderable=False)
-      
-#     def render_credit_alloue(self,value,record):
-#         if record.credit_alloue :
-#             if record.credit_alloue.article:
-#                 return str(record.credit_alloue.article)
-#         else :
-#             return '/' 
+    
+    action= '{% if not record.credit_alloue.article.posteriori %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
+            {% else %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
+            <a href="{% url "Engagement_de_la_provision_PDFView" engagement_pk=record.id %}" > Imprimer engagement provision</a>\
+            {% endif %}\
+            {% if  record.montant_operation %}\
+            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
+
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num', 'chapitre','article','type_engagement__nature','date']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee','montant_operation', 'nouveau_solde']
         template_name= "django_tables2/bootstrap4.html"
-    
+ 

@@ -2102,7 +2102,8 @@ class Article(models.Model):
         chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE, default='', related_name="articles")
         libelle_art_FR = models.CharField(max_length=100)
         libelle_art_AR = models.CharField(max_length=100, null=True, blank=True)
-        
+        posteriori=models.BooleanField(default='False', blank=True)
+
         def __str__(self):
             return self.code_art+' '+ self.libelle_art_FR 
        
@@ -2247,13 +2248,23 @@ class Banque(models.Model):
     
 class Credit_S2(models.Model):
     exercice = models.ForeignKey(Exercice, on_delete=CASCADE,default='' )
-    article = models.ForeignKey(Article, on_delete=CASCADE)
+    article = models.ForeignKey(Article,related_name='article_credit' , on_delete=CASCADE)
     chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
     credit_allouee = MoneyField(decimal_places=2, max_digits=9)
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
     epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
-
+    
+    def credit_article_posteriori(self):       
+        if self.article.posteriori==True :
+            return self.credit_allouee/2
+        else : 
+            return self.credit_allouee
+    
+    def __str__(self):
+        return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
+       
      
+    
 class Type_Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
     nature = models.CharField(max_length=150)
@@ -2263,15 +2274,26 @@ class Type_Engagement_S2(models.Model):
 class Engagement(models.Model):
     num = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
-    chapitre = models.ForeignKey(Chapitre, related_name='chapitre',on_delete= models.SET_NULL, null = True, blank = True)
-    article = models.ForeignKey(Article,related_name='article' , null= True, blank=True, on_delete=models.SET_NULL)
     type_engagement=models.ForeignKey(Type_Engagement_S2, related_name='type_engagement',on_delete= models.SET_NULL, null = True, blank = True)
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    
+    def nouveau_solde(self): 
+        solde=0      
+        if self.montant_operation :
+            solde=solde+self.credit_alloue.credit_allouee-self.montant_operation
+            return solde
+        if self.nouveau_solde():
+            self.credit_alloue.credit_reste=solde
+   
     
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type_engagement.nature)
 
 
 
+
+    
+ 
