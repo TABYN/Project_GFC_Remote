@@ -2270,11 +2270,16 @@ class Type_Engagement_S2(models.Model):
     nature = models.CharField(max_length=150)
     def __str__(self):
         return  self.code + ' : ' + self.nature
- 
+
+
+TYPE=(
+    ('01','Prise en charge'),
+    ('02','Depence')
+    ) 
 class Engagement(models.Model):
     num = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
-    type_engagement=models.ForeignKey(Type_Engagement_S2, related_name='type_engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    type = models.CharField(max_length = 2, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
@@ -2285,12 +2290,23 @@ class Engagement(models.Model):
         if self.montant_operation :
             solde=solde+self.credit_alloue.credit_allouee-self.montant_operation
             return solde
-        if self.nouveau_solde():
-            self.credit_alloue.credit_reste=solde
-   
+#         if self.nouveau_solde():
+#             self.credit_alloue.credit_reste=solde
+    def nouveau_solde_s1(self): 
+        solde_s1=self.credit_alloue.credit_allouee/2
+        if self.montant_operation :
+            solde_s1=solde_s1-self.montant_operation
+            return solde_s1
+        
+    def nouveau_solde_s2(self):  
+        solde_s2=self.credit_alloue.credit_allouee/2
+        if self.nouveau_solde_s1() :
+            solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+             
     
     def __str__(self):
-        return "Engagement "+ str(self.num)+' '+str(self.type_engagement.nature)
+        return "Engagement "+ str(self.num)
 
 
 

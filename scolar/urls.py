@@ -359,15 +359,22 @@ urlpatterns = [
     re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.Type_EngagementUpdateView.as_view(), name='engagement_S2_update'),
     re_path(r'^engagement_S2_delete/(?P<pk>[ -_&@\w]+)/$', views.Type_EngagementDeleteView.as_view(), name='engagement_S2_delete'),
     
-    path('engagement_list', views.EngagementListView.as_view(), name='engagement_list'),
-    path('engagement_create', views.engagement_create_view, name='engagement_create'),
+    path('Prise_en_charge_list', views.Prise_en_charge_ListView.as_view(), name='Prise_en_charge_list'),
+    path('prise_en_charge_create', views.prise_en_charge_create_view, name='prise_en_charge_create'),
     re_path(r'^engagement_delete/(?P<pk>\d+)/$', views.EngagementDeleteView.as_view(), name='engagement_delete'),
-    re_path(r'^engagement_update/(?P<engagement_pk>\d+)/$', views.engagement_update_view, name='engagement_update'),
-    re_path(r'^detail_engagement/(?P<pk>\d+)/$', views.EngagementDetailView.as_view(), name='detail_engagement'),
+    re_path(r'^prise_en_charge_update/(?P<engagement_pk>\d+)/$', views.prise_en_charge_update_view, name='prise_en_charge_update'),
+    re_path(r'^detail_prise_en_charge/(?P<pk>\d+)/$', views.Prise_en_chargeDetailView.as_view(), name='detail_prise_en_charge'),
 
+    path('Depence_List', views.Depence_ListView.as_view(), name='Depence_List'),
+    path('depence_create', views.depence_create_view, name='depence_create'),
+    re_path(r'^depence_update/(?P<engagement_pk>\d+)/$', views.depence_update_view, name='depence_update'),
+    re_path(r'^detail_depence/(?P<pk>\d+)/$', views.Depence_DetailView.as_view(), name='detail_depence'),
+
+    
     path('Prise_en_chargeS2_PDFView/<engagement_pk>/', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),
     path('Engagement_de_la_provision_PDFView/<engagement_pk>/', views.Engagement_de_la_provision_PDFView.as_view(), name='Engagement_de_la_provision_PDFView'),
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
+    path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
 
 
     ]
