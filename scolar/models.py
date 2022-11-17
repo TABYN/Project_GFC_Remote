@@ -2093,6 +2093,7 @@ class Chapitre(models.Model):
         code_chap = models.CharField(max_length=10)
         libelle_chap_FR = models.CharField(max_length=100)
         libelle_chap_AR = models.CharField(max_length=100, null=True, blank=True)
+        
         def __str__(self):
             return self.code_chap+' '+ self.libelle_chap_FR 
 
@@ -2103,9 +2104,9 @@ class Article(models.Model):
         libelle_art_AR = models.CharField(max_length=100, null=True, blank=True)
         posteriori=models.BooleanField(default='False', blank=True)
 
-
         def __str__(self):
-            return self.code_art+' '+ self.libelle_art_FR        
+            return self.code_art+' '+ self.libelle_art_FR 
+       
 
 class Exercice(models.Model):
     '''
@@ -2114,6 +2115,8 @@ class Exercice(models.Model):
     annee_budg=models.CharField(max_length=4, unique=True)
     debut=models.DateField()
     fin=models.DateField()
+    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
     
     def __str__(self):
         return self.annee_budg
@@ -2222,9 +2225,6 @@ class Immobilier(models.Model):
            return a
        
        #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################
-       
-        
-#############################################Section 2#####################
 
 class Fournisseur(models.Model):
         code_fournisseur = models.CharField(max_length=10, null=True)
@@ -2237,7 +2237,6 @@ class Fournisseur(models.Model):
         def __str__(self):
             return self.code_fournisseur+' '+ self.nom_fournisseur       
 
-
 class Banque(models.Model):
     code = models.CharField(max_length=3)
     abreviation = models.CharField(max_length=20)
@@ -2246,8 +2245,7 @@ class Banque(models.Model):
         
     def __str__(self):
         return  self.nom + ' : ' + self.abreviation
-
-
+    
 class Credit_S2(models.Model):
     exercice = models.ForeignKey(Exercice, on_delete=CASCADE,default='' )
     article = models.ForeignKey(Article,related_name='article_credit' , on_delete=CASCADE)
@@ -2256,10 +2254,15 @@ class Credit_S2(models.Model):
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
     epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
     
+    def credit_article_posteriori(self):       
+        if self.article.posteriori==True :
+            return self.credit_allouee/2
+        else : 
+            return self.credit_allouee
+    
     def __str__(self):
         return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
        
-
      
     
 class Type_Engagement_S2(models.Model):
@@ -2267,33 +2270,44 @@ class Type_Engagement_S2(models.Model):
     nature = models.CharField(max_length=150)
     def __str__(self):
         return  self.code + ' : ' + self.nature
- 
+
+
+TYPE=(
+    ('01','Prise en charge'),
+    ('02','Depence')
+    ) 
 class Engagement(models.Model):
     num = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
-    #chapitre = models.ForeignKey(Chapitre, related_name='chapitre',on_delete= models.SET_NULL, null = True, blank = True)
-    #article = models.ForeignKey(Article,related_name='article' , null= True, blank=True, on_delete=models.SET_NULL)
-    type_engagement=models.ForeignKey(Type_Engagement_S2, related_name='type_engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    type = models.CharField(max_length = 2, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    
+    def nouveau_solde(self): 
+        solde=0      
+        if self.montant_operation :
+            solde=solde+self.credit_alloue.credit_allouee-self.montant_operation
+            return solde
+#         if self.nouveau_solde():
+#             self.credit_alloue.credit_reste=solde
+    def nouveau_solde_s1(self): 
+        solde_s1=self.credit_alloue.credit_allouee/2
+        if self.montant_operation :
+            solde_s1=solde_s1-self.montant_operation
+            return solde_s1
+        
+    def nouveau_solde_s2(self):  
+        solde_s2=self.credit_alloue.credit_allouee/2
+        if self.nouveau_solde_s1() :
+            solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+             
     
     def __str__(self):
-        return "Engagement "+ str(self.num)+' '+str(self.type_engagement.nature)
-    
-    
-class Mandat(models.Model):
-    num = models.IntegerField(null = True)
-    date=models.DateField(null=True, blank=True)
-    #annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
-    #observation = models.CharField(max_length=300, default='')
-    fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
-    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+        return "Engagement "+ str(self.num)
 
-    def __str__(self):
-        return "Mandat "+ str(self.num)+' '+str(self.fournisseur.nom_fournisseur)
-   
-    
 
 
 

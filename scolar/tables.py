@@ -1072,8 +1072,8 @@ class SeanceTable(tables.Table):
         model=Seance
         template_name="django_tables2/bootstrap4.html"
         
-########################################section 2
 
+################################################budget
 class ChapitreFilter(django_filters.FilterSet):
     code_chap = django_filters.CharFilter(field_name='code_chap', lookup_expr='icontains', label='Code chapitre')
     libelle_chap_FR = django_filters.CharFilter(field_name='libelle_chap_FR', lookup_expr='icontains', label='Libelle chapitre')
@@ -1097,7 +1097,7 @@ class ChapitreTable(tables.Table):
 class ArticleFilter(django_filters.FilterSet):
     code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
     libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
-    posteriori = django_filters.BooleanFilter(field_name='posteriori')
+    posteriori = django_filters.BooleanFilter(field_name='posteriori', label='Posteriori')
                                                
     class Meta:
         model = Article
@@ -1119,28 +1119,6 @@ class ArticleTable(tables.Table):
         row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
                                         else "background-color: #66ff33;"}        
 
-class ArticleFilter(django_filters.FilterSet):
-    code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
-    libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
-
-    class Meta:
-        model = Article
-        fields = ['code_art', 'libelle_art_FR']
-
-class ArticleTable(tables.Table):
-    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
-    def render_chapitre(self,value,record):
-        if record.chapitre :
-            return str(record.chapitre)
-
-
-    class Meta:
-        model =Article
-        fields=('chapitre','code_art', 'libelle_art_FR', 'libelle_art_AR')
-        template_name= "django_tables2/bootstrap4.html"   
-
-
-
 class FournisseurFilter(django_filters.FilterSet):
     code_fournisseur = django_filters.CharFilter(field_name='code_fournisseur', lookup_expr='icontains', label='Code fournisseur')
     nom_fournisseur = django_filters.CharFilter(field_name='nom_fournisseur', lookup_expr='icontains', label='Nom de fournisseur')
@@ -1160,7 +1138,6 @@ class FournisseurTable(tables.Table):
         fields=('code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur')
         template_name= "django_tables2/bootstrap4.html"        
                     
-
 
 class BanqueTable(tables.Table):
     action='{% load icons %}\
@@ -1185,7 +1162,6 @@ class BanqueFilter(django_filters.FilterSet):
         fields = ['code', 'nom', 'abreviation']
         
 
-
 class Type_Engagement_S2Table(tables.Table):
     action='{% load icons %}\
             <a href="{% url "engagement_S2_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
@@ -1209,63 +1185,60 @@ class Type_Engagement_S2Filter(django_filters.FilterSet):
 
 class EngagementFilter(django_filters.FilterSet):
     num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero d'engagement")
-    type_engagement = django_filters.ModelChoiceFilter(field_name='type_engagement', queryset = Type_Engagement_S2.objects.all(), empty_label ="Type d'engagement")    
 
     class Meta:
         model = Engagement
-        fields = ['num','type_engagement']
+        fields = ['num']
         
-class EngagementTable(tables.Table):
+class Prise_en_chargeTable(tables.Table):
 
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
-            <a href="{% url "engagement_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "prise_en_charge_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
             <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
-            <a href=" {% url "detail_engagement" pk=record.id %}" > {% icon "eye" %}</a> '
+            <a href=" {% url "detail_prise_en_charge" pk=record.id %}" > {% icon "eye" %}</a> '
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
-    action= '<a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
-    Imprimer=tables.TemplateColumn(action, orderable=False)
-      
+    action= '{% if not record.credit_alloue.article.posteriori %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
+            {% else %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge<br></a>\
+            <a href="{% url "Engagement_de_la_provision_PDFView" engagement_pk=record.id %}" > Imprimer engagement provision</a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
 
     class Meta:
         model= Engagement
-
-        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date']
         template_name= "django_tables2/bootstrap4.html"
-    
-class MandatFilter(django_filters.FilterSet):
-    num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero Mandat")
-    fournisseur = django_filters.ModelChoiceFilter(field_name='fournisseur', queryset = Fournisseur.objects.all(), empty_label ="Fournisseur")    
+ 
+class DepenceTable(tables.Table):
 
-    class Meta:
-        model = Mandat
-        fields = ['num','fournisseur', 'date']
-        
-class MandatTable(tables.Table):#{% url "engagement_update" engagement_pk=record.id %}//{% url "engagement_delete" pk=record.id %}
-                                #{% url "detail_engagement" pk=record.id %}//{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
-            <a href="" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "mandat_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
-            <a href=" " > {% icon "eye" %}</a> '
+            <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> '
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
-    action= '<a href="" class="btn btn-info" role="button"> Imprimer</a>'
-    Imprimer=tables.TemplateColumn(action, orderable=False)
-      
+    action= '{% if  not record.credit_alloue.article.posteriori %}\
+            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
+            {% else %}\
+            <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id %}" > Imprimer fiche de regularisation de la provision</a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
 
     class Meta:
-        model= Mandat
-
- #       fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee']
-        fields =['num', 'date', 'fournisseur__nom_fournisseur', 'engagement__num']
+        model= Engagement
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation']
         template_name= "django_tables2/bootstrap4.html"

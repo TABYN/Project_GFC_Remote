@@ -62,7 +62,7 @@
 				  </div>	
 				</li>
 					<li class="list-group-item">
-				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'briefcase' %} Allocation des crédits</a>
+				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'briefcase' %} Allocation des credits</a>
 				  		<div class="dropdown-menu">		  
 	{% for exercice in user.exercice_list %}
 				  	 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">Exercice {{exercice.annee_budg}}</a></br>
@@ -110,7 +110,7 @@
 				
 				
 						<li class="list-group-item">
-				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'comment-dollar' %} Situation dépences</a>
+				  	<a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'comment-dollar' %} Situation depences</a>
 				  		<div class="dropdown-menu">		  
 	{% for exercice in user.exercice_list %}
 				  	 		<a class="dropdown-item"    href="{% url 'LitImput_for_exercice' exercice.id %}">Exercice {{exercice.annee_budg}}</a></br>
@@ -149,20 +149,6 @@
    			</ul>
 		{% endif %}
 		
-		
-<!-- 				{% if request.user|has_group:"budget" %}
-			<ul class="nav list-group">
-				<li>
-				<strong>Banques et Fournisseurs</strong>
-				
-				  <a class="list-group-item"  href="banque_list">{% icon 'tasks' %} Banques</a>
-				  <a class="list-group-item"  href="#">{% icon 'tasks' %} Fournisseurs</a>
-				</li>
-   			</ul>
-		{% endif %}
-		
- -->	
-
 		{% if request.user|has_group:"budget" %}
 			<ul class="nav list-group">
 			<li>
@@ -180,16 +166,15 @@
 			<li class="list-group-item">
 				  <a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'tasks' %} Engagement</a>
 				  <div class="dropdown-menu">	
-
 				    <a class="dropdown-item" href="{% url 'engagement_S2_list' %}">{% icon 'book' %} Liste Natures Engagements</a>		  
-				 	<a class="dropdown-item" href="{% url 'engagement_list' %}">{% icon 'book' %} Liste des engagements</a>		  
-
+				 	<a class="dropdown-item" href="{% url 'Prise_en_charge_list' %}">{% icon 'book' %} Liste des Prises en charge</a>		  
+				 	<a class="dropdown-item" href="{% url 'Depence_List' %}">{% icon 'book' %} Liste des Depences</a>		  
 				 
 				  </div>	
 				</li>
 			 
 			 <li>
-			 <a  class="list-group-item" href="{% url 'mandat_list' %}">{% icon 'tasks' %} Mandat</a>
+			 <a  class="list-group-item" href="">{% icon 'tasks' %} Mondat</a>
 			</li>    
 			<li>
 			 <a  class="list-group-item" href="">{% icon 'tasks' %} Transfert</a>
@@ -209,7 +194,7 @@
 				<strong>Repartition des credits</strong>
 				
 					{% for exercice in user.exercice_list %}
-		 	  				<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
+		 	  				<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  ">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
 				
 		        	{% endfor %}	
 				
@@ -221,8 +206,10 @@
 			    </ul>
 			{% endif %}
 		
-
-
+		
+		
+	
+	
 	{% else %}
 		<ul class="nav list-group">
 			<li>
@@ -239,9 +226,7 @@
 {% block content %}
 	<div align="center">
 		<h3></h3>
-		<img src="{{ institution.illustration_cursus.url }}" alt="Les achats à l'ESI" width="60%" >
+		<img src="{{ institution.illustration_cursus.url }}" alt="Les achats a l'ESI" width="60%" >
 	</div>
 
 {% endblock %}
-
-
