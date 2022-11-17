@@ -13194,7 +13194,6 @@ def trace_create(source, cible, action):
         return False 
     
 class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
-    #permission_required = 'scolar.fonctionnalite_postgraduation_gestionseminaires'
     model = Engagement
     template_name = 'scolar/delete.html'
     success_message = "Engagement a bien supprime."
@@ -13209,6 +13208,7 @@ class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
         
     def get_success_url(self):
         return reverse('Prise_en_charge_list')
+
     
 @login_required
 def prise_en_charge_update_view(request, engagement_pk):
