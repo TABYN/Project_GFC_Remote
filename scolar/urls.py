@@ -379,8 +379,8 @@ urlpatterns = [
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
 
 
-    path('mandat_list', views.MandatListView.as_view(), name='mandat_list'),
-    path('mandat_create', views.mandat_create_view, name='mandat_create'),
-    re_path(r'^mandat_delete/(?P<pk>\d+)/$', views.MandatDeleteView.as_view(), name='mandat_delete'),
-       
+#     path('mandat_list', views.MandatListView.as_view(), name='mandat_list'),
+#     path('mandat_create', views.mandat_create_view, name='mandat_create'),
+#     re_path(r'^mandat_delete/(?P<pk>\d+)/$', views.MandatDeleteView.as_view(), name='mandat_delete'),
+#        
     ]
