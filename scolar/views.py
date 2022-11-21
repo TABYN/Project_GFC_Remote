@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable
+    DepenceTable, ArticleFilter, ArticleTable, MandatFilter, MandatTable
 
     
 
@@ -60,7 +60,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -13518,4 +13518,96 @@ class Regularisation_provision_PDFView(PDFTemplateView):
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
+
+
+
+
+
+class MandatListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+  
+    def get_context_data(self, **kwargs):
+        context = super(MandatListView, self).get_context_data(**kwargs)
+  
+        filter_ = MandatFilter(self.request.GET, queryset=Mandat.objects.all().order_by('num_mandat'))
+  
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = MandatTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+  
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Mandats '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+            'Ajouter nouvelle Mandat': reverse('mandat_create'),
+                  
+            }
+        return context
+    
+    
+@login_required
+
+def mandat_create_view(request):
+
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = MandatCreateForm(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+
+                mandat_=Mandat.objects.create(
+                    #type_engagement=data['type_engagement'],
+                    num_mandat=data['num_mandat'],
+                    date=data['date'],
+                    fournisseur=data['fournisseur'],
+                    engagement=data['engagement']
+                    #observation=data['observation'],
+                    #annee_budg=data['annee_budg'],
+                    #credit_alloue=data['credit_alloue']
+                    )                         
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la création de Mandat. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('mandat_list'))
+                    
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = MandatCreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle Mandat")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+    
+  
+class MandatDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    #permission_required = 'scolar.fonctionnalite_postgraduation_gestionseminaires'
+    model = Mandat
+    template_name = 'scolar/delete.html'
+    success_message = "La Mandat est bien supprime."
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+
+    def delete(self, *args, **kwargs):
+        object_=self.get_object()
+        trace_create(self.request.user, None, "Suppression Mandat: "+str(object_))
+        return super(MandatDeleteView, self).delete(*args, **kwargs)
+        
+    def get_success_url(self):
+        return reverse('mandat_list')
                        

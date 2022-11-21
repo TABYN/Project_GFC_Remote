@@ -2310,6 +2310,16 @@ class Engagement(models.Model):
 
 
 
+class Mandat(models.Model):
+    num_mandat = models.IntegerField(null = True)
+    date=models.DateField(null=True, blank=True)
+    #annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
+    #observation = models.CharField(max_length=300, default='')
+    fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
+    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+
+    def __str__(self):
+        return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 
     
  

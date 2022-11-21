@@ -1789,4 +1789,53 @@ class Depence_DetailForm(forms.Form):
                 raise Exception
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation d'engagement")
+
+
+
+
+class MandatCreateForm(forms.Form):
+    
+    def __init__(self, request, *args, **kwargs):
+        super(MandatCreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+#             annee_en_cours_qs=AnneeUniv.objects.filter(encours=True)
+#             annee_en_cours=None
+#             if annee_en_cours_qs.exists() :
+#                 annee_en_cours=annee_en_cours_qs.first()
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
+                #required = False,
+            )    
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.all(),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
+                #required = False,
+            )    
+
+
+            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            self.fields['num_mandat'] = forms.IntegerField(initial=0, label='Numero Mandat')
+           # self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
+
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de Mandat. Merci de le signaler à l'administrateur")    
+  
               
