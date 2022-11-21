@@ -37,9 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable
-
-    
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -12921,7 +12919,23 @@ class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
 
     def get_success_url(self):
         return reverse('banque_list')
+
+class ExerciceListView(LoginRequiredMixin, TemplateView):
+    template_name='scolar/list.html'
     
+    def get_queryset(self,**kwargs):
+        return Exercice.objects.all().order_by('annee_budg')
+    
+    def get_context_data(self, **kwargs):
+        context = super(ExerciceListView, self).get_context_data(**kwargs)
+        exclude_=[]
+        table = ExerciceTable(self.get_queryset(**kwargs), exclude=exclude_)
+        RequestConfig(self.request).configure(table)
+        context['titre'] = 'Liste des exercices budgetire'
+        context['table'] = table
+        context['back'] = reverse('home')
+        return context
+        
 @login_required
 def CreditCreate_S2(request,exe):
     article = Article.objects.all()
@@ -13518,4 +13532,4 @@ class Regularisation_provision_PDFView(PDFTemplateView):
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
-                       
+ 

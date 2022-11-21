@@ -352,8 +352,10 @@ urlpatterns = [
     re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
     re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
     
+    path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'),    
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
+    
     path('engagement_S2_list', views.Type_EngagementListView.as_view(), name='engagement_S2_list'),
     path('engagement_S2_create', views.Type_EngagementCreateView.as_view(), name='engagement_S2_create'),
     re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.Type_EngagementUpdateView.as_view(), name='engagement_S2_update'),
@@ -375,6 +377,7 @@ urlpatterns = [
     path('Engagement_de_la_provision_PDFView/<engagement_pk>/', views.Engagement_de_la_provision_PDFView.as_view(), name='Engagement_de_la_provision_PDFView'),
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
+
 
 
     ]

@@ -185,25 +185,22 @@
 			<li>
 			 <a  class="list-group-item" href="{% url 'fournisseurs_list' %}">{% icon 'tasks' %} Liste benificiares</a>
 			</li>  
-			                <li>
+			<li>
 			 <a  class="list-group-item" href="{% url 'banque_list' %}">{% icon 'tasks' %} Liste banques</a>
 			</li>    
 			<li>
-			
+			<strong>Repartition des credits</strong>
+			</li>
 			<li>
-				<strong>Repartition des credits</strong>
-				
-					{% for exercice in user.exercice_list %}
-		 	  				<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  ">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
-				
-		        	{% endfor %}	
-				
-				  
-				</li>  
+			 <a  class="list-group-item" href="{% url 'exercice_list' %}">{% icon 'tasks' %} Liste exercices</a>
+			</li>  
+			<!-- <li>
+			{% for exercice in user.exercice_list %}
+		 	  	<a class="list-group-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  ">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
+	        {% endfor %}					  
+			</li>   -->
 			 
-			
-			
-			    </ul>
+			</ul>
 			{% endif %}
 		
 		

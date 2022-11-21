@@ -82,7 +82,7 @@ class User(AbstractUser):
             return Inscription.objects.none()
         
     def exercice_list(self):
-        if self.is_regisseur() or self.is_top_management():
+        if self.is_regisseur() or self.is_top_management() or self.is_budget():
             return Exercice.objects.all()
         else:
             return Exercice.objects.none()

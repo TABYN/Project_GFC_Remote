@@ -1242,3 +1242,13 @@ class DepenceTable(tables.Table):
         model= Engagement
         fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation']
         template_name= "django_tables2/bootstrap4.html"
+
+class ExerciceTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "CreditCreate_S2"  exe=record.id %}" class="btn btn-link"> Exercices </a>'
+    detail=tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model = Exercice
+        fields=['annee_budg']
+        template_name= "django_tables2/bootstrap4.html"
