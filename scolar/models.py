@@ -154,9 +154,7 @@ class User(AbstractUser):
         else:
             return self.is_direction()
         
-    def is_budget(self):
-        group_budget=get_object_or_404(Group, name='budget')
-        return group_budget in self.groups.all()
+
         
     
     def is_staff_only(self):

@@ -96,10 +96,11 @@ table {
 									<a style="padding-left:30px;" href="{% url 'CreditAssociate_S2'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-file-alt fa-lg"></i> </a>
 									{% for crd in crdt  %}
 									{% if crd.article == art and crd.exercie_id == pexe.id %}
-									<a style="padding-left:30px;" href="{% url 'CreditDelete'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-trash-alt fa-lg "></i> </a> 
-									
 									{% endif %}
 									{% endfor %}
+									<a style="padding-left:30px;" href="{% url 'CreditDelete'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-trash-alt fa-lg "></i> </a> 
+									
+									
 									
 								</td>
 					     

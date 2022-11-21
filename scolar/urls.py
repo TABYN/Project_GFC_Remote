@@ -306,7 +306,7 @@ urlpatterns = [
     path('CreditCreate/<int:avc>/',views.CreditCreate, name="CreditCreate"),
     path('CreditAssociate/<int:avc>/<int:art>/', views.CreditAssociate, name="CreditAssociate"),
     path('CreditDelete/<int:avc>/<int:art>/',views.CreditDelete, name="CreditDelete"),
-   
+
     path('aa_avance_PDFView/<avance_pk>/', views.aa_avance_PDFView.as_view(), name='aa_avance_PDFView'),
     path('BordereauCreate/<int:crdt>/', views.BordereauCreate, name="BordereauCreate"),
     path('LitImput/<int:avc>/', views.LitImput, name='LitImput'),

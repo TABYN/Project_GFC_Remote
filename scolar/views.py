@@ -12863,7 +12863,6 @@ class BanqueListView(TemplateView):
             }
         return context
 
-
 class BanqueCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_banque'
     model = Banque
@@ -12887,7 +12886,6 @@ class BanqueCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
         context['titre'] = titre
         return context
 
-
 class BanqueUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'scolar.change_banque'
     model = Banque
@@ -12910,7 +12908,6 @@ class BanqueUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
         self.success_url = reverse('banque_list')
         return form
 
-
 class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
     model = Banque
     template_name = 'scolar/delete.html'
@@ -12931,7 +12928,7 @@ class ExerciceListView(LoginRequiredMixin, TemplateView):
         exclude_=[]
         table = ExerciceTable(self.get_queryset(**kwargs), exclude=exclude_)
         RequestConfig(self.request).configure(table)
-        context['titre'] = 'Liste des exercices budgetire'
+        context['titre'] = 'Liste des exercices budgetaires'
         context['table'] = table
         context['back'] = reverse('home')
         return context
