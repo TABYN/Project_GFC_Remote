@@ -13610,4 +13610,25 @@ class MandatDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMi
         
     def get_success_url(self):
         return reverse('mandat_list')
+    
+    
+class Mandat_PDFView(PDFTemplateView):
+    template_name= 'scolar/mandat de paiement.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        mandat_ = Mandat.objects.get(id=self.kwargs.get('mandat_pk'))
+        mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['mandat_'] = mandat_
+        context['mandat_letter'] = mandat_letter
+  
+        self.filename ='mandat_'+str(mandat_.id) + '.pdf'
+        return context
+    
                        

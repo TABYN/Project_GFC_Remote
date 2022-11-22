@@ -1265,7 +1265,7 @@ class MandatTable(tables.Table):#{% url "engagement_update" engagement_pk=record
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
-    action= '<a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
+    action= '<a href="{% url "Mandat_PDFView" mandat_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
     Imprimer=tables.TemplateColumn(action, orderable=False)
       
 
