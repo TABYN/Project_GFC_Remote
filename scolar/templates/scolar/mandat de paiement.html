@@ -31,7 +31,7 @@ table {
 				  <tr>
 				        <td style="margin-top: 0; width: 45%;border:none;" >
                           <!-- <img src ="{% static 'eng.PNG' %}" alt="entete" width= "700" height="150" > -->
-                         <!--  <br><br> -->
+                          <!-- <br><br> -->
                           <table width="100%">
                           <tr >
                           <td>
@@ -70,25 +70,14 @@ table {
                           </td>
                           
                           </tr>
-                          
-                                <tr >
-                          <td   style="border: none;">
-                        
-                        
-                          <p style="text-align: left;">Total en lettres:<br> {{mandat_letter}}  Dinars Algeriens</p>
-     
-                          </td>
-                       
-                          
-                          </tr>
-                          
-                          </table>
+                        </table>
 					  </td>
 			  <td style="margin-top: 0; width: 5%;vertical-align: top;border:none;" >  </td>
 					  <td style="margin-top: 0; width: 45%;height:5;vertical-align: top;border:none;" >
-						 <!--  <img src ="{% static 'entete1.png' %}" alt="entete" width= "700" height="150" > -->
+						  <img src ="{% static 'entete doc budget.png' %}" alt="entete" width= "700" height="150" >
+						  <P>SECTION 02</P>
 						<table style="margin-top: 50px; width: 100%;">
-												<!-- <table style="margin-top: 50px; width: 75%;"> -->
+												
 						<tr style="height:30px;"> 
 							
 				        	<th colspan="2" style=" width: 80%;height:40;border-top: none;border-left: none;border-bottom: none;border-right: none;text-align:center;">MANDAT DE PAIEMENT</th>
@@ -98,28 +87,28 @@ table {
 						
 					  <tr style="height:40px;"> 
 							
-				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année  {{engagement_.annee_budg}}</p></td>
-						    <td></td>
+				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année  {{mandat.engagement.annee_budg}}</p></td>
+						    <td style="text-align:center;">{{mandat_.num_mandat}}</td>
 					  </tr>
 						
-						<tr style="height:25px;">
+						<tr style="height:20px;">
 						<td style="border-right: none;text-align:center;">
-                          <p style="text-align:left;">Service Emetteur</p><br><p style="text-align:LEFT;">N° au registre des O.P:</p>
+                          <p style="text-align:left;">Service Emetteur: !!!!!!</p><p style="text-align:LEFT;">N° au registre des O.P: !!!!!!!</p>
                         </td>
                          
                         <td colspan="2" style="border-left: none;text-align:center;">
-                            <p style="text-align:LEFT;">Compte Bénéficiaire: </p><br><p style="text-align:LEFT;">Libellé du Compte</p>
+                            <p style="text-align:LEFT;">Compte Bénéficiaire: ??????</p><p style="text-align:LEFT;">Libellé du Compte ???????</p>
                         </td>
 						</tr>
 						
 						
-						<tr style="height:30px;">
+						<tr style="height:20px;">
 						<td style="border-right: none;text-align:center;height:25;">
-                          <p style="text-align:left;">Montant en Lettres</p><br><p style="text-align:LEFT;">{{mandat_.engagement.montant_operation}}</p>
+                          <p style="text-align:left;">Montant en Lettres</p><p style="text-align:LEFT;">{{mandat_letter}}   Dinards Algeriens</p>
                         </td>
                          
                         <td colspan="2" style="text-align:center;">
-                            <p style="text-align:LEFT;">Date</p><br><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.engagement.montant_operation}}</p>
+                            <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.engagement.montant_operation}}</p>
                         </td>
 						</tr>
 						
@@ -139,16 +128,16 @@ table {
                           <td  style="border-bottom: none;">
                           <p>{{mandat_.fournisseur.nom_fournisseur}} ({{mandat_.fournisseur.code_fournisseur}})</p>
                           <br>
-                         <!--  <p>{{engagement_.observation}}</p> -->
+                         
                           <br><br><br><br><br><br><br><br>
                         
                           
                           </td>
                            <td  style="border-bottom: none;vertical-align: top;">
-                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                            <p style="text-align:right;">{{mandat_.engagement.montant_operation}}</p>
                           </td>
                            <td style="vertical-align: top;border-bottom: none;">
-                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                            <p style="text-align:left;">{{mandat_.engagement.observation}}</p>
                           </td>
 						</tr>
 						
@@ -161,17 +150,17 @@ table {
 						
 						<tr >
                           <td colspan="2">
-                          <p style="text-align:left;">CREDITS ALLOUES:</p>
+                          <p style="text-align:left;">CREDITS ALLOUES: {{mandat_.engagement.credit_alloue.credit_allouee}}</p>
                           </td>
                            <td>
                             <p style="text-align:left;">CREDITS DISPONIBLES:</p>
                           </td>
-                         <!--  <td style="width:40%;"></td> -->
+                         
                         </tr>
                           
                           <tr>
 						<td>
-                          <p style="text-align:center;">VISA DU SERVICEEMETTEUR</p>
+                          <p style="text-align:center;">VISA DU SERVICE EMETTEUR</p>
                           </td>
                           <td>
                           <p style="text-align:center;">SIGNATURE DE L'ORDONNATEUR</p>
@@ -188,11 +177,11 @@ table {
                          </tr>
                      
                          
-                         <tr style="height:10;">
-                         <td colspan="3" style=" width: 30%;height:15;"><p style="text-align:center;">REFERENCES DU REGLEMENT</p><br><p style="text-align:LEFT;">Chèque CCP N°  :{{mandat_.fournisseur.num_cmpt_fournisseur}}_{{mandat_.fournisseur.cle_cmpt_fournisseur}}</p>
-                         <br><p style="text-align:LEFT;">Trésore N°  :</p>
-                         <br><p style="text-align:LEFT;">Ordre de virement N°  :</p>
-                         <br><p style="text-align:LEFT;">Date  :</p>
+                         <tr style="height:15px;">
+                         <td colspan="3" style=" width: 30%;height:15;"><p style="text-align:center;">REFERENCES DU REGLEMENT</p><p style="text-align:LEFT;">Chèque CCP N°  :{{mandat_.fournisseur.num_cmpt_fournisseur}}_{{mandat_.fournisseur.cle_cmpt_fournisseur}}</p>
+                         <p style="text-align:LEFT;">Trésore N°  :</p>
+                         <p style="text-align:LEFT;">Ordre de virement N°  :</p>
+                         <p style="text-align:LEFT;">Date  :</p>
                          </td> 
                          </tr>
 				
