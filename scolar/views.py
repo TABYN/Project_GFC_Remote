@@ -13049,8 +13049,6 @@ class Type_EngagementListView(TemplateView):
             }
         return context
  
- 
- 
 class Type_EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_engagement_S2'
     model = Type_Engagement_S2
@@ -13219,6 +13217,8 @@ class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
         
     def get_success_url(self):
         return reverse('Prise_en_charge_list')
+        
+            
 
     
 @login_required
@@ -13371,10 +13371,10 @@ def depence_create_view(request):
 def depence_update_view(request, engagement_pk):
     engagement_=get_object_or_404(Engagement, id=engagement_pk)
     if request.user.is_budget():
-         pass       
+        pass       
     else :
-         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
-         return redirect('/accounts/login/?next=%s' % request.path)   
+        messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+        return redirect('/accounts/login/?next=%s' % request.path)   
     context={} 
     context['engagement']=engagement_
     if request.method == 'POST':
@@ -13403,7 +13403,7 @@ def depence_update_view(request, engagement_pk):
                     messages.error(request, "ERREUR: lors de la modification du l'engagement. Veuillez le signaler à l'administrateur.")
                     return render(request, 'scolar/update.html', {'form': form })
 
-            return HttpResponseRedirect(reverse('Depence_list'))
+            return HttpResponseRedirect(reverse('Depence_List'))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Depence_UpdateForm(engagement_pk, request)

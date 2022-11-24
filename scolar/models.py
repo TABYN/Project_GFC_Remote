@@ -2288,8 +2288,7 @@ class Engagement(models.Model):
         if self.montant_operation :
             solde=solde+self.credit_alloue.credit_allouee-self.montant_operation
             return solde
-#         if self.nouveau_solde():
-#             self.credit_alloue.credit_reste=solde
+      
     def nouveau_solde_s1(self): 
         solde_s1=self.credit_alloue.credit_allouee/2
         if self.montant_operation :
@@ -2300,6 +2299,8 @@ class Engagement(models.Model):
         solde_s2=self.credit_alloue.credit_allouee/2
         if self.nouveau_solde_s1() :
             solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+        else:
             return solde_s2
              
     

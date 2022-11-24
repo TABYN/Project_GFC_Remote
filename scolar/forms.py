@@ -9,14 +9,12 @@ from django.urls import reverse
 from django_select2.forms import ModelSelect2Widget, Select2Widget, ModelSelect2MultipleWidget, Select2MultipleWidget
 from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput, DateTimePickerInput
 import datetime
-from scolar.models import Chapitre, Article
 
 from string import Template
 from django.utils.safestring import mark_safe
 
 from django.contrib import messages
 from scolar.admin import settings
-
 
 
 
@@ -1483,18 +1481,6 @@ class Prise_en_charge_CreateForm(forms.Form):
                 label=u"Type",
                 help_text = "Choisir le type ",
             ) 
-#             self.fields['type_engagement']=forms.ModelChoiceField(
-#                 queryset=Type_Engagement_S2.objects.all(),
-#                 label=u"Nature engagement",
-#                 widget=ModelSelect2Widget(
-#                         model=Type_Engagement_S2,
-#                         search_fields=['nature__icontains',],
-#                     ),
-#                 help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-#                 #required = True,
-#             )
-#             #self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, help_text = "Remplir ce champ si c'est une depence ")
-
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
             self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
@@ -1540,16 +1526,6 @@ class Prise_en_charge_UpdateForm(forms.Form):
                 initial=engagement_.type,
                 required = False
             ) 
-#             self.fields['type_engagement']=forms.ModelChoiceField(
-#                 queryset=Type_Engagement_S2.objects.all(),
-#                 label=u"Nature engagement",
-#                 widget=ModelSelect2Widget(
-#                         model=Type_Engagement_S2,
-#                         search_fields=['nature__icontains',],
-#                     ),
-#                 required = False,
-#                 initial=engagement_.type_engagement
-#             ) 
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
             self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
@@ -1596,17 +1572,6 @@ class Prise_en_charge_DetailForm(forms.Form):
                 initial=engagement_.type,
                 required = False
             ) 
-#             self.fields['type_engagement']=forms.ModelChoiceField(
-#                 queryset=Type_Engagement_S2.objects.all(),
-#                 label=u"Nature engagement",
-#                 widget=ModelSelect2Widget(
-#                         model=Type_Engagement_S2,
-#                         search_fields=['nature__icontains',],
-#                     ),
-#                 required = False,
-#                 initial=engagement_.type_engagement
-#             ) 
-            
             self.fields['date']=forms.DateField(label="Date", required=False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
             self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
@@ -1652,16 +1617,6 @@ class Depence_CreateForm(forms.Form):
                 help_text = "Choisir le type ",
                 required = True
             ) 
-#             self.fields['type_engagement']=forms.ModelChoiceField(
-#                 queryset=Type_Engagement_S2.objects.all(),
-#                 label=u"Nature engagement",
-#                 widget=ModelSelect2Widget(
-#                         model=Type_Engagement_S2,
-#                         search_fields=['nature__icontains',],
-#                     ),
-#                 help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-#                 required = False,
-#             )
             self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2,)
 
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
@@ -1707,18 +1662,8 @@ class Depence_UpdateForm(forms.Form):
                 label=u"Type",
                 initial=engagement_.type,
                 required = False
-            ) 
-#             self.fields['type_engagement']=forms.ModelChoiceField(
-#                 queryset=Type_Engagement_S2.objects.all(),
-#                 label=u"Nature engagement",
-#                 widget=ModelSelect2Widget(
-#                         model=Type_Engagement_S2,
-#                         search_fields=['nature__icontains',],
-#                     ),
-#                 required = False,
-#                 initial=engagement_.type_engagement
-#             ) 
-            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, initial=engagement_.montant_operation,  max_digits=9, decimal_places=2)
+            )  
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, initial=engagement_.montant_operation,  localize=True)
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
             self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
@@ -1764,17 +1709,7 @@ class Depence_DetailForm(forms.Form):
                 initial=engagement_.type,
                 required = False
             ) 
-#             self.fields['type_engagement']=forms.ModelChoiceField(
-#                 queryset=Type_Engagement_S2.objects.all(),
-#                 label=u"Nature engagement",
-#                 widget=ModelSelect2Widget(
-#                         model=Type_Engagement_S2,
-#                         search_fields=['nature__icontains',],
-#                     ),
-#                 required = False,
-#                 initial=engagement_.type_engagement
-#             ) 
-            self.fields['montant_operation'] = forms.CharField(label='Montant operation', required = False, initial=engagement_.montant_operation)
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False,  localize=True, initial=engagement_.montant_operation)
             self.fields['date']=forms.DateField(label="Date", required=False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
             self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
