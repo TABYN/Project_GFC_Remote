@@ -1799,10 +1799,6 @@ class MandatCreateForm(forms.Form):
         super(MandatCreateForm, self).__init__(*args, **kwargs)
         self.helper=FormHelper()
         try:
-#             annee_en_cours_qs=AnneeUniv.objects.filter(encours=True)
-#             annee_en_cours=None
-#             if annee_en_cours_qs.exists() :
-#                 annee_en_cours=annee_en_cours_qs.first()
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",
@@ -1838,4 +1834,142 @@ class MandatCreateForm(forms.Form):
             else:
                 messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de Mandat. Merci de le signaler à l'administrateur")    
   
+
+
+class Mandat_UpdateForm(forms.Form):
+    
+    def __init__(self, mandat_pk, request, *args, **kwargs):
+        super(Mandat_UpdateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:  
+            mandat_= get_object_or_404(Mandat, id=mandat_pk)
+
+
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.fournisseur                                             
+            )    
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.all(),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                #help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
+                required = False,
+                initial=mandat_.engagement
+            )    
+
+            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
+            self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
+            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
+    
+             
+            self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification d'engagement. Merci de le signaler à l'administrateur")
+
+
+class Mandat_DetailForm(forms.Form):
+
+    def __init__(self, mandat_pk, *args, **kwargs):
+        super(Mandat_DetailForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try : 
+            mandat_= get_object_or_404(Mandat, id=mandat_pk)
+            
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.fournisseur                                             
+                
+            )    
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.all(),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                                                              
+                required = False,
+                initial=mandat_.engagement
+            )    
+             
+            self.fields['credit_alloue']=forms.ModelChoiceField(
+                queryset = Credit_S2.objects.all(),
+                label=u"Article",
+                widget=ModelSelect2Widget(
+                    model=Credit_S2,
+                    search_fields=['engagement__article__code_art__icontains'],
+                ),
+                required=False,
+                initial=mandat_.engagement.credit_alloue   
+             )
+            
+            self.fields['type'] = forms.ChoiceField(
+                choices=TYPE,
+                label=u"Type",
+                help_text = "Choisir le type ",
+                initial=mandat_.engagement.type,
+                required = False
+            ) 
+
+
+#             self.fields['montant_operation']=forms.ModelChoiceField(
+#                 queryset=Engagement.objects.all(),
+#                 label=u"Montant_Operation",
+#                 widget=ModelSelect2Widget(
+#                         model=Engagement,
+#                         search_fields=['montant_operation',],
+#                     ),
+#                 required = False,
+#                 initial=mandat_.engagement.montant_operation
+#             ) 
+#             self.fields['observation']=forms.ModelChoiceField(
+#                 queryset=Engagement.objects.all(),
+#                 label=u"Observation",
+#                 widget=ModelSelect2Widget(
+#                         model=Engagement,
+#                         search_fields=['observation__icontains'],
+#                     ),
+#                 required = False,
+#                 initial=mandat_.engagement.observation
+#             ) 
+
+ 
+            
+            self.fields['date']=forms.DateField(label="Date", required=False, initial=mandat_.date)
+            self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
+            #self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
+            
+            for key_ in self.fields.keys():
+                self.fields[key_].disabled=True
+        
+            self.helper.add_input(Button('cancel', 'Retour', css_class='btn-secondary', onclick="window.history.back()"))
+                    
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation de Mandat")
+                
+                
               

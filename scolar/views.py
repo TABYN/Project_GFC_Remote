@@ -60,7 +60,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm, Mandat_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -13568,9 +13568,7 @@ def mandat_create_view(request):
                     date=data['date'],
                     fournisseur=data['fournisseur'],
                     engagement=data['engagement']
-                    #observation=data['observation'],
-                    #annee_budg=data['annee_budg'],
-                    #credit_alloue=data['credit_alloue']
+                    
                     )                         
                 
             except Exception:
@@ -13629,6 +13627,83 @@ class Mandat_PDFView(PDFTemplateView):
         context['mandat_letter'] = mandat_letter
   
         self.filename ='mandat_'+str(mandat_.id) + '.pdf'
+        return context
+
+
+
+@login_required
+def mandat_update_view(request, mandat_pk):
+    mandat_=get_object_or_404(Mandat, id=mandat_pk)
+    if request.user.is_budget():
+         pass       
+    else :
+         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+         return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['mandat']=mandat_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Mandat_UpdateForm(mandat_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                      
+                mandat_.date=data['date']
+                mandat_.num_mandat=data['num_mandat']
+                mandat_.engagement=data['engagement']
+                mandat_.fournisseur=data['fournisseur']
+                
+                mandat_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du Mandat. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('mandat_list'))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Mandat_UpdateForm(mandat_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier le Mandat")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
+
+
+class MandatDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/mandat_detail.html'
+
+    def test_func(self): 
+        mandat_=get_object_or_404(Mandat, id=self.kwargs.get("pk"))   
+        return self.request.user.is_budget()
+        
+    def get_context_data(self, **kwargs):
+        context = super(MandatDetailView, self).get_context_data(**kwargs)
+        titre='Mandat N: '+ self.kwargs.get("pk")
+        context['titre'] = titre
+
+        mandat_=get_object_or_404(Mandat, id=self.kwargs.get("pk"))
+        
+        context['mandat_form'] = Mandat_DetailForm(mandat_pk=mandat_.id)
+        
+        exclude_columns_=[]
+        if not self.request.user.is_authenticated:
+            exclude_columns_.append('expert')
+            exclude_columns_.append('action')
+            exclude_columns_.append('edit')
+            exclude_columns_.append('admin')
+        else :
+            if (not self.request.user.is_budget()):
+                exclude_columns_.append('edit')
+                exclude_columns_.append('admin')
+                exclude_columns_.append('expert')
+                  
         return context
     
                        

@@ -1252,16 +1252,16 @@ class MandatFilter(django_filters.FilterSet):
         model = Mandat
         fields = ['num_mandat','fournisseur', 'date']
         
-class MandatTable(tables.Table):#{% url "engagement_update" engagement_pk=record.id %}//{% url "engagement_delete" pk=record.id %}
-                                #{% url "detail_engagement" pk=record.id %}//{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}
+class MandatTable(tables.Table):
+                                
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
-            <a href="" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "mandat_update" mandat_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
             <a href="{% url "mandat_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
-            <a href=" " > {% icon "eye" %}</a> '
+            <a href=" {% url "detail_mandat" pk=record.id %} " > {% icon "eye" %}</a> '      
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
