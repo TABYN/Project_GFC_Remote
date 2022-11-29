@@ -1275,4 +1275,33 @@ class MandatTable(tables.Table):
  #       fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee']
         fields =['num_mandat', 'date', 'fournisseur__nom_fournisseur', 'engagement__num']
         template_name= "django_tables2/bootstrap4.html"
+
+
+class Article_mandatFilter(django_filters.FilterSet):
+    code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
+    libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
+    posteriori = django_filters.BooleanFilter(field_name='posteriori', label='Posteriori')
+                                               
+    class Meta:
+        model = Article
+        fields = ['code_art', 'libelle_art_FR', 'posteriori']
+
+class Article_mandatTable(tables.Table):
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.chapitre :
+            return str(record.chapitre)
+    
+#     action = '{% load icons %}\
+#                 <a href="{% url "article_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>'          
+#     declarer_posteriori= tables.TemplateColumn(action, orderable=False)
+    action= '<a href="{% url "test" mandat_pk=record.id %}" class="btn btn-info" role="button"> Mandatement</a>'
+    Mandatement=tables.TemplateColumn(action, orderable=False)
+
+    class Meta:
+        model =Article
+        fields=('chapitre','code_art', 'libelle_art_FR')
+        template_name= "django_tables2/bootstrap4.html"   
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
+                                        else "background-color: #66ff33;"}        
         

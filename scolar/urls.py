@@ -390,5 +390,8 @@ urlpatterns = [
     re_path(r'^mandat_update/(?P<mandat_pk>\d+)/$', views.mandat_update_view, name='mandat_update'),
     re_path(r'^detail_mandat/(?P<pk>\d+)/$', views.MandatDetailView.as_view(), name='detail_mandat'),
 
+    path('articles_mandat_list', views.Articles_mandatListView.as_view(), name='articles_mandat_list'),
+    path('test/<mandat_pk>/', views.MandatListView.as_view(), name='test'),
+
         
     ]

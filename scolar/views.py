@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, MandatFilter, MandatTable
+    DepenceTable, ArticleFilter, ArticleTable, MandatFilter, MandatTable, Article_mandatFilter, Article_mandatTable
 
     
 
@@ -13705,5 +13705,43 @@ class MandatDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                 exclude_columns_.append('expert')
                   
         return context
+
+class Articles_mandatListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(Articles_mandatListView, self).get_context_data(**kwargs)
+
+        filter_ = Article_mandatFilter(self.request.GET, queryset=Article.objects.all())
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Article_mandatTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des articles et leurs mandats '
+        #if self.request.user.is_staff_only():
+#         context['btn_list'] = {
+#                 'Ajouter chapitre': reverse('chapitre_create')
+#                 
+#             }
+        return context
+    
+# class ArticleUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+#     permission_required = 'scolar.change_article'
+#     model = Article
+#     fields = ['posteriori']
+#     template_name = 'scolar/update.html'
+#     success_message = "L'article a ete modifie avec succes!"
+#  
+#     def get_form(self, form_class=None):
+#         form = super().get_form(form_class)
+#         form.helper = FormHelper()
+#         form.helper.add_input(Submit('submit', 'Enregictrer', css_class='btn-warning'))
+#         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+#         self.success_url = reverse('articles_list')
+#         return form
     
                        
