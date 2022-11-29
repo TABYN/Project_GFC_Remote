@@ -2313,6 +2313,8 @@ class Engagement(models.Model):
 class Mandat(models.Model):
     num_mandat = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
+    article_mandat = models.ForeignKey(Article,related_name='article_mandat' , on_delete= CASCADE, null = True, blank = True)
+    
     #annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     #observation = models.CharField(max_length=300, default='')
     fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
