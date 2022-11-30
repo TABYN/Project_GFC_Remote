@@ -391,7 +391,9 @@ urlpatterns = [
     re_path(r'^detail_mandat/(?P<pk>\d+)/$', views.MandatDetailView.as_view(), name='detail_mandat'),
 
     path('articles_mandat_list', views.Articles_mandatListView.as_view(), name='articles_mandat_list'),
-    path('test/<mandat_pk>/', views.MandatListView.as_view(), name='test'),
+    path('test/<int:mandat_pk>/', views.Article_MandatListView, name='test'),
+
+    #path('test/<mandat_pk>/', views.Article_MandatListView.as_view(), name='test'),#path('test/<mandat_pk>/', views.Article_MandatListView, name='test'),
 
         
     ]

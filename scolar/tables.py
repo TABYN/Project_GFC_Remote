@@ -1300,7 +1300,7 @@ class Article_mandatTable(tables.Table):
 
     class Meta:
         model =Article
-        fields=('chapitre','code_art', 'libelle_art_FR')
+        fields=('id','chapitre','code_art', 'libelle_art_FR')
         template_name= "django_tables2/bootstrap4.html"   
         row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
                                         else "background-color: #66ff33;"}        

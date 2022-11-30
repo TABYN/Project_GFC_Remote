@@ -13728,6 +13728,34 @@ class Articles_mandatListView(TemplateView):
 #                 
 #             }
         return context
+#####################################################################
+# class Article_MandatListView(TemplateView):
+#     template_name = 'scolar/filter_list.html'
+#     
+#     def get_queryset(selfself, **kwargs):
+#         #mandat_=get_object_or_404(Mandat, id=self.kwargs.get("mandat_pk"))
+#         article_mandat= Mandat.objects.get(article_mandat="mandat_pk")
+#         return article_mandat
+#     def get_context_data(self, **kwargs):
+#         context = super(Article_MandatListView, self).get_context_data(**kwargs)
+#   
+#         filter_ = MandatFilter(self.request.GET, queryset=self.get_queryset(**kwargs))
+#                                 # queryset=Mandat.objects.filter(mandat_pk== Article.objects.filter(id)).order_by('num_mandat')
+#         filter_.form.helper = FormHelper()
+#         exclude_columns_ = exclude_columns(self.request.user)
+#         table = MandatTable(filter_.qs)
+#         RequestConfig(self.request).configure(table)
+#   
+#         context['filter'] = filter_
+#         context['table'] = table
+#         context['titre'] = 'Liste des Mandats '
+#         #if self.request.user.is_staff_only():
+#         context['btn_list'] = {
+#             'Ajouter nouvelle Mandat': reverse('mandat_create'),
+#                   
+#             }
+#         return context
+###############################################################################################
     
 # class ArticleUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
 #     permission_required = 'scolar.change_article'
@@ -13743,5 +13771,12 @@ class Articles_mandatListView(TemplateView):
 #         form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
 #         self.success_url = reverse('articles_list')
 #         return form
+
+
+def Article_MandatListView (request, mandat_pk):   
     
+    article= Article.objects.get(id = mandat_pk)
+    context= {'article':article}
+     
+    return render(request, 'scolar/article_mandat_list.html', context)#
                        
