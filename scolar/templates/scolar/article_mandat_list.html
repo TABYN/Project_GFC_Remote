@@ -25,11 +25,40 @@ table {
 			<div class="col-md-12 grid-margin stretch-card" >
 				<div class="card">
 					<div class="card-body" >
-						<h3>La liste des Mandats du l'article {{article.id}}</h3>
+						<h3>La liste des mandats de l'article : {{article.libelle_art_FR}} ( {{article.code_art}} )</h3>
 						<br>
 						<!-- <p class="lead font-italic">Allocation des crédits pour l'Exercice : Exercice :{{pexe}}</p> -->
 						<hr class="my-4">
+						
+						<table class="table table-sm">
+						    <tr>
+						    <th>Num_Mandat</th>
+						    <th>Date</th>
+						    <th>Fournisseur</th>
+						    <th>Engagement</th>
+						    <th>Mettre à jour</th>
+						    <th>Supprimer</th>
+						    </tr>
+						
+						{% for mandat in mandats %}
+						{% if article.code_art == mandat.article_mandat.code_art %}
+						
+						<tr>
+						<td>{{mandat.num_mandat}}</td>
+						<td>{{mandat.date}}</td>
+						<td>{{mandat.fournisseur}}</td>
+						<td>{{mandat.engagement}}</td>
+						<td><a href= ''>Mettre à jour</a></td>   
+						<td><a href= ''>Supprimer</a></td>  
+						{% endif %}
+						{% endfor %}
+						</tr>
+						
+						
+						</table>
 					
 
 </html>
 {% endblock %}
+
+<!-- "{% url 'mandat_delete' %}" -->

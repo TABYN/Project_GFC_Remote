@@ -13773,10 +13773,16 @@ class Articles_mandatListView(TemplateView):
 #         return form
 
 
+
 def Article_MandatListView (request, mandat_pk):   
     
     article= Article.objects.get(id = mandat_pk)
-    context= {'article':article}
+    #mandats= article.commande_set.all()
+    mandats= Mandat.objects.all()
+    
+    #mandat_total=mandats.count() 
+    context= {'article':article, 'mandats':mandats}#, 'mandat_total':mandat_total
      
     return render(request, 'scolar/article_mandat_list.html', context)#
+
                        
