@@ -6,9 +6,7 @@
  <!-- Required meta tags -->
  <meta charset="utf-8">
  {% block content %}
- {% load djmoney %}
-
- <!-- <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data"> -->
+ <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
  {% csrf_token %}
    	   <style>
  	   body {
@@ -22,43 +20,96 @@ table {
     </style>
 	<div class="content-wrapper">
 		<div class="row">
-			<div class="col-md-12 grid-margin stretch-card" >
+			<div class="col-md-12 grid-margin stretch-card">
 				<div class="card">
-					<div class="card-body" >
-						<h3>La liste des mandats de l'article : {{article.libelle_art_FR}} ( {{article.code_art}} )</h3>
+					<div class="card-body">
+						<h3>Suivi des Mandats </h3>
 						<br>
-						<!-- <p class="lead font-italic">Allocation des crédits pour l'Exercice : Exercice :{{pexe}}</p> -->
-						<hr class="my-4">
-						
-						<table class="table table-sm">
-						    <tr>
-						    <th>Num_Mandat</th>
-						    <th>Date</th>
-						    <th>Fournisseur</th>
-						    <th>Engagement</th>
-						    <th>Mettre à jour</th>
-						    <th>Supprimer</th>
-						    </tr>
-						
-						{% for mandat in mandats %}
-						{% if article.code_art == mandat.article_mandat.code_art %}
-						
-						<tr>
-						<td>{{mandat.num_mandat}}</td>
-						<td>{{mandat.date}}</td>
-						<td>{{mandat.fournisseur}}</td>
-						<td>{{mandat.engagement}}</td>
-						<td><a href= ''>Mettre à jour</a></td>   
-						<td><a href= ''>Supprimer</a></td>  
-						{% endif %}
-						{% endfor %}
-						</tr>
-						
-						
-						</table>
-					
-
+						<form class="forms-sample">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label" for="number1" >Num_Mandat</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="num_mandat" id="number1"  />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Date_Mandat</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="date" />
+										</div>
+									</div>
+								</div>
+							<!-- 	<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Libellé en arabe</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="libelle_art_AR" />
+										</div>
+									</div>
+								</div> -->
+							</div>
+							<div class="row">
+								<div class="col-md-4">
+									<a href="{% url 'articles_mandat_list' %}" class="btn btn-secondary btn-block">
+										<i class="fa fa-list"></i> Retour
+									</a>
+								</div>
+								<div class="col-md-4">
+									<button type="submit" class="btn btn-primary btn-block" >
+										<i class="fa fa-database"></i>Enregistrer</button>
+								</div>
+							</div>
+						</form>
+						<div class="content-wrapper">
+							<div class="row">
+								<div class="col-md-12 grid-margin stretch-card">
+									<div class="card">
+										<div class="card-body">
+											<p class="lead font-italic">Listes des Mandats </p>
+											<hr class="my-4">
+											<table class="table table-borderless">
+												<thead class="border-bottom font-weight-bold">
+												<tr>
+													<th>code_Article</th>
+													<th>Num_Mandat</th>
+													<th>Date</th>
+													<!-- <th>libelle_Article_AR</th> -->
+												</tr>
+												</thead>
+												<tbody>
+												{% for mandat in mandats %}
+												<tr>
+													<td>{{mandat.article_mandat.code_art}}</td>
+													<td>{{mandat.num_mandat}}</td>
+													<td>{{mandat.date}}</td>
+													<!-- <td>{{art.libelle_art_AR}}</td> -->
+											        <td>
+														<a style="padding-left:30px;" href="{% url 'MandatDelete' mandat.id %}" class="d-inline" >
+															<i class="fa fa-trash-alt fa-lg "></i>
+														</a>
+													</td>
+												</tr>
+												</tr>
+												{% endfor %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+ </form>
 </html>
-{% endblock %}
 
-<!-- "{% url 'mandat_delete' %}" -->
+{% endblock %}

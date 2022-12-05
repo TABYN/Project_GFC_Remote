@@ -392,10 +392,11 @@ urlpatterns = [
 
     path('articles_mandat_list', views.Articles_mandatListView.as_view(), name='articles_mandat_list'),
     path('test/<int:mandat_pk>/', views.Article_MandatListView, name='test'),
+    path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
 
     
     
-    #path('test/<mandat_pk>/', views.Article_MandatListView.as_view(), name='test'),#path('test/<mandat_pk>/', views.Article_MandatListView, name='test'),
+    #path('test/<mandat_pk>/', views.Article_MeateandatListView.as_view(), name='test'),#path('test/<mandat_pk>/', views.Article_MandatListView, name='test'),
 
         
     ]

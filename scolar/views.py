@@ -1,4 +1,5 @@
 # Create your views here.
+# from django.utils.datastructures import MultiValueDictKeyError
 from django.shortcuts import render, get_object_or_404
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -13774,15 +13775,38 @@ class Articles_mandatListView(TemplateView):
 
 
 
-def Article_MandatListView (request, mandat_pk):   
-    
-    article= Article.objects.get(id = mandat_pk)
-    #mandats= article.commande_set.all()
-    mandats= Mandat.objects.all()
-    
+def Article_MandatListView (request, mandat_pk):      
+    article= Article.objects.get(pk = mandat_pk)
+    if request.method == 'POST':
+        mandat = Mandat(
+            article_mandat=Article.objects.get(pk=mandat_pk),
+            num_mandat=request.POST['num_mandat'],
+            date=request.POST['date'],
+           # libelle_art_AR=request.POST['libelle_art_AR'],
+        )
+        mandat.save()
+        messages.success(request, 'Mandat enregistree.')
+        return redirect(request.path_info)
+    else:
+        mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=mandat_pk))
+        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article})   
+#     
     #mandat_total=mandats.count() 
-    context= {'article':article, 'mandats':mandats}#, 'mandat_total':mandat_total
+    #context= {'article':article, 'mandats':mandats}#, 'mandat_total':mandat_total
      
-    return render(request, 'scolar/article_mandat_list.html', context)#
+    #return render(request, 'scolar/article_mandat_list.html', context)#
 
+
+
+@login_required
+def MandatDelete(request, mandat):
+    mandat = Mandat.objects.get(pk=mandat)
+    article = mandat.article_mandat.id
+    delete = 2
+    if request.method == "POST":
+        mandat.delete()
+        messages.success(request, 'Mandat supprimee.')
+        mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=article))
+        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article})
+    return render(request, 'scolar/delete_item.html', {'delete': delete, 'article': article})
                        
