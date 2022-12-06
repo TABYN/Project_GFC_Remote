@@ -13777,19 +13777,22 @@ class Articles_mandatListView(TemplateView):
 
 def Article_MandatListView (request, mandat_pk):      
     article= Article.objects.get(pk = mandat_pk)
+    fournisseurs= Fournisseur.objects.all()
+    fournisseur_id=request.POST.get('fournisseur')
     if request.method == 'POST':
         mandat = Mandat(
             article_mandat=Article.objects.get(pk=mandat_pk),
             num_mandat=request.POST['num_mandat'],
             date=request.POST['date'],
-           # libelle_art_AR=request.POST['libelle_art_AR'],
+            #fournisseur_id=request.POST.get('fournisseur'),
+            fournisseur= Fournisseur.objects.get(id=fournisseur_id),
         )
         mandat.save()
         messages.success(request, 'Mandat enregistree.')
         return redirect(request.path_info)
     else:
         mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=mandat_pk))
-        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article})   
+        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article, 'fournisseurs':fournisseurs})   
 #     
     #mandat_total=mandats.count() 
     #context= {'article':article, 'mandats':mandats}#, 'mandat_total':mandat_total
