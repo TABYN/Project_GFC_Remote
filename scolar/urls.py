@@ -378,6 +378,11 @@ urlpatterns = [
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
 
+   
+    path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),
+    path('mandatCreate/<int:art>/', views.MandatCreate, name="mandatCreate"),
+    path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
+    path('Mandat_PDFView/<mandat_pk>/', views.Mandat_PDFView.as_view(), name='Mandat_PDFView'),
 
 
     ]

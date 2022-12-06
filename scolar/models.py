@@ -2271,8 +2271,8 @@ class Type_Engagement_S2(models.Model):
 
 
 TYPE=(
-    ('01','Prise en charge'),
-    ('02','Depence')
+    ('Prise en charge','Prise en charge'),
+    ('Depence','Depence')
     ) 
 class Engagement(models.Model):
     num = models.IntegerField(null = True)
@@ -2305,7 +2305,17 @@ class Engagement(models.Model):
              
     
     def __str__(self):
-        return "Engagement "+ str(self.num)
+        return "Engagement "+ str(self.num)+' '+str(self.type)
+
+class Mandat(models.Model):
+    num_mandat = models.IntegerField(null = True)
+    date=models.DateField(null=True, blank=True)
+    article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
+    fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
+    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+
+    def __str__(self):
+        return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 
 
 

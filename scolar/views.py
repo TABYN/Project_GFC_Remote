@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable, MandatFilter, MandatTable, Mandat_1Table
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -58,7 +58,8 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, \
+    MandatCreateForm, Mandat_UpdateForm, Mandat_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -12991,7 +12992,7 @@ def CreditAssociate_S2(request,exe,art):
                 messages.error(request, 'Vous ne pouvez pas allouer un credi plusieurs fois au meme article ... ') 
                 return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
                 return redirect(request.path_info)
-      
+            
         except IntegrityError:     
             messages.error(request, "Erreur dans lenregistrement")
             return redirect(request.path_info)
@@ -13105,7 +13106,7 @@ class Prise_en_charge_ListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Prise_en_charge_ListView, self).get_context_data(**kwargs)
   
-        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='01').order_by('num'))
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='Prise en charge').order_by('num'))
   
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -13217,10 +13218,7 @@ class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
         
     def get_success_url(self):
         return reverse('Prise_en_charge_list')
-        
-            
-
-    
+  
 @login_required
 def prise_en_charge_update_view(request, engagement_pk):
     engagement_=get_object_or_404(Engagement, id=engagement_pk)
@@ -13276,7 +13274,7 @@ class Prise_en_chargeDetailView(LoginRequiredMixin, UserPassesTestMixin, Templat
         
     def get_context_data(self, **kwargs):
         context = super(Prise_en_chargeDetailView, self).get_context_data(**kwargs)
-        titre='Engagement N: '+ self.kwargs.get("pk")
+        titre='Engagement Peise en charge'#+ self.kwargs.get("pk")
         context['titre'] = titre
 
         engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
@@ -13306,7 +13304,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Depence_ListView, self).get_context_data(**kwargs)
   
-        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='02').order_by('num'))
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='Depence').order_by('num'))
   
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -13423,7 +13421,7 @@ class Depence_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         
     def get_context_data(self, **kwargs):
         context = super(Depence_DetailView, self).get_context_data(**kwargs)
-        titre='Engagement N: '+ self.kwargs.get("pk")
+        titre='Engagement Depence '#+ self.kwargs.get("pk")
         context['titre'] = titre
 
         engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
@@ -13530,3 +13528,76 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
  
+
+class MandatListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super(MandatListView, self).get_context_data(**kwargs)
+
+        filter_ = ArticleFilter(self.request.GET, queryset=Article.objects.all())
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Mandat_1Table(filter_.qs)
+        RequestConfig(self.request).configure(table)
+        
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Mandats '
+
+        return context   
+    
+@login_required
+def MandatCreate(request, art):
+    arti=Article.objects.get(pk=art)
+    frn = Fournisseur.objects.all()
+    fournisseur_id=request.POST.get('fournisseur')
+    if request.method == 'POST':
+        mandat = Mandat(
+            article=Article.objects.get(pk=art),
+            num_mandat=request.POST['num_mandat'],
+            date=request.POST['date'],
+            fournisseur=Fournisseur.objects.get(id=fournisseur_id),
+        )
+        mandat.save()
+        messages.success(request, 'Mandat enregistree.')
+        return redirect(request.path_info)
+    else:
+        mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
+        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'arti': arti, 'frn':frn})
+
+@login_required
+def MandatDelete(request, mandat):
+    mandat = Mandat.objects.get(pk=mandat)
+    article = mandat.article.id
+    delete = 6
+    if request.method == "POST":
+        mandat.delete()
+        messages.success(request, 'mandat supprime.')
+        mandats = Mandat.objects.filter(article=Article.objects.get(pk=article))
+        return render(request, 'scolar/add_mandat.html', {'article': article ,'mandats':mandats})
+    return render(request, 'scolar/delete_item.html', {'delete': delete, 'article': article}) 
+
+       
+    
+class Mandat_PDFView(PDFTemplateView):
+    template_name= 'scolar/mandat de paiement.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        mandat_ = Mandat.objects.get(id=self.kwargs.get('mandat_pk'))
+        mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['mandat_'] = mandat_
+        context['mandat_letter'] = mandat_letter
+  
+        self.filename ='mandat_'+str(mandat_.id) + '.pdf'
+        return context
+
+
