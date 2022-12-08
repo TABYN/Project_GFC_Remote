@@ -42,17 +42,17 @@ table {
                           
                           </tr>
                           
-                             <tr >
+                          <tr >
                           <td style="border-bottom: none;">
-                         <!--  <p>{{mandat_.engagement.montant_operation}}</p> -->
+                          <p>{{mandat_.observation}}</p>
                           <br>
-                          <p>{{mandat_.engagement.observation}}</p>
-                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<!--                           <p>{{mandat_.engagement.observation}}</p>
+ -->                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                      
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{mandat_.engagement.montant_operation}}</p>
+                            <p style="text-align:right;">{{mandat_.montant_op}}</p>
                           </td>
                           
                           </tr>
@@ -65,7 +65,7 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{mandat_.engagement.montant_operation}}</p>
+                            <p style="text-align:right;">{{mandat_.montant_op}} </p>
                           </td>
                           
                           </tr>
@@ -86,28 +86,28 @@ table {
 						
 					  <tr style="height:40px;"> 
 							
-				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année  {{mandat.engagement.annee_budg}}</p></td>
+				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année  <!-- {{mandat.engagement.annee_budg}} --></p></td>
 						    <td style="text-align:center;">{{mandat_.num_mandat}}</td>
 					  </tr>
 						
 						<tr style="height:20px;">
 						<td style="border-right: none;text-align:center;">
-                          <p style="text-align:left;">Service Emetteur: !!!!!!</p><p style="text-align:LEFT;">N° au registre des O.P: !!!!!!!</p>
+                          <p style="text-align:left;">Service Emetteur: </p><p style="text-align:LEFT;">N° au registre des O.P: !!!!!!!</p>
                         </td>
                          
                         <td colspan="2" style="border-left: none;text-align:center;">
-                            <p style="text-align:LEFT;">Compte Bénéficiaire: ??????</p><p style="text-align:LEFT;">Libellé du Compte ???????</p>
+                            <p style="text-align:LEFT;">Compte Bénéficiaire: </p><p style="text-align:LEFT;">Libellé du Compte </p>
                         </td>
 						</tr>
 						
 						
 						<tr style="height:20px;">
 						<td style="border-right: none;text-align:center;height:25;">
-                          <p style="text-align:left;">Montant en Lettres</p><p style="text-align:LEFT;">{{mandat_letter}}   Dinards Algeriens</p>
+                          <p style="text-align:left;">Montant en Lettres</p><p style="text-align:LEFT;">{{mandat_letter}}   Dinards Algeriens </p>
                         </td>
                          
                         <td colspan="2" style="text-align:center;">
-                            <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.engagement.montant_operation}}</p>
+                            <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.montant_op}} --></p>
                         </td>
 						</tr>
 						
@@ -133,10 +133,10 @@ table {
                           
                           </td>
                            <td  style="border-bottom: none;vertical-align: top;">
-                            <p style="text-align:right;">{{mandat_.engagement.montant_operation}}</p>
+                            <p style="text-align:right;">{{mandat_.montant_op}} </p>
                           </td>
                            <td style="vertical-align: top;border-bottom: none;">
-                            <p style="text-align:left;">{{mandat_.engagement.observation}}</p>
+                            <p style="text-align:left;"><!-- {{mandat_.engagement.observation}} --></p>
                           </td>
 						</tr>
 						
@@ -149,7 +149,7 @@ table {
 						
 						<tr >
                           <td colspan="2">
-                          <p style="text-align:left;">CREDITS ALLOUES: {{mandat_.engagement.credit_alloue.credit_allouee}}</p>
+                          <p style="text-align:left;">CREDITS ALLOUES: <!-- {{mandat_.engagement.credit_alloue.credit_allouee}} --></p>
                           </td>
                            <td>
                             <p style="text-align:left;">CREDITS DISPONIBLES:</p>

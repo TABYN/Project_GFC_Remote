@@ -42,7 +42,7 @@ table {
 									<div class="form-group row">
 										<label class="col-sm-3 col-form-label">Date</label>
 										<div class="col-sm-9">
-											<input type="text" class="form-control" name="date" />
+											<input type="date" class="form-control" name="date" />
 										</div>
 									</div>
 								</div>
@@ -56,6 +56,24 @@ table {
 											   {% endfor %}
 											</select>
 											
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label" for="number1" >Montant operation</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="montant_op" id="number1"  />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Observation</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control"  name="observation_mandat" />
 										</div>
 									</div>
 								</div>
@@ -86,6 +104,8 @@ table {
 													<th>Numero mandat</th>
 													<th>Date</th>
 													<th>Fournisseur</th>
+													<th>Montant operation</th>
+													<th>Observation</th>
 												</tr>
 												</thead>
 												<tbody>
@@ -95,9 +115,19 @@ table {
 													<td>{{mandat.num_mandat}}</td>
 													<td>{{mandat.date}}</td>
 													<td>{{mandat.fournisseur.code_fournisseur}} {{mandat.fournisseur.nom_fournisseur}}</td>
+													<td>{{mandat.montant_op}}</td>
+													<td>{{mandat.observation_mandat}}</td>
+													<td></td>
 													<td>
 														<a style="padding-left:30px;" href="{% url 'MandatDelete' mandat.id %}" class="d-inline" >
 															<i class="fa fa-trash-alt fa-lg "></i>
+															<a style="padding-left:30px;" href="{% url 'mandat_update' mandat.id %}" class="d-inline" >
+															<i class="fa fa-pencil-alt fa-lg "></i>
+														</a>
+													</td>
+													<td>
+														<a style="padding-left:30px;" href="{% url 'Mandat_PDFView' mandat.id %}" class="d-inline" >
+															<i class="fa fa-print fa-lg" ></i>
 														</a>
 													</td>
 												</tr>

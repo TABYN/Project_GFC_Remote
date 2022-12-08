@@ -372,17 +372,15 @@ urlpatterns = [
     re_path(r'^depence_update/(?P<engagement_pk>\d+)/$', views.depence_update_view, name='depence_update'),
     re_path(r'^detail_depence/(?P<pk>\d+)/$', views.Depence_DetailView.as_view(), name='detail_depence'),
 
+    path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),
+    path('mandatCreate/<int:art>/', views.MandatCreate, name="mandatCreate"),
+    path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
+    re_path(r'^mandat_update/(?P<mandat_pk>\d+)/$', views.mandat_update_view, name='mandat_update'),
     
     path('Prise_en_chargeS2_PDFView/<engagement_pk>/', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),
     path('Engagement_de_la_provision_PDFView/<engagement_pk>/', views.Engagement_de_la_provision_PDFView.as_view(), name='Engagement_de_la_provision_PDFView'),
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
-
-   
-    path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),
-    path('mandatCreate/<int:art>/', views.MandatCreate, name="mandatCreate"),
-    path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
     path('Mandat_PDFView/<mandat_pk>/', views.Mandat_PDFView.as_view(), name='Mandat_PDFView'),
-
 
     ]

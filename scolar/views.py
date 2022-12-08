@@ -13482,7 +13482,6 @@ class Engagement_de_la_provision_PDFView(PDFTemplateView):
         return context
 
 class Depence_PDFView(PDFTemplateView):
-    #regularisation_provision_template_name= 'scolar/Depence.html'    
     template_name= 'scolar/Depence.html'
     cmd_options = {
         'orientation': 'Landscape',
@@ -13501,13 +13500,6 @@ class Depence_PDFView(PDFTemplateView):
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
     
-#     def get_template_names(self):
-#         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-#   
-#         if engagement_.credit_alloue.article.posteriori==True:
-#             return [self.regularisation_provision_template_name]
-#         else: 
-#            return [self.depence_template_name]
 
 class Regularisation_provision_PDFView(PDFTemplateView):
     template_name= 'scolar/Fiche de regularisation de la provision.html'
@@ -13524,7 +13516,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         context = {}
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
-  
+
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
  
@@ -13558,6 +13550,8 @@ def MandatCreate(request, art):
             article=Article.objects.get(pk=art),
             num_mandat=request.POST['num_mandat'],
             date=request.POST['date'],
+            montant_op=request.POST['montant_op'],
+            observation_mandat=request.POST['observation_mandat'],
             fournisseur=Fournisseur.objects.get(id=fournisseur_id),
         )
         mandat.save()
@@ -13579,8 +13573,51 @@ def MandatDelete(request, mandat):
         return render(request, 'scolar/add_mandat.html', {'article': article ,'mandats':mandats})
     return render(request, 'scolar/delete_item.html', {'delete': delete, 'article': article}) 
 
-       
-    
+@login_required
+def mandat_update_view(request, mandat_pk):
+    mandat_=get_object_or_404(Mandat, id=mandat_pk)
+    if request.user.is_budget():
+        pass       
+    else :
+        messages.error(request,"Vous ...................cette operation")
+        return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['mandat']=mandat_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Mandat_UpdateForm(mandat_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+                mandat_.num_mandat=data['num_mandat']      
+                mandat_.date=data['date']
+                mandat_.fournisseur=data['fournisseur']
+                mandat_.observation_mandat=data['observation_mandat']
+                mandat_.montant_op=data['montant_op']
+                
+                mandat_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du mandat. Veuillez le signaler a l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('mandatCreate', kwargs={'art': mandat_.article.id, }))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Mandat_UpdateForm(mandat_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier le mandat")
+
+        
+    context['form']=form
+    return render(request, 'scolar/update.html', context)
+
+
 class Mandat_PDFView(PDFTemplateView):
     template_name= 'scolar/mandat de paiement.html'
     cmd_options = {
@@ -13590,7 +13627,7 @@ class Mandat_PDFView(PDFTemplateView):
 
     def get_context_data(self,  **kwargs):
         mandat_ = Mandat.objects.get(id=self.kwargs.get('mandat_pk'))
-        mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
+        mandat_letter = num2words(mandat_.montant_op.amount, lang='fr')
  
         pieces = {}
         context = {}

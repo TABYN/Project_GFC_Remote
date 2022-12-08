@@ -1782,27 +1782,27 @@ class Mandat_UpdateForm(forms.Form):
                 label=u"Fournisseur",
                 widget=ModelSelect2Widget(
                         model=Fournisseur,
-                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                        search_fields=['code_fournisseur__icontains','nom_fournisseur__icontains'],
                     ),
                  required = False,
                  initial=mandat_.fournisseur                                             
             )    
-            self.fields['engagement']=forms.ModelChoiceField(
-                queryset=Engagement.objects.all(),
-                label=u"Engagement",
-                widget=ModelSelect2Widget(
-                        model=Engagement,
-                        search_fields=['num__icontains',],
-                    ),
-                #help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-                required = False,
-                initial=mandat_.engagement
-            )    
+#             self.fields['engagement']=forms.ModelChoiceField(
+#                 queryset=Engagement.objects.all(),
+#                 label=u"Engagement",
+#                 widget=ModelSelect2Widget(
+#                         model=Engagement,
+#                         search_fields=['num__icontains',],
+#                     ),
+#                 #help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
+#                 required = False,
+#                 initial=mandat_.engagement
+#             )    
 
             self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
             self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
-            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
-    
+            self.fields['montant_op'] = forms.DecimalField(label='Montant operation', required = False, initial=mandat_.montant_op,  localize=True)
+            self.fields['observation_mandat']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=mandat_.observation_mandat)    
              
             self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
             self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
@@ -1865,29 +1865,6 @@ class Mandat_DetailForm(forms.Form):
             ) 
 
 
-#             self.fields['montant_operation']=forms.ModelChoiceField(
-#                 queryset=Engagement.objects.all(),
-#                 label=u"Montant_Operation",
-#                 widget=ModelSelect2Widget(
-#                         model=Engagement,
-#                         search_fields=['montant_operation',],
-#                     ),
-#                 required = False,
-#                 initial=mandat_.engagement.montant_operation
-#             ) 
-#             self.fields['observation']=forms.ModelChoiceField(
-#                 queryset=Engagement.objects.all(),
-#                 label=u"Observation",
-#                 widget=ModelSelect2Widget(
-#                         model=Engagement,
-#                         search_fields=['observation__icontains'],
-#                     ),
-#                 required = False,
-#                 initial=mandat_.engagement.observation
-#             ) 
-
- 
-            
             self.fields['date']=forms.DateField(label="Date", required=False, initial=mandat_.date)
             self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
             #self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
@@ -1902,4 +1879,5 @@ class Mandat_DetailForm(forms.Form):
                 raise Exception
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation de Mandat")
+
                              

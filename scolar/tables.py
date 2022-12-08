@@ -1233,7 +1233,7 @@ class DepenceTable(tables.Table):
     action= '{% if  not record.credit_alloue.article.posteriori %}\
             <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
             {% else %}\
-            <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id %}" > Imprimer fiche de regularisation de la provision</a>\
+            <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id  %}" > Imprimer fiche de regularisation de la provision</a>\
             {% endif %}'
 
     Imprimer=tables.TemplateColumn(action, orderable=False)          
