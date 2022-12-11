@@ -39,9 +39,35 @@ table {
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Annee_budget</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="annee_budget" />
+										</div>
+									</div>
+								</div>							
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Montant_Operation</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="montant_operatio" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Observation</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="observatio" />
+										</div>
+									</div>
+								</div>
+
+							
+								<div class="col-md-6">
+									<div class="form-group row">
 										<label class="col-sm-3 col-form-label">Date_Mandat</label>
 										<div class="col-sm-9">
-											<input type="text" class="form-control" name="date" />
+											<input type="date" class="form-control" name="date" />
 										</div>
 									</div>
 								</div>
@@ -85,11 +111,16 @@ table {
 												<thead class="border-bottom font-weight-bold">
 												<tr>
 													<th>code_Article</th>
+													<th>Annee_budget</th>
 													<th>Num_Mandat</th>
+													<th>Montant_Operation</th>
+													<th>Observation</th>
 													<th>Date</th>
 													<th>Fournisseur</th>
 													<th>Imprimer</th>
 													<th>Supprimer</th>
+													
+													
 						    						
 													
 													<!-- <th>libelle_Article_AR</th> -->
@@ -99,9 +130,13 @@ table {
 												{% for mandat in mandats %}
 												<tr>
 													<td>{{mandat.article_mandat.code_art}}</td>
+													<td>{{mandat.annee_budget.annee_univ}}</td>
 													<td>{{mandat.num_mandat}}</td>
+													<td>{{mandat.montant_operatio}}</td>
+													<td>{{mandat.observatio}}</td>
 													<td>{{mandat.date}}</td>
 													<td>{{mandat.fournisseur}}</td>
+													
 						                           	<td>
 														<a style="padding-left:30px;" href="{% url 'Mandat_PDFView' mandat.id %}" class="d-inline" >
 															<i class="fa fa-print" aria-hidden="true"></i>
@@ -128,6 +163,7 @@ table {
 			</div>
 		</div>
 	</div>
+	
  </form>
 </html>
 

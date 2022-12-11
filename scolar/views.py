@@ -13612,7 +13612,7 @@ class MandatDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMi
     
     
 class Mandat_PDFView(PDFTemplateView):
-    template_name= 'scolar/mandat de paiement.html'
+    template_name= 'scolar/mandat de paiement.html'# 'scolar/mandat paiement engagement.html' 
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
@@ -13620,7 +13620,7 @@ class Mandat_PDFView(PDFTemplateView):
 
     def get_context_data(self,  **kwargs):
         mandat_ = Mandat.objects.get(id=self.kwargs.get('mandat_pk'))
-        mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
+        mandat_letter = num2words(mandat_.montant_operatio.amount, lang='fr')#mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
  
         pieces = {}
         context = {}
@@ -13779,12 +13779,15 @@ def Article_MandatListView (request, mandat_pk):
     article= Article.objects.get(pk = mandat_pk)
     fournisseurs= Fournisseur.objects.all()
     fournisseur_id=request.POST.get('fournisseur')
+    #annee_budget_id=request.POST.get['annee_budget']
     if request.method == 'POST':
         mandat = Mandat(
             article_mandat=Article.objects.get(pk=mandat_pk),
             num_mandat=request.POST['num_mandat'],
+            #annee_budget=request.POST['annee_budget'],#annee_budget= AnneeUniv.objects.get(id=annee_budget_id),
+            montant_operatio=request.POST['montant_operatio'],
+            observatio=request.POST['observatio'],
             date=request.POST['date'],
-            #fournisseur_id=request.POST.get('fournisseur'),
             fournisseur= Fournisseur.objects.get(id=fournisseur_id),
         )
         mandat.save()
@@ -13805,11 +13808,12 @@ def Article_MandatListView (request, mandat_pk):
 def MandatDelete(request, mandat):
     mandat = Mandat.objects.get(pk=mandat)
     article = mandat.article_mandat.id
-    delete = 2
+    delete = 6
     if request.method == "POST":
         mandat.delete()
         messages.success(request, 'Mandat supprimee.')
         mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=article))
         return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article})
     return render(request, 'scolar/delete_item.html', {'delete': delete, 'article': article})
-                       
+
+                     

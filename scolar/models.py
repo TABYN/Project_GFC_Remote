@@ -2308,20 +2308,51 @@ class Engagement(models.Model):
     def __str__(self):
         return "Engagement "+ str(self.num)
 
-
-
 class Mandat(models.Model):
     num_mandat = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
     article_mandat = models.ForeignKey(Article,related_name='article_mandat' , on_delete= CASCADE, null = True, blank = True)
-    
-    #annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
-    #observation = models.CharField(max_length=300, default='')
+    credit_allou=models.ForeignKey(Credit_S2 ,related_name='credit_allou' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_operatio = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    annee_budget=models.ForeignKey(AnneeUniv ,related_name='annee_budget' , null= True, blank=True, on_delete=models.SET_NULL)
+    observatio = models.CharField(max_length=300, default='')
     fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
     engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
 
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
+# class Mandat(models.Model):
+#     num_mandat = models.IntegerField(null = True)
+#     date=models.DateField(null=True, blank=True)
+#     article_mandat = models.ForeignKey(Article,related_name='article_mandat' , on_delete= CASCADE, null = True, blank = True)
+#     fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
+#     #engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+#     observation = models.CharField(max_length=300, default='')
+#     annee_budget=models.ForeignKey(AnneeUniv ,related_name='annee_budget' , null= True, blank=True, on_delete=models.SET_NULL)
+#     credit_allou=models.ForeignKey(Credit_S2 ,related_name='credit_allou' , null= True, blank=True, on_delete=models.SET_NULL)
+#     montant_operatio = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+#     
+#     def nouveau_solde(self): 
+#         solde=0      
+#         if self.montant_operatio :
+#             solde=solde+self.credit_allou.credit_allouee-self.montant_operatio
+#             return solde
+# #         if self.nouveau_solde():
+# #             self.credit_alloue.credit_reste=solde
+#     def nouveau_solde_s1(self): 
+#         solde_s1=self.credit_allou.credit_allouee/2
+#         if self.montant_operatio :
+#             solde_s1=solde_s1-self.montant_operatio
+#             return solde_s1
+#         
+#     def nouveau_solde_s2(self):  
+#         solde_s2=self.credit_allou.credit_allouee/2
+#         if self.nouveau_solde_s1() :
+#             solde_s2=solde_s2+self.nouveau_solde_s1()
+#             return solde_s2
+# 
+#     def __str__(self):
+#         return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 
     
  
