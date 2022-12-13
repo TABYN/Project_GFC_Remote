@@ -107,7 +107,7 @@ table {
                         </td>
                          
                         <td colspan="2" style="text-align:center;">
-                            <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.montant_op}} --></p>
+                            <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.montant_op}}</p>
                         </td>
 						</tr>
 						
@@ -136,7 +136,7 @@ table {
                             <p style="text-align:right;">{{mandat_.montant_op}} </p>
                           </td>
                            <td style="vertical-align: top;border-bottom: none;">
-                            <p style="text-align:left;"><!-- {{mandat_.engagement.observation}} --></p>
+                            <p style="text-align:left;">{{mandat_.observation_mandat}} </p>
                           </td>
 						</tr>
 						
@@ -149,10 +149,10 @@ table {
 						
 						<tr >
                           <td colspan="2">
-                          <p style="text-align:left;">CREDITS ALLOUES: <!-- {{mandat_.engagement.credit_alloue.credit_allouee}} --></p>
+                          <p style="text-align:left;">CREDITS ALLOUES: {{mandat_.credit_s2.credit_allouee}} </p>
                           </td>
                            <td>
-                            <p style="text-align:left;">CREDITS DISPONIBLES:</p>
+                            <p style="text-align:left;">CREDITS DISPONIBLES: {{mandat_.nouveau_solde_mandat}}</p>
                           </td>
                          
                         </tr>

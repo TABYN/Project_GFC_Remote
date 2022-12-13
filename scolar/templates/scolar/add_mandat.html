@@ -106,24 +106,24 @@ table {
 													<th>Fournisseur</th>
 													<th>Montant operation</th>
 													<th>Observation</th>
+													<th style="color: blue;">Edit</th>
+													<th style="color: blue;">Imprimer</th>
 												</tr>
 												</thead>
 												<tbody>
 												{% for mandat in mandats %}
 												<tr>
-													<td>{{mandat.article.code_art}}</td>
+													<td>{{mandat.credit_s2.article.code_art}}</td>
 													<td>{{mandat.num_mandat}}</td>
 													<td>{{mandat.date}}</td>
 													<td>{{mandat.fournisseur.code_fournisseur}} {{mandat.fournisseur.nom_fournisseur}}</td>
 													<td>{{mandat.montant_op}}</td>
 													<td>{{mandat.observation_mandat}}</td>
-													<td></td>
 													<td>
 														<a style="padding-left:30px;" href="{% url 'MandatDelete' mandat.id %}" class="d-inline" >
-															<i class="fa fa-trash-alt fa-lg "></i>
-															<a style="padding-left:30px;" href="{% url 'mandat_update' mandat.id %}" class="d-inline" >
-															<i class="fa fa-pencil-alt fa-lg "></i>
-														</a>
+															<i class="fa fa-trash-alt fa-lg "></i></a>
+														<a style="padding-left:30px;" href="{% url 'mandat_update' mandat.id %}" class="d-inline" >
+															<i class="fa fa-pencil-alt fa-lg "></i></a>
 													</td>
 													<td>
 														<a style="padding-left:30px;" href="{% url 'Mandat_PDFView' mandat.id %}" class="d-inline" >

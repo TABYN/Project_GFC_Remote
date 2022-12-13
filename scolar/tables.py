@@ -1253,51 +1253,43 @@ class ExerciceTable(tables.Table):
         fields=['annee_budg']
         template_name= "django_tables2/bootstrap4.html"
         
-class MandatFilter(django_filters.FilterSet):
-    num_mandat = django_filters.CharFilter(field_name='num_mandat', lookup_expr='icontains', label="numero Mandat")
-    fournisseur = django_filters.ModelChoiceFilter(field_name='fournisseur', queryset = Fournisseur.objects.all(), empty_label ="Fournisseur")    
-
-    class Meta:
-        model = Mandat
-        fields = ['num_mandat','fournisseur', 'date']
+# class Mandat_1Table(tables.Table):
+#     chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+#     def render_chapitre(self,value,record):
+#         if record.chapitre :
+#             return str(record.chapitre)
+#         
+#     action= '<a href="{% url "mandatCreate" art=record.id %}" class="btn btn-info" role="button"> Liste mandats</a>'
+#     Mandats=tables.TemplateColumn(action, orderable=False)
+#     
+#     class Meta:
+#         model =Article
+#         fields=('chapitre','code_art','libelle_art_FR')
+#         template_name= "django_tables2/bootstrap4.html"      
+#         row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
+#                                         else "background-color: #66ff33;"}    
         
-class MandatTable(tables.Table):
-                                
-    date = tables.DateTimeColumn(format ='d/m/Y')
-    action='{% load icons %}\
-            <a href="{% url "mandat_update" mandat_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "mandat_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
-    edit   = tables.TemplateColumn(action, orderable=False)
-    
-    action= '{% load icons %}\
-            <a href=" {% url "detail_mandat" pk=record.id %} " > {% icon "eye" %}</a> '      
-               
-    detail   = tables.TemplateColumn(action, orderable=False)
-    
-    action= '<a href="{% url "Mandat_PDFView" mandat_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
-    Imprimer=tables.TemplateColumn(action, orderable=False)
-      
-
-    class Meta:
-        model= Mandat
-        fields =['num_mandat', 'date', 'fournisseur__nom_fournisseur', 'engagement__num']
-        template_name= "django_tables2/bootstrap4.html"
-###############################################
-
-class Mandat_1Table(tables.Table):
-    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
-    def render_chapitre(self,value,record):
-        if record.chapitre :
-            return str(record.chapitre)
+class Mandat_1_Table(tables.Table):
+#     chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+#     def render_chapitre(self,value,record):
+#         if record.chapitre :
+#             return str(record.chapitre)
         
-    action= '<a href="{% url "mandatCreate" art=record.id %}" class="btn btn-info" role="button"> Liste mandats</a>'
+    action= '<a href="{% url "mandatCreate" crd=record.id %}" class="btn btn-info" role="button"> Liste mandats</a>'
     Mandats=tables.TemplateColumn(action, orderable=False)
     
     class Meta:
-        model =Article
-        fields=('chapitre','code_art','libelle_art_FR')
-        template_name= "django_tables2/bootstrap4.html"      
-        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
-                                        else "background-color: #66ff33;"}    
+        model = Credit_S2
+        fields=('article__code_art','article__libelle_art_FR')
+        template_name= "django_tables2/bootstrap4.html"    
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.article.posteriori==False 
+                                        else "background-color: #66ff33;"}  
         
-       
+
+class Mandat_1_Filter(django_filters.FilterSet):
+    code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
+                                      
+    class Meta:
+        model = Credit_S2
+        fields = ['code_art']
+              

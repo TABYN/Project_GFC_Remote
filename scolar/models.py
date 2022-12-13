@@ -2233,7 +2233,7 @@ class Fournisseur(models.Model):
         
 
         def __str__(self):
-            return self.code_fournisseur+' '+ self.nom_fournisseur       
+            return self.code_fournisseur+' '+ self.nom_fournisseur      
 
 class Banque(models.Model):
     code = models.CharField(max_length=3)
@@ -2283,6 +2283,9 @@ class Engagement(models.Model):
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
     montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     
+    def __str__(self):
+        return "Engagement "+ str(self.num)+' '+str(self.type)
+
     def nouveau_solde(self): 
         solde=0      
         if self.montant_operation :
@@ -2304,9 +2307,7 @@ class Engagement(models.Model):
             return solde_s2
              
     
-    def __str__(self):
-        return "Engagement "+ str(self.num)+' '+str(self.type)
-
+    
 class Mandat(models.Model):
     num_mandat = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
@@ -2316,24 +2317,24 @@ class Mandat(models.Model):
     montant_op = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     observation_mandat = models.CharField(max_length=300, default='')
     annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
-    credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2' , null= True, blank=True, on_delete=models.SET_NULL)
+    credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2_mandat' , null= True, blank=True, on_delete=models.SET_NULL)
     
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 
-    def nouveau_solde(self): 
+    def nouveau_solde_mandat(self): 
         solde=0      
         if self.montant_op :
             solde=solde+self.credit_s2.credit_reste-self.montant_op
             return solde
 
-    def nouveau_solde_s1(self): 
+    def nouveau_solde_s1_mandat(self): 
         solde_s1=self.credit_s2.credit_allouee/2
         if self.montant_op :
             solde_s1=solde_s1-self.montant_op
             return solde_s1
         
-    def nouveau_solde_s2(self):  
+    def nouveau_solde_s2_mandat(self):  
         solde_s2=self.credit_s2.credit_allouee/2
         if self.nouveau_solde_s1() :
             solde_s2=solde_s2+self.nouveau_solde_s1()

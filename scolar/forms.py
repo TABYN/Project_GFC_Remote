@@ -1787,17 +1787,6 @@ class Mandat_UpdateForm(forms.Form):
                  required = False,
                  initial=mandat_.fournisseur                                             
             )    
-#             self.fields['engagement']=forms.ModelChoiceField(
-#                 queryset=Engagement.objects.all(),
-#                 label=u"Engagement",
-#                 widget=ModelSelect2Widget(
-#                         model=Engagement,
-#                         search_fields=['num__icontains',],
-#                     ),
-#                 #help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-#                 required = False,
-#                 initial=mandat_.engagement
-#             )    
 
             self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
             self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
@@ -1811,7 +1800,7 @@ class Mandat_UpdateForm(forms.Form):
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification d'engagement. Merci de le signaler a l'administrateur")
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification du mandat. Merci de le signaler a l'administrateur")
 
 
 class Mandat_DetailForm(forms.Form):
