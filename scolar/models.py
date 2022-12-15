@@ -2311,9 +2311,9 @@ class Engagement(models.Model):
 class Mandat(models.Model):
     num_mandat = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
-    article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
+    #article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
     fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
-    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    #engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
     montant_op = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     observation_mandat = models.CharField(max_length=300, default='')
     annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)

@@ -59,7 +59,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
     Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, \
-    MandatCreateForm, Mandat_UpdateForm, Mandat_DetailForm
+    Mandat_UpdateForm, Mandat_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -13504,8 +13504,12 @@ class MandatListView(TemplateView):
 def MandatCreate(request, crd):
     crdt= Credit_S2.objects.get(pk=crd)
     #arti=Article.objects.get(pk=art)
+    annee_bdg = AnneeUniv.objects.all()
+    annee_budge_id=request.POST.get('annee_budge')
+    
     frn = Fournisseur.objects.all()
     fournisseur_id=request.POST.get('fournisseur')
+    
     if request.method == 'POST':
         mandat = Mandat(
             credit_s2 =Credit_S2.objects.get(pk=crd),
@@ -13514,7 +13518,9 @@ def MandatCreate(request, crd):
             date=request.POST['date'],
             montant_op=request.POST['montant_op'],
             observation_mandat=request.POST['observation_mandat'],
+            annee_budge=AnneeUniv.objects.get(annee_univ=annee_budge_id),
             fournisseur=Fournisseur.objects.get(id=fournisseur_id),
+            
         )
         mandat.save()
         messages.success(request, 'Mandat enregistree.')
@@ -13522,7 +13528,7 @@ def MandatCreate(request, crd):
     else:
         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
         mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
-        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn})
+        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg,})
 
 @login_required
 def MandatDelete(request, mandat):

@@ -1725,49 +1725,6 @@ class Depence_DetailForm(forms.Form):
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation d'engagement")
  
-class MandatCreateForm(forms.Form):
-    
-    def __init__(self, request, *args, **kwargs):
-        super(MandatCreateForm, self).__init__(*args, **kwargs)
-        self.helper=FormHelper()
-        try:
-            self.fields['fournisseur']=forms.ModelChoiceField(
-                queryset=Fournisseur.objects.all(),
-                label=u"Fournisseur",
-                widget=ModelSelect2Widget(
-                        model=Fournisseur,
-                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
-                    ),
-                help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-                #required = False,
-            )    
-            self.fields['engagement']=forms.ModelChoiceField(
-                queryset=Engagement.objects.all(),
-                label=u"Engagement",
-                widget=ModelSelect2Widget(
-                        model=Engagement,
-                        search_fields=['num__icontains'],
-                    ),
-                help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-                #required = False,
-            )    
-
-
-            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
-            self.fields['num_mandat'] = forms.IntegerField(initial=0, label='Numero Mandat')
-           # self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
-
-            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
-            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-            self.helper.form_method='POST'
-        except Exception:
-            if settings.DEBUG:
-                raise Exception
-            else:
-                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de Mandat. Merci de le signaler a l'administrateur")    
-  
-
-
 class Mandat_UpdateForm(forms.Form):
     
     def __init__(self, mandat_pk, request, *args, **kwargs):
@@ -1785,12 +1742,13 @@ class Mandat_UpdateForm(forms.Form):
                         search_fields=['code_fournisseur__icontains','nom_fournisseur__icontains'],
                     ),
                  required = False,
-                 initial=mandat_.fournisseur                                             
+                 initial=mandat_.fournisseur,
+                 help_text = "Tapez le code ou le nom du fournisseur ",                                             
             )    
 
             self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
             self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
-            self.fields['montant_op'] = forms.DecimalField(label='Montant operation', required = False, initial=mandat_.montant_op,  localize=True)
+            self.fields['montant_op'] = forms.DecimalField(label='Montant operation', required = False, initial=mandat_.montant_op,  localize=True, help_text = "Supprimer tout le contenu et Tapez un nombre",)
             self.fields['observation_mandat']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=mandat_.observation_mandat)    
              
             self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))

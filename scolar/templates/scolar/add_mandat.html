@@ -36,6 +36,19 @@ table {
 										</div>
 									</div>
 								</div>
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Annee budgetaire</label>
+										<div class="col-sm-9">
+											<select class="form-control"  name="annee_budge" >
+											   {% for annee_bdg in annee_bdg %}
+											   <option value="{{ annee_bdg.annee_univ }}">{{ annee_bdg.annee_univ }}</option>
+											   {% endfor %}
+											</select>
+											
+										</div>
+									</div>
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-6">
@@ -102,6 +115,7 @@ table {
 												<tr>
 													<th>code article</th>
 													<th>Numero mandat</th>
+													<th>Annee budgetaire</th>
 													<th>Date</th>
 													<th>Fournisseur</th>
 													<th>Montant operation</th>
@@ -115,6 +129,7 @@ table {
 												<tr>
 													<td>{{mandat.credit_s2.article.code_art}}</td>
 													<td>{{mandat.num_mandat}}</td>
+													<td>{{mandat.annee_budge.annee_univ}}</td>
 													<td>{{mandat.date}}</td>
 													<td>{{mandat.fournisseur.code_fournisseur}} {{mandat.fournisseur.nom_fournisseur}}</td>
 													<td>{{mandat.montant_op}}</td>
