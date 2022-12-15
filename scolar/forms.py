@@ -1971,5 +1971,38 @@ class Mandat_DetailForm(forms.Form):
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation de Mandat")
                 
+class Mandat_UpdateForm2(forms.Form):
+    
+    def __init__(self, mandat_pk, request, *args, **kwargs):
+        super(Mandat_UpdateForm2, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:  
+            mandat_= get_object_or_404(Mandat, id=mandat_pk)
+
+
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['code_fournisseur__icontains','nom_fournisseur__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.fournisseur                                             
+            )    
+
+            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
+            self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
+            self.fields['montant_operatio'] = forms.DecimalField(label='Montant_operation', required = False, initial=mandat_.montant_operatio,  localize=True)
+            self.fields['observatio']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=mandat_.observatio)    
+             
+            self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification du mandat. Merci de le signaler a l'administrateur")
                 
               

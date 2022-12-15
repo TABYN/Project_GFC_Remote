@@ -61,7 +61,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm, Mandat_DetailForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm,Mandat_UpdateForm2, Mandat_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -13778,13 +13778,14 @@ class Articles_mandatListView(TemplateView):
 def Article_MandatListView (request, mandat_pk):      
     article= Article.objects.get(pk = mandat_pk)
     fournisseurs= Fournisseur.objects.all()
+    annee_budgets=AnneeUniv.objects.all()
     fournisseur_id=request.POST.get('fournisseur')
-    #annee_budget_id=request.POST.get['annee_budget']
+    annee_budget_id=request.POST.get('annee_budget')
     if request.method == 'POST':
         mandat = Mandat(
             article_mandat=Article.objects.get(pk=mandat_pk),
             num_mandat=request.POST['num_mandat'],
-            #annee_budget=request.POST['annee_budget'],#annee_budget= AnneeUniv.objects.get(id=annee_budget_id),
+            annee_budget= AnneeUniv.objects.get(annee_univ=annee_budget_id),#annee_budget=request.POST['annee_budget'],
             montant_operatio=request.POST['montant_operatio'],
             observatio=request.POST['observatio'],
             date=request.POST['date'],
@@ -13795,7 +13796,7 @@ def Article_MandatListView (request, mandat_pk):
         return redirect(request.path_info)
     else:
         mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=mandat_pk))
-        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article, 'fournisseurs':fournisseurs})   
+        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article, 'fournisseurs':fournisseurs, 'annee_budgets': annee_budgets})   
 #     
     #mandat_total=mandats.count() 
     #context= {'article':article, 'mandats':mandats}#, 'mandat_total':mandat_total
@@ -13815,5 +13816,50 @@ def MandatDelete(request, mandat):
         mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=article))
         return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article})
     return render(request, 'scolar/delete_item.html', {'delete': delete, 'article': article})
+
+@login_required
+def mandat_update_view2(request, mandat_pk):
+    mandat_=get_object_or_404(Mandat, id=mandat_pk)
+    if request.user.is_budget():
+         pass       
+    else :
+         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+         return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['mandat']=mandat_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Mandat_UpdateForm2(mandat_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+                mandat_.num_mandat=data['num_mandat']      
+                mandat_.date=data['date']
+                mandat_.fournisseur=data['fournisseur']
+                mandat_.observatio=data['observatio']
+                mandat_.montant_operatio=data['montant_operatio']
+                
+                mandat_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du Mandat. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('test', kwargs={ 'mandat_pk': mandat_.article_mandat.id}))#article= Article.objects.get(pk = mandat_pk)
+    # if a GET (or any other method) we'll create a blank form-----------'
+    else:
+        form = Mandat_UpdateForm2(mandat_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier le Mandat")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
 
                      
