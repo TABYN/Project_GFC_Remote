@@ -82,7 +82,7 @@ class User(AbstractUser):
             return Inscription.objects.none()
         
     def exercice_list(self):
-        if self.is_regisseur() or self.is_top_management():
+        if self.is_regisseur() or self.is_top_management() or self.is_budget():
             return Exercice.objects.all()
         else:
             return Exercice.objects.none()
@@ -154,9 +154,7 @@ class User(AbstractUser):
         else:
             return self.is_direction()
         
-    def is_budget(self):
-        group_budget=get_object_or_404(Group, name='budget')
-        return group_budget in self.groups.all()
+
         
     
     def is_staff_only(self):
@@ -2235,7 +2233,7 @@ class Fournisseur(models.Model):
         
 
         def __str__(self):
-            return self.code_fournisseur+' '+ self.nom_fournisseur       
+            return self.code_fournisseur+' '+ self.nom_fournisseur      
 
 class Banque(models.Model):
     code = models.CharField(max_length=3)
@@ -2270,30 +2268,78 @@ class Type_Engagement_S2(models.Model):
     nature = models.CharField(max_length=150)
     def __str__(self):
         return  self.code + ' : ' + self.nature
- 
+
+
+TYPE=(
+    ('Prise en charge','Prise en charge'),
+    ('Depence','Depence')
+    ) 
 class Engagement(models.Model):
     num = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
-    type_engagement=models.ForeignKey(Type_Engagement_S2, related_name='type_engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    type = models.CharField(max_length = 2, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
     montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     
+    def __str__(self):
+        return "Engagement "+ str(self.num)+' '+str(self.type)
+
     def nouveau_solde(self): 
         solde=0      
         if self.montant_operation :
-            solde=solde+self.credit_alloue.credit_allouee-self.montant_operation
+            solde=solde+self.credit_alloue.credit_reste-self.montant_operation
             return solde
-        if self.nouveau_solde():
-            self.credit_alloue.credit_reste=solde
-   
+      
+    def nouveau_solde_s1(self): 
+        solde_s1=self.credit_alloue.credit_allouee/2
+        if self.montant_operation :
+            solde_s1=solde_s1-self.montant_operation
+            return solde_s1
+        
+    def nouveau_solde_s2(self):  
+        solde_s2=self.credit_alloue.credit_allouee/2
+        if self.nouveau_solde_s1() :
+            solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+        else:
+            return solde_s2
+             
+    
+    
+class Mandat(models.Model):
+    num_mandat = models.IntegerField(null = True)
+    date=models.DateField(null=True, blank=True)
+    #article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
+    fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
+    #engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    montant_op = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    observation_mandat = models.CharField(max_length=300, default='')
+    annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
+    credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2_mandat' , null= True, blank=True, on_delete=models.SET_NULL)
     
     def __str__(self):
-        return "Engagement "+ str(self.num)+' '+str(self.type_engagement.nature)
+        return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 
+    def nouveau_solde_mandat(self): 
+        solde=0      
+        if self.montant_op :
+            solde=solde+self.credit_s2.credit_reste-self.montant_op
+            return solde
 
-
-
+    def nouveau_solde_s1_mandat(self): 
+        solde_s1=self.credit_s2.credit_allouee/2
+        if self.montant_op :
+            solde_s1=solde_s1-self.montant_op
+            return solde_s1
+        
+    def nouveau_solde_s2_mandat(self):  
+        solde_s2=self.credit_s2.credit_allouee/2
+        if self.nouveau_solde_s1() :
+            solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+        else:
+            return solde_s2
     
  

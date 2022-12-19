@@ -44,7 +44,7 @@ table {
                           
                              <tr >
                           <td style="border-bottom: none;">
-                          <p>{{engagement_.observation}}</p>
+                          <p>{{engagement_.credit_alloue.article}}</p>
                           <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                         
                           
@@ -85,28 +85,37 @@ table {
 					  <td style="margin-top: 0; width: 45%;vertical-align: top;border:none;" >
 						  <img src ="{% static 'entete doc budget.png' %}" alt="entete" width= "700" height="50" >
                        <p>Section 02</p>
- 					   <p align="center"><b>ANNEXE N° 1</b></p>	  
-				       <p><b>Code Ordonnateur</b></p>
+ 					   <p>DESIGNATION DE L'ORDONNATEUR</p>	  
+				       <p><b>Directeur de l'ecole</b></p>
+				       <table   style=" width: 60%; ">
+						<tr style="height:25px;"> 
+							<td style=" width: 30%;height:25;"><p style="text-align:LEFT;"><b>CODE ORDONNATEUR</b></p></td>
+							<td style="width: 30%;height:25;" >  </td>
+						</tr>
+						</table>  
+						<br>
 				       <table  style="margin-left: auto; margin-right: auto; width: 60%; ">
 						<tr style="height:50px;"> 
 							<td style=" width: 50%;height:25;"><p style="text-align:center;"><b>BUDGET DE FONCTIONNEMENT</b></p></td>
 						</tr>
-						</table>  	  
-						<table style="margin-top: 50px; width: 100%;">
+						</table>  
+						<br>	  
+						<table style="width: 100%;">
 						<thead>
 						<tr style="height:50px;"> 
-							<td colspan="2" style=" width: 30%;height:25;"><p style="text-align:center;">Identification de la fiche d'engagement</p></td>	
+							<td colspan="2" style=" width: 30%;height:25;"><p style="text-align:left;">Semestre:<br>Fiche de provision N°</p></td>	
 				        	<td style=" width: 40%;height:25;border-top: none;border-bottom: none;"></td>
-							<td style=" width: 30%;height:25;text-align:center;"><p>Visa du controleur financier</p></td>
+							<td colspan="2" style=" width: 30%;height:25;text-align:center;"><p>Visa du controleur financier</p></td>
 						</tr>
 						</thead>
 						<tbody>
-					  <tr style="height:80px;"> 
+					  <tr style="height:50px;"> 
 					  
-							<td style=" width: 15%;height:25;"><p>Annee&nbsp;&nbsp;&nbsp;&nbsp;{{engagement_.annee_budg}}</p></td>
-							<td style=" width: 15%;height:25;"><p>N°&nbsp;&nbsp;&nbsp;&nbsp;0002</p></td>
+							<td style=" width: 15%;height:25;"><p>Année&nbsp;&nbsp;&nbsp;&nbsp;{{engagement_.annee_budg}}</p></td>
+							<td style=" width: 15%;height:25;"><p>N°&nbsp;&nbsp;&nbsp;&nbsp;003</p></td>
 							<td style=" width: 40%;height:25;border-top: none;border-bottom: none;vertical-align: bottom;"><br></td>
-                           <td style=" width: 30%;height:25;"><p>N°&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DU</p></td>						
+                           <td style=" width: 15%;height:25;"><p>N°</p></td>	
+                           <td style=" width: 15%;height:25;"><p>DU</p></td>					
                       </tr>
                       </tbody>
 						</table>  
@@ -114,7 +123,7 @@ table {
 						
 						<table  style="margin-left: auto; margin-right: auto; width: 60%; ">
 						<tr style="height:50px;"> 
-							<td style=" width: 50%;height:25;"><p style="text-align:center;"><b>FICHE D'ENGAGEMENT DE LA PROVISION (CREDIT/PROVISION)</b></p></td>
+							<td style=" width: 50%;height:25;"><p style="text-align:center;"><b>FICHE DE REGULARISATION DE LA PROVISION</b></p></td>
 						</tr>
 						</table>  
 					
@@ -128,35 +137,35 @@ table {
 						
 					<table style="margin-top: 20px; width: 100%;">	
 					  <tr style="height:40px;">
-					        <td style=" width: 15%;height:25;text-align:center;"><p>COMPTABILITE</p></td> 
-							<td style=" width: 10%;height:25;text-align:center;"><p>CHAP</p></td>
-				        	<td style=" width: 10%;height:25;text-align:center;"><p>ART</p></td>
-						    <td style=" width: 15%;height:25;text-align:center;"><p>ANCIEN SOLDE</p></td>
-				        	<td style=" width: 15%;height:25;text-align:center;"><p>MONTANT DE LA PROVISION</p></td>
-						    <td style=" width: 15%;height:25;text-align:center;"><p>NOUVEAU SOLDE</p></td>
-						    <td style=" width: 40%;height:25;text-align:center;"><p>OBSERVATION DES SERVICES(1)</p></td>
+					        <td style=" width: 15%;height:25;text-align:center;"><p>Comptabilité</p></td> 
+							<td style=" width: 10%;height:25;text-align:center;"><p>Chapitre</p></td>
+				        	<td style=" width: 10%;height:25;text-align:center;"><p>Article</p></td>
+						    <td style=" width: 15%;height:25;text-align:center;"><p>Ancien solde</p></td>
+				        	<td style=" width: 15%;height:25;text-align:center;"><p>Montant de l'opiration</p></td>
+						    <td style=" width: 15%;height:25;text-align:center;"><p>Nouveau solde</p></td>
+						    <td style=" width: 40%;height:25;text-align:center;"><p>Observation des services</p></td>
 						    
+						</tr>
+						
+						<tr style="height:100px;"> 
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.montant_operation}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s1}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
+						
 						</tr>
 						
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>*Dotation budgetaire initiale{{engagement_.credit_alloue.credit_allouee}}</p></td>
-						
-						</tr>
-						
-						<tr style="height:100px;"> 
-						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision (50% CB)</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>0.00</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>*Le montant de la provision{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s1}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
 						
 						</tr>
 
@@ -164,18 +173,22 @@ table {
 						
 						<div style="text-align:left;">
 						<p>L'intitule: </p>
-						<p>Chapitre:&nbsp;&nbsp;{{engagement_.credit_alloue.chapitre.code_chap}} </p>
+						<p>Chapitre:&nbsp;&nbsp;{{engagement_.credit_alloue.chapitre.libelle_chap_FR}} </p>
 						<p>Article: &nbsp;&nbsp;{{engagement_.credit_alloue.article.libelle_art_FR}}</p>
-						<p><b>NB:*Dotation budgetaire initiale</b></p>
+						<p>Observation de service</p>
+						<p>Regularisation d'engagement de dépence pris en charge dans sa forme à posteriori.......................<br>
+						      .............................................................................................................................<br>
+						      .............................................................................................................................</p>
 						</div>
 						
-						<table style="margin-top: 50px; width: 50%;">
+						<table style="margin-top: 50px; width: 100%;">
 						<tr style="height:150px;"> 
-							<td style=" width: 30%;height:25;"><p style="text-align:center;">VISA DU CONTROLEUR FINANCIER</p></td>
+							<td style=" width: 50%;height:25;"><p style="text-align:center;">VISA DU CONTROLEUR FINANCIER</p></td>
+							<td style=" width: 50%;height:25;border-top: none;border-bottom: none;border-right: none;">&nbsp;&nbsp;&nbsp;&nbsp;A................     Le...............<br>&nbsp;&nbsp;&nbsp;&nbsp;L'ordonateur</td>
 						</tr>
 						</table>  
 						
-						A................     Le...............
+						
 						
 						
 						  

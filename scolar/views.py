@@ -36,10 +36,8 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     CoordinationModuleFilter, SemainierTable, FeedbackTable, AnneeUnivTable, SeanceTable, ActiviteEtudiantFilter, \
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
-    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, EngagementTable, EngagementFilter, \
-    ArticleFilter, ArticleTable
-
-    
+    FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -60,7 +58,8 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    EngagementCreateForm, EngagementUpdateForm, EngagementDetailForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, \
+    Mandat_UpdateForm, Mandat_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -12865,7 +12864,6 @@ class BanqueListView(TemplateView):
             }
         return context
 
-
 class BanqueCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_banque'
     model = Banque
@@ -12889,7 +12887,6 @@ class BanqueCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
         context['titre'] = titre
         return context
 
-
 class BanqueUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'scolar.change_banque'
     model = Banque
@@ -12912,7 +12909,6 @@ class BanqueUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
         self.success_url = reverse('banque_list')
         return form
 
-
 class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
     model = Banque
     template_name = 'scolar/delete.html'
@@ -12921,7 +12917,23 @@ class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
 
     def get_success_url(self):
         return reverse('banque_list')
+
+class ExerciceListView(LoginRequiredMixin, TemplateView):
+    template_name='scolar/list.html'
     
+    def get_queryset(self,**kwargs):
+        return Exercice.objects.all().order_by('annee_budg')
+    
+    def get_context_data(self, **kwargs):
+        context = super(ExerciceListView, self).get_context_data(**kwargs)
+        exclude_=[]
+        table = ExerciceTable(self.get_queryset(**kwargs), exclude=exclude_)
+        RequestConfig(self.request).configure(table)
+        context['titre'] = 'Liste des exercices budgetaires'
+        context['table'] = table
+        context['back'] = reverse('home')
+        return context
+        
 @login_required
 def CreditCreate_S2(request,exe):
     article = Article.objects.all()
@@ -12980,7 +12992,7 @@ def CreditAssociate_S2(request,exe,art):
                 messages.error(request, 'Vous ne pouvez pas allouer un credi plusieurs fois au meme article ... ') 
                 return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
                 return redirect(request.path_info)
-      
+            
         except IntegrityError:     
             messages.error(request, "Erreur dans lenregistrement")
             return redirect(request.path_info)
@@ -13038,8 +13050,6 @@ class Type_EngagementListView(TemplateView):
             }
         return context
  
- 
- 
 class Type_EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_engagement_S2'
     model = Type_Engagement_S2
@@ -13091,35 +13101,35 @@ class Type_EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permiss
     def get_success_url(self):
         return reverse('engagement_S2_list')
 
-class EngagementListView(TemplateView):
+class Prise_en_charge_ListView(TemplateView):
     template_name = 'scolar/filter_list.html'
     def get_context_data(self, **kwargs):
-        context = super(EngagementListView, self).get_context_data(**kwargs)
+        context = super(Prise_en_charge_ListView, self).get_context_data(**kwargs)
   
-        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.all().order_by('num'))
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='Prise en charge').order_by('num'))
   
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
-        table = EngagementTable(filter_.qs)
+        table = Prise_en_chargeTable(filter_.qs)
 
         RequestConfig(self.request).configure(table)
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des engagements '
+        context['titre'] = 'Liste des Prises en charge '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
-            'Ajouter nouvel engagement': reverse('engagement_create'),
+            'Ajouter nouvelle prise en charge': reverse('prise_en_charge_create'),
                   
             }
         return context
   
 @login_required
-def engagement_create_view(request):
+def prise_en_charge_create_view(request):
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = EngagementCreateForm(request, request.POST)
+        form = Prise_en_charge_CreateForm(request, request.POST)
         # check whether it's valid:
         if form.is_valid():
             try:
@@ -13128,75 +13138,37 @@ def engagement_create_view(request):
                 
 
                 engagement_=Engagement.objects.create(
-                    #chapitre=data['chapitre'],
-                    #article=data['article'],
-                    type_engagement=data['type_engagement'],
+                    type=data['type'],
                     num=data['num'],
                     date=data['date'],
                     observation=data['observation'],
                     annee_budg=data['annee_budg'],
-                    credit_alloue=data['credit_alloue'],
-                    montant_operation=data['montant_operation']
+                    credit_alloue=data['credit_alloue']
+                    
                     )                         
                 
             except Exception:
                 if settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: lors de la création de l'engagement. Veuillez le signaler à l'administrateur.")
+                    messages.error(request, "ERREUR: lors de la création de la prise en charge. Veuillez le signaler à l'administrateur.")
                     return render(request, 'scolar/create.html', {'form': form })
 
-            return HttpResponseRedirect(reverse('engagement_list'))
+            return HttpResponseRedirect(reverse('Prise_en_charge_list'))
                     
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = EngagementCreateForm(request)
-        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvel engagement")
+        form = Prise_en_charge_CreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle prise en charge")
     
     context={}  
     context['form']=form
     return render(request, 'scolar/create.html', context)
 
-#source type User
-#cible de type User ou Etudiant ou Enseignant ou n'importe quel autre modèle, si le modèle de Cible n'a pas d'attribut User alors la cible sera automatiquement None
-#action de type texte
-def trace_create(source, cible, action):
-    try :
-        if source :
-            source_text_=source.nom()+' '+source.prenom()
-        else :
-            source_text_=""
-        if cible :
-            cible_class=cible.__class__
-            if cible_class.__name__ == "User" :
-                cible_text_=cible.nom()+' '+cible.prenom()
-            else :
-                if hasattr(cible_class, 'user') and cible.user :
-                    cible_text_=cible.user.nom()+' '+cible.user.prenom()
-                    cible=cible.user
-                else :
-                    if cible_class.__name__ == "Etudiant" :
-                        cible_text_=cible.nom+' '+cible.prenom
-                    else :
-                        cible_text_=str(cible)
-                    cible=None
-        else :
-            cible_text_=""
-        trace_= Trace.objects.create(
-            source=source,
-            source_text=source_text_,
-            cible=cible,
-            cible_text=cible_text_,
-            action=str(action),
-                             )
-        return trace_
-        
-    except Exception :
-        return False 
+
     
 class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
-    #permission_required = 'scolar.fonctionnalite_postgraduation_gestionseminaires'
     model = Engagement
     template_name = 'scolar/delete.html'
     success_message = "Engagement a bien supprime."
@@ -13204,27 +13176,22 @@ class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTe
     def test_func(self):
         return self.request.user.is_budget()
 
-    def delete(self, *args, **kwargs):
-        object_=self.get_object()
-        trace_create(self.request.user, None, "Suppression Engagement: "+str(object_))
-        return super(EngagementDeleteView, self).delete(*args, **kwargs)
-        
     def get_success_url(self):
-        return reverse('engagement_list')
-    
+        return reverse('Prise_en_charge_list')
+
 @login_required
-def engagement_update_view(request, engagement_pk):
+def prise_en_charge_update_view(request, engagement_pk):
     engagement_=get_object_or_404(Engagement, id=engagement_pk)
     if request.user.is_budget():
-         pass       
+        pass       
     else :
-         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
-         return redirect('/accounts/login/?next=%s' % request.path)   
+        messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+        return redirect('/accounts/login/?next=%s' % request.path)   
     context={} 
     context['engagement']=engagement_
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = EngagementUpdateForm(engagement_pk, request, request.POST)
+        form = Prise_en_charge_UpdateForm(engagement_pk, request, request.POST)
         # check whether it's valid:
         if form.is_valid():
             try:
@@ -13232,9 +13199,7 @@ def engagement_update_view(request, engagement_pk):
                 data=form.cleaned_data
                       
                 engagement_.annee_budg=data['annee_budg']
-                #engagement_.chapitre=data['chapitre']
-                #engagement_.article=data['article']
-                engagement_.type_engagement=data['type_engagement']
+                engagement_.type=data['type']
                 engagement_.date=data['date']
                 engagement_.num=data['num']
                 engagement_.observation=data['observation']
@@ -13249,10 +13214,10 @@ def engagement_update_view(request, engagement_pk):
                     messages.error(request, "ERREUR: lors de la modification du l'engagement. Veuillez le signaler à l'administrateur.")
                     return render(request, 'scolar/update.html', {'form': form })
 
-            return HttpResponseRedirect(reverse('engagement_list'))
+            return HttpResponseRedirect(reverse('Prise_en_charge_list'))
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = EngagementUpdateForm(engagement_pk, request)
+        form = Prise_en_charge_UpdateForm(engagement_pk, request)
         messages.info(request, "Utilisez ce formulaire pour modifier l'engagement")
 
         
@@ -13260,7 +13225,7 @@ def engagement_update_view(request, engagement_pk):
   
     return render(request, 'scolar/update.html', context)
   
-class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class Prise_en_chargeDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'scolar/engagement_detail.html'
 
     def test_func(self): 
@@ -13268,13 +13233,13 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         return self.request.user.is_budget()
         
     def get_context_data(self, **kwargs):
-        context = super(EngagementDetailView, self).get_context_data(**kwargs)
-        titre='Engagement N: '+ self.kwargs.get("pk")
+        context = super(Prise_en_chargeDetailView, self).get_context_data(**kwargs)
+        titre='Engagement Peise en charge'#+ self.kwargs.get("pk")
         context['titre'] = titre
 
         engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
         
-        context['engagement_form'] = EngagementDetailForm(engagement_pk=engagement_.id)
+        context['engagement_form'] = Prise_en_charge_DetailForm(engagement_pk=engagement_.id)
         
         exclude_columns_=[]
         if not self.request.user.is_authenticated:
@@ -13289,10 +13254,155 @@ class EngagementDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 exclude_columns_.append('expert')
                   
         return context
+
+class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/filter_list.html'
     
+    def test_func(self):
+        return self.request.user.is_budget()
+        
+    def get_context_data(self, **kwargs):
+        context = super(Depence_ListView, self).get_context_data(**kwargs)
+  
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='Depence').order_by('num'))
+  
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = DepenceTable(filter_.qs)
+
+        RequestConfig(self.request).configure(table)
+  
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Depences '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+            'Ajouter nouvelle depence': reverse('depence_create'),
+                  
+            }
+        return context
+  
+@login_required
+def depence_create_view(request):
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Depence_CreateForm(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+
+                engagement_=Engagement.objects.create(
+                    type=data['type'],
+                    num=data['num'],
+                    date=data['date'],
+                    observation=data['observation'],
+                    annee_budg=data['annee_budg'],
+                    credit_alloue=data['credit_alloue'],
+                    montant_operation=data['montant_operation']
+                    
+                    )                         
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la création de la depence. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('Depence_List'))
+                    
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Depence_CreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle depence")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+@login_required
+def depence_update_view(request, engagement_pk):
+    engagement_=get_object_or_404(Engagement, id=engagement_pk)
+    if request.user.is_budget():
+        pass       
+    else :
+        messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+        return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['engagement']=engagement_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Depence_UpdateForm(engagement_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                      
+                engagement_.annee_budg=data['annee_budg']
+                engagement_.type=data['type']
+                engagement_.date=data['date']
+                engagement_.num=data['num']
+                engagement_.observation=data['observation']
+                engagement_.credit_alloue=data['credit_alloue']
+                engagement_.montant_operation=data['montant_operation']
+                
+                engagement_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du l'engagement. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('Depence_List'))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Depence_UpdateForm(engagement_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier la depence")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
+
+class Depence_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/engagement_detail.html'
+
+    def test_func(self): 
+        engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))   
+        return self.request.user.is_budget()
+        
+    def get_context_data(self, **kwargs):
+        context = super(Depence_DetailView, self).get_context_data(**kwargs)
+        titre='Engagement Depence '#+ self.kwargs.get("pk")
+        context['titre'] = titre
+
+        engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
+        
+        context['engagement_form'] = Depence_DetailForm(engagement_pk=engagement_.id)
+        
+        exclude_columns_=[]
+        if not self.request.user.is_authenticated:
+            exclude_columns_.append('expert')
+            exclude_columns_.append('action')
+            exclude_columns_.append('edit')
+            exclude_columns_.append('admin')
+        else :
+            if (not self.request.user.is_budget()):
+                exclude_columns_.append('edit')
+                exclude_columns_.append('admin')
+                exclude_columns_.append('expert')
+                  
+        return context      
 
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
-    #provision_template_name= 'scolar/Engagement de la provision.html'
     template_name= 'scolar/Prise en charge.html'
     cmd_options = {
         'orientation': 'Landscape',
@@ -13311,13 +13421,7 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
     
-#     def get_template_names(self):
-#         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-#  
-#         if engagement_.credit_alloue.article.posteriori==True:
-#             return [self.provision_template_name]
-#         else: 
-#            return [self.prise_en_charge_template_name]
+       
 class Engagement_de_la_provision_PDFView(PDFTemplateView):
     template_name= 'scolar/Engagement de la provision.html'
     cmd_options = {
@@ -13355,4 +13459,154 @@ class Depence_PDFView(PDFTemplateView):
   
         self.filename ='engagement_'+str(engagement_.id) + '.pdf'
         return context
-              
+    
+
+class Regularisation_provision_PDFView(PDFTemplateView):
+    template_name= 'scolar/Fiche de regularisation de la provision.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
+        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['engagement_'] = engagement_
+        context['engagement_letter'] = engagement_letter
+
+        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        return context
+ 
+
+class MandatListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super(MandatListView, self).get_context_data(**kwargs)
+
+        filter_ = Mandat_1_Filter(self.request.GET, queryset=Credit_S2.objects.all())
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Mandat_1_Table(filter_.qs)
+        RequestConfig(self.request).configure(table)
+        
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Mandats '
+
+        return context   
+    
+@login_required
+def MandatCreate(request, crd):
+    crdt= Credit_S2.objects.get(pk=crd)
+    #arti=Article.objects.get(pk=art)
+    annee_bdg = AnneeUniv.objects.all()
+    annee_budge_id=request.POST.get('annee_budge')
+    
+    frn = Fournisseur.objects.all()
+    fournisseur_id=request.POST.get('fournisseur')
+    
+    if request.method == 'POST':
+        mandat = Mandat(
+            credit_s2 =Credit_S2.objects.get(pk=crd),
+            #article=Article.objects.get(pk=art),
+            num_mandat=request.POST['num_mandat'],
+            date=request.POST['date'],
+            montant_op=request.POST['montant_op'],
+            observation_mandat=request.POST['observation_mandat'],
+            annee_budge=AnneeUniv.objects.get(annee_univ=annee_budge_id),
+            fournisseur=Fournisseur.objects.get(id=fournisseur_id),
+            
+        )
+        mandat.save()
+        messages.success(request, 'Mandat enregistree.')
+        return redirect(request.path_info)
+    else:
+        #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
+        mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
+        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg,})
+
+@login_required
+def MandatDelete(request, mandat):
+    mandat = Mandat.objects.get(pk=mandat)
+    #article = mandat.article.id
+    credit_s2 = mandat.credit_s2.id
+    delete = 6
+    if request.method == "POST":
+        mandat.delete()
+        messages.success(request, 'mandat supprime.')
+        #mandats = Mandat.objects.filter(article=Article.objects.get(pk=article))
+        mandats = Mandat.objects.filter(credit_s2=Credit_S2.objects.get(pk=credit_s2))
+
+        return render(request, 'scolar/add_mandat.html', {'credit_s2': credit_s2 ,'mandats':mandats})
+    return render(request, 'scolar/delete_item.html', {'delete': delete, 'credit_s2': credit_s2}) 
+
+@login_required
+def mandat_update_view(request, mandat_pk):
+    mandat_=get_object_or_404(Mandat, id=mandat_pk)
+    if request.user.is_budget():
+        pass       
+    else :
+        messages.error(request,"Vous .............. cette operation")
+        return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['mandat']=mandat_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Mandat_UpdateForm(mandat_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+                mandat_.num_mandat=data['num_mandat']      
+                mandat_.date=data['date']
+                mandat_.fournisseur=data['fournisseur']
+                mandat_.observation_mandat=data['observation_mandat']
+                mandat_.montant_op=data['montant_op']
+                
+                mandat_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du mandat. Veuillez le signaler a l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('mandatCreate', kwargs={'crd': mandat_.credit_s2.id, }))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Mandat_UpdateForm(mandat_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier le mandat")
+
+        
+    context['form']=form
+    return render(request, 'scolar/update.html', context)
+
+
+class Mandat_PDFView(PDFTemplateView):
+    template_name= 'scolar/mandat de paiement.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        mandat_ = Mandat.objects.get(id=self.kwargs.get('mandat_pk'))
+        mandat_letter = num2words(mandat_.montant_op.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['mandat_'] = mandat_
+        context['mandat_letter'] = mandat_letter
+  
+        self.filename ='mandat_'+str(mandat_.id) + '.pdf'
+        return context
+
+

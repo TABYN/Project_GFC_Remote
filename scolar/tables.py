@@ -1185,39 +1185,95 @@ class Type_Engagement_S2Filter(django_filters.FilterSet):
 
 class EngagementFilter(django_filters.FilterSet):
     num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero d'engagement")
-    type_engagement = django_filters.ModelChoiceFilter(field_name='type_engagement', queryset = Type_Engagement_S2.objects.all(), empty_label ="Type d'engagement")    
 
     class Meta:
         model = Engagement
-        fields = ['num','type_engagement']
+        fields = ['num']
         
-class EngagementTable(tables.Table):
+class Prise_en_chargeTable(tables.Table):
 
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
-            <a href="{% url "engagement_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "prise_en_charge_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
             <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
-            <a href=" {% url "detail_engagement" pk=record.id %}" > {% icon "eye" %}</a> '
+            <a href=" {% url "detail_prise_en_charge" pk=record.id %}" > {% icon "eye" %}</a> '
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% if not record.credit_alloue.article.posteriori %}\
             <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
             {% else %}\
-            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge<br></a>\
             <a href="{% url "Engagement_de_la_provision_PDFView" engagement_pk=record.id %}" > Imprimer engagement provision</a>\
-            {% endif %}\
-            {% if  record.montant_operation %}\
-            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
             {% endif %}'
 
     Imprimer=tables.TemplateColumn(action, orderable=False)          
 
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type_engagement__nature','date', 'credit_alloue__credit_allouee','montant_operation', 'nouveau_solde']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date']
         template_name= "django_tables2/bootstrap4.html"
  
+class DepenceTable(tables.Table):
+
+    date = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% load icons %}\
+            <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> '
+               
+    detail   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% if  not record.credit_alloue.article.posteriori %}\
+            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
+            {% else %}\
+            <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id  %}" > Imprimer fiche de regularisation de la provision</a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
+
+    class Meta:
+        model= Engagement
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation']
+        template_name= "django_tables2/bootstrap4.html"
+
+class ExerciceTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "CreditCreate_S2"  exe=record.id %}" class="btn btn-link"> Exercices </a>'
+    detail=tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model = Exercice
+        fields=['annee_budg']
+        template_name= "django_tables2/bootstrap4.html"   
+        
+class Mandat_1_Table(tables.Table):
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.article.chapitre :
+            return str(record.article.chapitre)
+        
+    action= '<a href="{% url "mandatCreate" crd=record.id %}" class="btn btn-info" role="button"> Liste mandats</a>'
+    Mandats=tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model = Credit_S2
+        fields=('chapitre','article__code_art','article__libelle_art_FR')
+        template_name= "django_tables2/bootstrap4.html"    
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.article.posteriori==False 
+                                        else "background-color: #66ff33;"}  
+        
+
+class Mandat_1_Filter(django_filters.FilterSet):
+    code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
+                                      
+    class Meta:
+        model = Credit_S2
+        fields = ['code_art']
+              
