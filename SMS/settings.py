@@ -45,9 +45,9 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost']
 #ALLOWED_HOSTS = ['talents.esi.dz']
-PROTOCOLE_HOST = 'http://localhost:8000'
+PROTOCOLE_HOST = 'http://10.0.0.96'
 # EMAIL
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
@@ -196,9 +196,8 @@ SOCIAL_AUTH_PIPELINE = (
 )
 SOCIAL_AUTH_STRATEGY = 'social_django.strategy.DjangoStrategy'  # new
 SOCIAL_AUTH_STORAGE = 'social_django.models.DjangoStorage'  # new
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '788698204337-hf38104m1m42tte4t87aoklf29uedl82.apps.googleusercontent.com' # new
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'qWHKbQlOynagtGQarIZ2mdhn'   # new
-
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '556491559119-0h3umpondnf5nmgpa3dovn4e8ufn1itf.apps.googleusercontent.com' # new
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'   # new
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -221,7 +220,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'fr-fr'
+LANGUAGE_CODE = 'en-us'
 
 
 TIME_ZONE = 'Africa/Algiers'
@@ -236,7 +235,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/scolar/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'root') 
 STATICFILES_DIRS = [
 #    os.path.join(BASE_DIR, 'static'),

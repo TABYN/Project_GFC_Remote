@@ -1474,6 +1474,7 @@ class EngagementCreateForm(forms.Form):
                 #initial=annee_en_cours
             )
             
+
             self.fields['credit_alloue'] = forms.ModelChoiceField(
                  queryset=Credit_S2.objects.all(),
                  label=u"Article",
@@ -1485,6 +1486,44 @@ class EngagementCreateForm(forms.Form):
                  #required = False
              ) 
          
+
+            self.fields['credit_S2'] = forms.ModelChoiceField(
+                queryset=Credit_S2.objects.all(),
+                label=u"Credit a Engager",
+                widget=ModelSelect2Widget(
+                        model=Credit_S2,
+                        search_fields=['exercice__annee_budg'],
+   
+                    ),
+                help_text = "Tapez le code de l Exercice pour afficher la liste des chapitre_article a engager , par exemple 2022 ",
+                #required = False
+            ) 
+             
+            #===================================================================
+            # self.fields['chapitre'] = forms.ModelChoiceField(
+            #     queryset=Chapitre.objects.all(),
+            #     label=u"Chapitre",
+            #     widget=ModelSelect2Widget(
+            #             model=Chapitre,
+            #             search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
+            #          
+            #         ),
+            #     help_text = "Tapez le code du chapitre, ou tappez 2 lettres ou plus du libelle du chapitre",
+            #     #required = False
+            # ) 
+            # self.fields['article'] = forms.ModelChoiceField(
+            #     queryset=Article.objects.all(),
+            #     label=u"Article",
+            #     widget=ModelSelect2Widget(
+            #             model=Article,
+            #             search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
+            #             #dependent_fields={'chapitre':'chapitre'},
+            #         ),
+            #     help_text = "Tapez le code de l'article, ou tappez 2 lettres ou plus du libelle de l'article",                                           
+            #     #required = False
+            #===================================================================
+           # ) 
+
             self.fields['type_engagement']=forms.ModelChoiceField(
                 queryset=Type_Engagement_S2.objects.all(),
                 label=u"Nature engagement",
