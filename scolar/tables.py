@@ -1251,36 +1251,20 @@ class ExerciceTable(tables.Table):
     class Meta:
         model = Exercice
         fields=['annee_budg']
-        template_name= "django_tables2/bootstrap4.html"
-        
-# class Mandat_1Table(tables.Table):
-#     chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
-#     def render_chapitre(self,value,record):
-#         if record.chapitre :
-#             return str(record.chapitre)
-#         
-#     action= '<a href="{% url "mandatCreate" art=record.id %}" class="btn btn-info" role="button"> Liste mandats</a>'
-#     Mandats=tables.TemplateColumn(action, orderable=False)
-#     
-#     class Meta:
-#         model =Article
-#         fields=('chapitre','code_art','libelle_art_FR')
-#         template_name= "django_tables2/bootstrap4.html"      
-#         row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
-#                                         else "background-color: #66ff33;"}    
+        template_name= "django_tables2/bootstrap4.html"   
         
 class Mandat_1_Table(tables.Table):
-#     chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
-#     def render_chapitre(self,value,record):
-#         if record.chapitre :
-#             return str(record.chapitre)
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.article.chapitre :
+            return str(record.article.chapitre)
         
     action= '<a href="{% url "mandatCreate" crd=record.id %}" class="btn btn-info" role="button"> Liste mandats</a>'
     Mandats=tables.TemplateColumn(action, orderable=False)
     
     class Meta:
         model = Credit_S2
-        fields=('article__code_art','article__libelle_art_FR')
+        fields=('chapitre','article__code_art','article__libelle_art_FR')
         template_name= "django_tables2/bootstrap4.html"    
         row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.article.posteriori==False 
                                         else "background-color: #66ff33;"}  
