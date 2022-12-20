@@ -13504,7 +13504,7 @@ class MandatListView(TemplateView):
 def MandatCreate(request, crd):
     crdt= Credit_S2.objects.get(pk=crd)
     #arti=Article.objects.get(pk=art)
-    annee_bdg = AnneeUniv.objects.all()
+    annee_bdg = AnneeUniv.objects.all().order_by('-annee_univ')
     annee_budge_id=request.POST.get('annee_budge')
     
     frn = Fournisseur.objects.all()
