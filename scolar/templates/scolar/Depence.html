@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	  {% load static %}
+	  {% load djmoney %}
+	  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+	   <style>
+table {
+  		page-break-inside:auto;
+ 		font-family: Arial, Helvetica, sans-serif;
+	}
+	th, td {
+	  border: 1px solid black;
+	  border-collapse: collapse;
+	}
+	td {
+		page-break-before:avoid;
+	}
+	tr {
+         page-break-inside:avoid;
+    }
+
+    </style>
+  </head>
+
+		  <table style="margin-top: 0; width: 100%;">
+				  <tr>
+				        <td style="margin-top: 0; width: 45%;border:none;" >
+                          <img src ="{% static 'eng.PNG' %}" alt="entete" width= "700" height="150" >
+                          <br><br>
+                          <table width="100%">
+                          <tr >
+                          <td>
+                          <p style="text-align:center;">Nature des engagements</p>
+                          </td>
+                           <td>
+                            <p style="text-align:center;">Montant</p>
+                          </td>
+                          
+                          </tr>
+                          
+                             <tr >
+                          <td style="border-bottom: none;">
+                          <!-- <p>{{engagement_.type_engagement.nature}}</p> -->
+                          <br>
+                          <p>{{engagement_.observation}}</p>
+                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                        
+                          
+                          </td>
+                           <td style="vertical-align: top;">
+                            <p style="text-align:right;">{{engagement_.montant_operation}}</p>
+                          </td>
+                          
+                          </tr>
+                          
+                           <tr >
+                          <td   style="border-top: none;">
+                        
+                        
+                          <p style="text-align: right;">TOTAL......... </p>
+                          
+                          </td>
+                           <td style="vertical-align: top;">
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                          </td>
+                          
+                          </tr>
+                          
+                                <tr >
+                          <td   style="border: none;">
+                        
+                        
+                          <p style="text-align: left;">Total en lettres:<br> {{engagement_letter}}  Dinars Algeriens</p>
+     
+                          </td>
+                       
+                          
+                          </tr>
+                          
+                          </table>
+					  </td>
+			  <td style="margin-top: 0; width: 5%;vertical-align: top;border:none;" >  </td>
+					  <td style="margin-top: 0; width: 45%;vertical-align: top;border:none;" >
+						  <img src ="{% static 'entete doc budget.png' %}" alt="entete" width= "700" height="150" >
+						<table style="margin-top: 50px; width: 100%;">
+						<tr style="height:50px;"> 
+							<td style=" width: 30%;height:25;"><p style="text-align:center;">VISA DU CONTROLEUR FINANCIER</p></td>
+				        	<td style=" width: 40%;height:25;border-top: none;border-bottom: none;"></td>
+							<td style=" width: 30%;height:25;text-align:center;"><p>Année  {{engagement_.annee_budg}}</p></td>
+						</tr>
+					  <tr style="height:80px;"> 
+							<td style=" width: 30%;height:25;"><p>N°</p><br><p>DU</p></td>
+				        	<td style=" width: 40%;height:25;border-top: none;border-bottom: none;vertical-align: bottom;"><br><p>Ordonnateur</p></td>
+						<td style=" width: 30%;height:25;"><p style="text-align:center;">FICHE N°</p><br><p style="text-align:center;">0002</p></td>
+						</tr>
+				
+						</table>  
+						<br>
+						
+							<table style="margin-top: 20px; width: 100%;">
+					
+						  <tr style="height:60px;"> 
+						<td colspan="6">	<div style="text-align:left;font-weight: bold;">
+						<p>Objet : {{engagement_.type}}</p>
+						</div></td>
+					
+						</tr>
+						
+						
+						
+					  <tr style="height:40px;"> 
+							<td style=" width: 15%;height:25;text-align:right;"><p>CHAP</p></td>
+				        	<td style=" width: 10%;height:25;text-align:right;"><p>ART</p></td>
+						    <td style=" width: 10%;height:25;text-align:right;"><p>PAR</p></td>
+						    <td style=" width: 25%;height:25;text-align:right;"><p>ANCIEN SOLDE</p></td>
+				        	<td style=" width: 25%;height:25;text-align:right;"><p>MONTANT OPERATION</p></td>
+						    <td style=" width: 25%;height:25;text-align:right;"><p>NOUVEAU SOLDE</p></td>
+						</tr>
+						
+						  <tr style="height:130px;"> 
+							<td style=" width: 15%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
+						    <td style=" width: 10%;height:25;vertical-align: top;text-align:right;"><p></p></td>
+						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
+				        	<td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.montant_operation}}</p></td>
+						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.nouveau_solde}}</p></td>
+						</tr>
+
+						</table>  
+						
+						<div style="text-align:center;text-decoration: underline;">
+						<p>OPSERVATION DU SERVICE</p>
+						</div>
+						<br><br><br><br><br><br>
+						<div style="text-align:center">
+						<p>A................     Le...............</p>
+						</div>
+						
+						
+						  
+						  
+						  
+						  
+					  </td>
+				  </tr>
+			
+		
+				  
+		  </table>
+				 
+
+</html>

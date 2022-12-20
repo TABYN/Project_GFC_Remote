@@ -1,0 +1,70 @@
+
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+<form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+   <div class="content-wrapper">
+      <div class="row">
+         <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+               <div class="card-body">
+                  <h3> </h3>
+                   <p class="lead font-italic">Listes des article </p>
+                     <hr class="my-4">
+                     <table class="table table-striped" >
+                         <thead class="border-bottom font-weight-bold">
+                         <tr>
+                             <th>chapitre</th>
+                             <th>code_article</th>
+                             <th>libelle_article_FR</th>
+                             <th>libelle_article_AR</th>
+                          <!--    <th>
+                                 <a href="{% url 'ChapitreCreate' %}"
+                                              class="btn btn-outline-success d-inline">
+                                     <i class="fa fa-plus">Ajouter chapitre</i>
+                                 </a>
+                             </th> -->
+                         </tr>
+                         </thead>
+                         <tbody>
+                         {% for art in article %}
+                         <tr>
+                             <td>{{art.chapitre}}</td>
+                         <td>{{art.code_art}}</td>
+                             <td>{{art.libelle_art_FR}}</td>
+                             <td>{{art.libelle_art_AR}}</td>
+                             <td>
+                                 <a style="padding-left:30px;" href="{% url 'ArticleDelete' art.id %}" class="d-inline" >
+                                     <i class="fa fa-trash-alt fa-lg "></i>
+                                 </a>
+                                 
+                             </td> 
+                         </tr>
+                         {% endfor %}
+                         </tbody>
+                     </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</form>
+</html>
+
+{% endblock %}

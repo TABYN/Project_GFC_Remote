@@ -1,0 +1,130 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+ {% load djmoney %}
+
+ <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+	<div class="content-wrapper">
+		<div class="row">
+			<div class="col-md-12 grid-margin stretch-card" >
+				<div class="card">
+					<div class="card-body" >
+						<h3>Gestion du Bedget : Volet S2</h3>
+						<br>
+						<p class="lead font-italic">Allocation des crédits pour l'Exercice : Exercice :{{pexe}}</p>
+						<hr class="my-4">
+					
+										<table class="table table-striped" >
+									<thead class="border-bottom font-weight-bold">
+								<tr>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Crédit Exercice</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Reste crédit non alloué</th>
+
+							</tr>
+							
+							</thead>
+							<tbody>
+												<tr style="border: 1px solid black; padding: 0px; border-radius: 0px;">
+								
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{pexe.total}} DA</td>
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{pexe.credit_non_allouee.amount}} DA</td>
+
+							  </tr>
+							<tbody>
+						</table>
+						
+						<table class="table table-striped" >
+							<thead class="border-bottom font-weight-bold">
+						
+							<tr>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Code_chapitre</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Code_Article</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Libelle_Article_FR</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Libelle_Article_AR</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Crédit</th>
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Reste</th>
+								
+						<!-- 		{% if pavc.encours == True %}	
+								<th style="border: 1px solid black; padding: 0px; border-radius: 0px;">Allocation_crédit</th>
+								{% endif %}	 -->
+							</tr>
+							</thead>
+							<tbody>
+							{% for art in article %}
+							    <tr style="border: 1px solid black; padding: 0px; border-radius: 0px;">
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{art.chapitre.code_chap}}</td>
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{art.code_art}}</td>
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{art.libelle_art_FR}}</td>
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{art.libelle_art_AR}}</td>
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
+									{% for crd in crdt %}
+									{% if crd.article == art  and crd.exercice_id == pexe.id %}
+									{{crd.credit_allouee}} 
+									{% else %}
+									{% endif %}
+									{% endfor %}
+								</td>
+								
+								
+									<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
+									{% for crd in crdt %}
+									{% if crd.article == art  and crd.exercice_id == pexe.id %}
+									{{crd.credit_reste}}
+									{% else %}
+									{% endif %}
+									{% endfor %}
+								</td>
+								
+					   
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
+									<a style="padding-left:30px;" href="{% url 'CreditAssociate_S2'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-file-alt fa-lg"></i> </a>
+									{% for crd in crdt  %}
+									{% if crd.article == art and crd.exercie_id == pexe.id %}
+									{% endif %}
+									{% endfor %}
+									<a style="padding-left:30px;" href="{% url 'CreditDelete'  pexe.id art.id %}" class="d-inline" > <i class="fa fa-trash-alt fa-lg "></i> </a> 
+									
+									
+									
+								</td>
+					     
+							</tr>
+							{% endfor %}
+							
+		
+							
+							
+							</tbody>
+						</table>
+		
+						
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+ </form>
+<form id="demoForm2" method="POST"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+
+	 </div>
+ </form>
+</html>
+{% endblock %}

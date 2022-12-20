@@ -1072,3 +1072,208 @@ class SeanceTable(tables.Table):
         model=Seance
         template_name="django_tables2/bootstrap4.html"
         
+
+################################################budget
+class ChapitreFilter(django_filters.FilterSet):
+    code_chap = django_filters.CharFilter(field_name='code_chap', lookup_expr='icontains', label='Code chapitre')
+    libelle_chap_FR = django_filters.CharFilter(field_name='libelle_chap_FR', lookup_expr='icontains', label='Libelle chapitre')
+
+    class Meta:
+        model = Chapitre
+        fields = ['code_chap', 'libelle_chap_FR']
+
+class ChapitreTable(tables.Table):
+    action = '{% load icons %}\
+                <a href="{% url "chapitre_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>\
+                <a href="{% url "chapitre_delete" pk=record.id %}" > {% icon "trash" %} </a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+    action= '<a href="{% url "ArticleCreate" chap=record.id %}" class="btn btn-info" role="button"> Articles</a>'
+    Article=tables.TemplateColumn(action, orderable=False)
+    class Meta:
+        model =Chapitre
+        fields=('code_chap', 'libelle_chap_FR', 'libelle_chap_AR')
+        template_name= "django_tables2/bootstrap4.html"   
+
+class ArticleFilter(django_filters.FilterSet):
+    code_art = django_filters.CharFilter(field_name='code_art', lookup_expr='icontains', label='Code article')
+    libelle_art_FR = django_filters.CharFilter(field_name='libelle_art_FR', lookup_expr='icontains', label='Libelle article')
+    posteriori = django_filters.BooleanFilter(field_name='posteriori', label='Posteriori')
+                                               
+    class Meta:
+        model = Article
+        fields = ['code_art', 'libelle_art_FR', 'posteriori']
+
+class ArticleTable(tables.Table):
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.chapitre :
+            return str(record.chapitre)
+    
+    action = '{% load icons %}\
+                <a href="{% url "article_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>'          
+    declarer_posteriori= tables.TemplateColumn(action, orderable=False)
+    class Meta:
+        model =Article
+        fields=('chapitre','code_art', 'libelle_art_FR', 'libelle_art_AR', 'posteriori')
+        template_name= "django_tables2/bootstrap4.html"   
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.posteriori==False 
+                                        else "background-color: #66ff33;"}        
+
+class FournisseurFilter(django_filters.FilterSet):
+    code_fournisseur = django_filters.CharFilter(field_name='code_fournisseur', lookup_expr='icontains', label='Code fournisseur')
+    nom_fournisseur = django_filters.CharFilter(field_name='nom_fournisseur', lookup_expr='icontains', label='Nom de fournisseur')
+   
+    class Meta:
+        model = Fournisseur
+        fields = ['code_fournisseur', 'nom_fournisseur']    
+        
+class FournisseurTable(tables.Table):
+    action = '{% load icons %}\
+                <a href="{% url "fournisseur_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>\
+                <a href="{% url "fournisseur_delete" pk=record.id %}" > {% icon "trash" %} </a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model =Fournisseur
+        fields=('code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur')
+        template_name= "django_tables2/bootstrap4.html"        
+                    
+
+class BanqueTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "banque_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "banque_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Banque
+        fields = ['code', 'nom', 'abreviation', 'nom_a']
+        template_name= "django_tables2/bootstrap4.html"
+        
+
+class BanqueFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='Code')
+    nom = django_filters.CharFilter(field_name='nom', lookup_expr='icontains', label='Nom')
+    abreviation = django_filters.CharFilter(field_name='abreviation', lookup_expr='icontains', label='Abreviation')
+   
+    class Meta:
+        model = Banque
+        fields = ['code', 'nom', 'abreviation']
+        
+
+class Type_Engagement_S2Table(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "engagement_S2_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_S2_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Type_Engagement_S2
+        fields = ['code', 'nature']
+        template_name= "django_tables2/bootstrap4.html"
+    
+
+class Type_Engagement_S2Filter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+    nature = django_filters.CharFilter(field_name='nature', lookup_expr='icontains', label='nature')
+   
+    class Meta:
+        model = Type_Engagement_S2
+        fields = ['code', 'nature']
+
+class EngagementFilter(django_filters.FilterSet):
+    num = django_filters.CharFilter(field_name='num', lookup_expr='icontains', label="numero d'engagement")
+
+    class Meta:
+        model = Engagement
+        fields = ['num']
+        
+class Prise_en_chargeTable(tables.Table):
+
+    date = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "prise_en_charge_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% load icons %}\
+            <a href=" {% url "detail_prise_en_charge" pk=record.id %}" > {% icon "eye" %}</a> '
+               
+    detail   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% if not record.credit_alloue.article.posteriori %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge</a>\
+            {% else %}\
+            <a href="{% url "Prise_en_chargeS2_PDFView" engagement_pk=record.id %}" > Imprimer prise en charge<br></a>\
+            <a href="{% url "Engagement_de_la_provision_PDFView" engagement_pk=record.id %}" > Imprimer engagement provision</a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
+
+    class Meta:
+        model= Engagement
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date']
+        template_name= "django_tables2/bootstrap4.html"
+ 
+class DepenceTable(tables.Table):
+
+    date = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% load icons %}\
+            <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> '
+               
+    detail   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% if  not record.credit_alloue.article.posteriori %}\
+            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
+            {% else %}\
+            <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id  %}" > Imprimer fiche de regularisation de la provision</a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
+
+    class Meta:
+        model= Engagement
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation']
+        template_name= "django_tables2/bootstrap4.html"
+
+class ExerciceTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "CreditCreate_S2"  exe=record.id %}" class="btn btn-link"> Exercices </a>'
+    detail=tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model = Exercice
+        fields=['annee_budg']
+        template_name= "django_tables2/bootstrap4.html"   
+        
+class Mandat_1_Table(tables.Table):
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.article.chapitre :
+            return str(record.article.chapitre)
+        
+    action= '<a href="{% url "mandatCreate" crd=record.id %}" class="btn btn-info" role="button"> Liste mandats</a>'
+    Mandats=tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model = Credit_S2
+        fields=('chapitre','article__code_art','article__libelle_art_FR')
+        template_name= "django_tables2/bootstrap4.html"    
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.article.posteriori==False 
+                                        else "background-color: #66ff33;"}  
+        
+
+class Mandat_1_Filter(django_filters.FilterSet):
+    code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
+                                      
+    class Meta:
+        model = Credit_S2
+        fields = ['code_art']
+              

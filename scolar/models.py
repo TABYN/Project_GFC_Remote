@@ -82,7 +82,7 @@ class User(AbstractUser):
             return Inscription.objects.none()
         
     def exercice_list(self):
-        if self.is_regisseur() or self.is_top_management():
+        if self.is_regisseur() or self.is_top_management() or self.is_budget():
             return Exercice.objects.all()
         else:
             return Exercice.objects.none()
@@ -130,6 +130,10 @@ class User(AbstractUser):
         group_regisseur=get_object_or_404(Group, name='regisseur')
         return group_regisseur in self.groups.all()
     
+    def is_budget(self):
+        group_budget=get_object_or_404(Group, name='budget')
+        return group_budget in self.groups.all()
+    
     def is_not_etudiant(self):
         return not self.is_etudiant()
     
@@ -149,9 +153,12 @@ class User(AbstractUser):
                 return False
         else:
             return self.is_direction()
+        
+
+        
     
     def is_staff_only(self):
-        return self.is_direction() or self.is_scolarite() or self.is_surveillance() or self.is_stage() or self.is_top_management()
+        return self.is_direction() or self.is_scolarite() or self.is_surveillance() or self.is_stage() or self.is_top_management() or self.is_budget()
          
     def is_staff_or_student_himself(self, etudiant_pk):
         if self.is_staff_only() or self.is_enseignant():
@@ -2084,12 +2091,19 @@ class Chapitre(models.Model):
         code_chap = models.CharField(max_length=10)
         libelle_chap_FR = models.CharField(max_length=100)
         libelle_chap_AR = models.CharField(max_length=100, null=True, blank=True)
+        
+        def __str__(self):
+            return self.code_chap+' '+ self.libelle_chap_FR 
 
 class Article(models.Model):
         code_art = models.CharField(max_length=10)
         chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE, default='', related_name="articles")
         libelle_art_FR = models.CharField(max_length=100)
         libelle_art_AR = models.CharField(max_length=100, null=True, blank=True)
+        posteriori=models.BooleanField(default='False', blank=True)
+
+        def __str__(self):
+            return self.code_art+' '+ self.libelle_art_FR 
        
 
 class Exercice(models.Model):
@@ -2099,6 +2113,8 @@ class Exercice(models.Model):
     annee_budg=models.CharField(max_length=4, unique=True)
     debut=models.DateField()
     fin=models.DateField()
+    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
     
     def __str__(self):
         return self.annee_budg
@@ -2207,5 +2223,123 @@ class Immobilier(models.Model):
            return a
        
        #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################
-       
+
+class Fournisseur(models.Model):
+        code_fournisseur = models.CharField(max_length=10, null=True)
+        nom_fournisseur = models.CharField(max_length=200, null=True)
+        adresse_fournisseur = models.CharField(max_length=200, null=True)
+        num_cmpt_fournisseur = models.IntegerField(null=True)
+        cle_cmpt_fournisseur = models.IntegerField(null=True) 
         
+
+        def __str__(self):
+            return self.code_fournisseur+' '+ self.nom_fournisseur      
+
+class Banque(models.Model):
+    code = models.CharField(max_length=3)
+    abreviation = models.CharField(max_length=20)
+    nom = models.CharField(max_length=100)
+    nom_a = models.CharField(max_length=100,blank=True)
+        
+    def __str__(self):
+        return  self.nom + ' : ' + self.abreviation
+    
+class Credit_S2(models.Model):
+    exercice = models.ForeignKey(Exercice, on_delete=CASCADE,default='' )
+    article = models.ForeignKey(Article,related_name='article_credit' , on_delete=CASCADE)
+    chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
+    credit_allouee = MoneyField(decimal_places=2, max_digits=9)
+    credit_reste = MoneyField(decimal_places=2, max_digits=9)
+    epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
+    
+    def credit_article_posteriori(self):       
+        if self.article.posteriori==True :
+            return self.credit_allouee/2
+        else : 
+            return self.credit_allouee
+    
+    def __str__(self):
+        return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
+       
+     
+    
+class Type_Engagement_S2(models.Model):
+    code = models.CharField(max_length=3)
+    nature = models.CharField(max_length=150)
+    def __str__(self):
+        return  self.code + ' : ' + self.nature
+
+
+TYPE=(
+    ('Prise en charge','Prise en charge'),
+    ('Depence','Depence')
+    ) 
+class Engagement(models.Model):
+    num = models.IntegerField(null = True)
+    date=models.DateField(null=True, blank=True)
+    type = models.CharField(max_length = 15, choices = TYPE, null=True, default='')   
+    observation = models.CharField(max_length=300, default='')
+    annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
+    credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    
+    def __str__(self):
+        return "Engagement "+ str(self.num)+' '+str(self.type)
+
+    def nouveau_solde(self): 
+        solde=0      
+        if self.montant_operation :
+            solde=solde+self.credit_alloue.credit_reste-self.montant_operation
+            return solde
+      
+    def nouveau_solde_s1(self): 
+        solde_s1=self.credit_alloue.credit_allouee/2
+        if self.montant_operation :
+            solde_s1=solde_s1-self.montant_operation
+            return solde_s1
+        
+    def nouveau_solde_s2(self):  
+        solde_s2=self.credit_alloue.credit_allouee/2
+        if self.nouveau_solde_s1() :
+            solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+        else:
+            return solde_s2
+             
+    
+    
+class Mandat(models.Model):
+    num_mandat = models.IntegerField(null = True)
+    date=models.DateField(null=True, blank=True)
+    #article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
+    fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
+    #engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    montant_op = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    observation_mandat = models.CharField(max_length=300, default='')
+    annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
+    credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2_mandat' , null= True, blank=True, on_delete=models.SET_NULL)
+    
+    def __str__(self):
+        return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
+
+    def nouveau_solde_mandat(self): 
+        solde=0      
+        if self.montant_op :
+            solde=solde+self.credit_s2.credit_reste-self.montant_op
+            return solde
+
+    def nouveau_solde_s1_mandat(self): 
+        solde_s1=self.credit_s2.credit_allouee/2
+        if self.montant_op :
+            solde_s1=solde_s1-self.montant_op
+            return solde_s1
+        
+    def nouveau_solde_s2_mandat(self):  
+        solde_s2=self.credit_s2.credit_allouee/2
+        if self.nouveau_solde_s1() :
+            solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+        else:
+            return solde_s2
+    
+ 
