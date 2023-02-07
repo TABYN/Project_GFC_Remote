@@ -1195,7 +1195,7 @@ class Prise_en_chargeTable(tables.Table):
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "prise_en_charge_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "prise_en_charge_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
@@ -1222,7 +1222,7 @@ class DepenceTable(tables.Table):
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "depence_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
@@ -1240,7 +1240,7 @@ class DepenceTable(tables.Table):
 
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation','credit_alloue__credit_reste']
         template_name= "django_tables2/bootstrap4.html"
 
 class ExerciceTable(tables.Table):

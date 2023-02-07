@@ -13012,6 +13012,7 @@ def CreditAssociate_S2(request,exe,art):
                 credit_S2.credit_reste=float(request.POST['credit_allouee']) - float(consom)
                 credit_S2.credit_allouee=request.POST['credit_allouee']
                 credit_S2.save()
+                
                 pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount +(Ancien_crdt-credit_S2.credit_allouee.amount)
                 pexe.save(update_fields=['credit_non_allouee'])
                 messages.success(request, 'Credit modifie avec suuces.')
@@ -13168,10 +13169,10 @@ def prise_en_charge_create_view(request):
 
 
     
-class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+class Prise_En_ChargeDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
     model = Engagement
     template_name = 'scolar/delete.html'
-    success_message = "Engagement a bien supprime."
+    success_message = "La prise en charge a bien supprime."
     
     def test_func(self):
         return self.request.user.is_budget()
@@ -13274,7 +13275,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Depences '
+        context['titre'] = 'Liste des Depences et fiches de regularisation de la provision '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
             'Ajouter nouvelle depence': reverse('depence_create'),
@@ -13372,6 +13373,17 @@ def depence_update_view(request, engagement_pk):
   
     return render(request, 'scolar/update.html', context)
 
+class DepenseDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    model = Engagement
+    template_name = 'scolar/delete.html'
+    success_message = "La depence a bien supprime."
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+
+    def get_success_url(self):
+        return reverse('Depence_List')
+
 class Depence_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'scolar/engagement_detail.html'
 
@@ -13418,7 +13430,7 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_prise_en_charge'+str(engagement_.id) + '.pdf'
         return context
     
        
@@ -13438,7 +13450,7 @@ class Engagement_de_la_provision_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
 
 class Depence_PDFView(PDFTemplateView):
@@ -13457,7 +13469,7 @@ class Depence_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_depence'+str(engagement_.id) + '.pdf'
         return context
     
 
@@ -13504,7 +13516,7 @@ class MandatListView(TemplateView):
 def MandatCreate(request, crd):
     crdt= Credit_S2.objects.get(pk=crd)
     #arti=Article.objects.get(pk=art)
-    annee_bdg = AnneeUniv.objects.all()
+    annee_bdg = AnneeUniv.objects.all().order_by('-annee_univ')
     annee_budge_id=request.POST.get('annee_budge')
     
     frn = Fournisseur.objects.all()
@@ -13606,7 +13618,7 @@ class Mandat_PDFView(PDFTemplateView):
         context['mandat_'] = mandat_
         context['mandat_letter'] = mandat_letter
   
-        self.filename ='mandat_'+str(mandat_.id) + '.pdf'
+        self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
         return context
 
 

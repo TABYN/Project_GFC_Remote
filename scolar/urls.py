@@ -363,13 +363,14 @@ urlpatterns = [
     
     path('Prise_en_charge_list', views.Prise_en_charge_ListView.as_view(), name='Prise_en_charge_list'),
     path('prise_en_charge_create', views.prise_en_charge_create_view, name='prise_en_charge_create'),
-    re_path(r'^engagement_delete/(?P<pk>\d+)/$', views.EngagementDeleteView.as_view(), name='engagement_delete'),
+    re_path(r'^prise_en_charge_delete/(?P<pk>\d+)/$', views.Prise_En_ChargeDeleteView.as_view(), name='prise_en_charge_delete'),
     re_path(r'^prise_en_charge_update/(?P<engagement_pk>\d+)/$', views.prise_en_charge_update_view, name='prise_en_charge_update'),
     re_path(r'^detail_prise_en_charge/(?P<pk>\d+)/$', views.Prise_en_chargeDetailView.as_view(), name='detail_prise_en_charge'),
 
     path('Depence_List', views.Depence_ListView.as_view(), name='Depence_List'),
     path('depence_create', views.depence_create_view, name='depence_create'),
     re_path(r'^depence_update/(?P<engagement_pk>\d+)/$', views.depence_update_view, name='depence_update'),
+    re_path(r'^depence_delete/(?P<pk>\d+)/$', views.DepenseDeleteView.as_view(), name='depence_delete'),
     re_path(r'^detail_depence/(?P<pk>\d+)/$', views.Depence_DetailView.as_view(), name='detail_depence'),
 
     path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),

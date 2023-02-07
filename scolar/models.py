@@ -2120,58 +2120,58 @@ class Exercice(models.Model):
         return self.annee_budg
 
 class Avance(models.Model):
-        code_avance = models.CharField(max_length=12)
-        chapitres = models.ManyToManyField(Chapitre)
-        exercice = models.ForeignKey(Exercice, on_delete=CASCADE, default='')
-        encours=models.BooleanField(default='False',  blank=True)
-        total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
-        credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
+    code_avance = models.CharField(max_length=12)
+    chapitres = models.ManyToManyField(Chapitre)
+    exercice = models.ForeignKey(Exercice, on_delete=CASCADE, default='')
+    encours=models.BooleanField(default='False',  blank=True)
+    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
         
         
-        def str_encours(self):       
-          if self.encours :
+    def str_encours(self):       
+        if self.encours :
             return 'OUI'
-          else : 
+        else : 
             return 'NON'
         
 class Credit(models.Model):
-        avance = models.ForeignKey(Avance, on_delete=CASCADE,default='' )
-        article = models.ForeignKey(Article, on_delete=CASCADE)
-        chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
-        credit_allouee = MoneyField(decimal_places=2, max_digits=9)
-        credit_reste = MoneyField(decimal_places=2, max_digits=9)
+    avance = models.ForeignKey(Avance, on_delete=CASCADE,default='' )
+    article = models.ForeignKey(Article, on_delete=CASCADE)
+    chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
+    credit_allouee = MoneyField(decimal_places=2, max_digits=9)
+    credit_reste = MoneyField(decimal_places=2, max_digits=9)
 
         
 class Bordereau(models.Model):
-        credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
-        deseingnation = models.CharField(max_length=200, null=True, blank=True)
-        regisseur = models.CharField(max_length=50, null=True, blank=True)
-        cloture = models.BooleanField(default=False)
-        date_borderau = models.DateField(null=True, blank=True)
-        etat_borderau = models.BooleanField(default=True, null=True, blank=True)  #Rejeté ou accepté
+    credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
+    deseingnation = models.CharField(max_length=200, null=True, blank=True)
+    regisseur = models.CharField(max_length=50, null=True, blank=True)
+    cloture = models.BooleanField(default=False)
+    date_borderau = models.DateField(null=True, blank=True)
+    etat_borderau = models.BooleanField(default=True, null=True, blank=True)  #Rejeté ou accepté
 
 class Piece(models.Model):
-        credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
-        bordreau = models.ForeignKey(Bordereau, on_delete=CASCADE, default='')
-        deseingnation = models.CharField(max_length=200, null=True, blank=True)
-        montant = MoneyField(decimal_places=2, max_digits=9)
+    credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
+    bordreau = models.ForeignKey(Bordereau, on_delete=CASCADE, default='')
+    deseingnation = models.CharField(max_length=200, null=True, blank=True)
+    montant = MoneyField(decimal_places=2, max_digits=9)
         
 #################################### THIS PART FOR INVENTAIRE GESTION ###############################################
 
 class Bloc(models.Model):
-        Num_blc = models.CharField(max_length=10)
-        libelle_blc = models.CharField(max_length=200)
+    Num_blc = models.CharField(max_length=10)
+    libelle_blc = models.CharField(max_length=200)
     
         
 class Bureau(models.Model):
-        code_bur = models.CharField(max_length=10)
-        bloc = models.ForeignKey(Bloc, on_delete=CASCADE, default='', null=True, blank=True,related_name="bureaux")
-        libelle_bureau = models.CharField(max_length=200)
+    code_bur = models.CharField(max_length=10)
+    bloc = models.ForeignKey(Bloc, on_delete=CASCADE, default='', null=True, blank=True,related_name="bureaux")
+    libelle_bureau = models.CharField(max_length=200)
         
 class Immobilier(models.Model):
-        code_barre = models.CharField(max_length=10, null=False,blank=False)
-        deseingnation = models.CharField(max_length=200, null=True, blank=True)
-        FAMILLE=(
+    code_barre = models.CharField(max_length=10, null=False,blank=False)
+    deseingnation = models.CharField(max_length=200, null=True, blank=True)
+    FAMILLE=(
         ('01','Logiciels et Applicatifs'),
         ('02','Materiel informatique'),
         ('03','Materiel et Mobilier de bureau et d''enseingement '),
@@ -2197,43 +2197,43 @@ class Immobilier(models.Model):
         ('24','Audio visuelle '),
         ('25','Materiel medical '))
         
-        famille = models.CharField(max_length = 2, choices = FAMILLE)   
-        fournisseur = models.CharField(max_length=200, null=True, blank=True) 
-        num_inventaire = models.CharField(max_length=20) 
-        valeur = models.DecimalField(decimal_places=2, max_digits=9,default=0.0)
-        benificaire = models.ForeignKey(Personnel, on_delete=models.SET_NULL, null=True, blank=True)
-        Num_facture = models.CharField(max_length=20)  
-        Num_chassis = models.CharField(max_length=30) 
-        matricule = models.CharField(max_length=15) 
-        marque = models.CharField(max_length=15, null=True, blank=True) 
-        date_facture = models.DateField(null=True, blank=True)
-        duree_garantie=models.IntegerField(null=True) 
+    famille = models.CharField(max_length = 2, choices = FAMILLE)   
+    fournisseur = models.CharField(max_length=200, null=True, blank=True) 
+    num_inventaire = models.CharField(max_length=20) 
+    valeur = models.DecimalField(decimal_places=2, max_digits=9,default=0.0)
+    benificaire = models.ForeignKey(Personnel, on_delete=models.SET_NULL, null=True, blank=True)
+    Num_facture = models.CharField(max_length=20)  
+    Num_chassis = models.CharField(max_length=30) 
+    matricule = models.CharField(max_length=15) 
+    marque = models.CharField(max_length=15, null=True, blank=True) 
+    date_facture = models.DateField(null=True, blank=True)
+    duree_garantie=models.IntegerField(null=True) 
        
-        bureau = models.ForeignKey(Bureau, on_delete=models.SET_NULL, null=True, blank=True, default='01')
+    bureau = models.ForeignKey(Bureau, on_delete=models.SET_NULL, null=True, blank=True, default='01')
         
-        observation = models.TextField(max_length=300, null=True, blank=True) 
+    observation = models.TextField(max_length=300, null=True, blank=True) 
         
-        facture=models.FileField(upload_to='invent_files', null=True)
+    facture=models.FileField(upload_to='invent_files', null=True)
                
-        def lib_field(self):
-           try:
+    def lib_field(self):
+        try:
             a=os.path.basename(self.facture.file.name)
-           except :
+        except :
             a=""
-           return a
+        return a
        
        #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################
 
 class Fournisseur(models.Model):
-        code_fournisseur = models.CharField(max_length=10, null=True)
-        nom_fournisseur = models.CharField(max_length=200, null=True)
-        adresse_fournisseur = models.CharField(max_length=200, null=True)
-        num_cmpt_fournisseur = models.IntegerField(null=True)
-        cle_cmpt_fournisseur = models.IntegerField(null=True) 
+    code_fournisseur = models.CharField(max_length=10, null=True)
+    nom_fournisseur = models.CharField(max_length=200, null=True)
+    adresse_fournisseur = models.CharField(max_length=200, null=True)
+    num_cmpt_fournisseur = models.IntegerField(null=True)
+    cle_cmpt_fournisseur = models.IntegerField(null=True) 
         
 
-        def __str__(self):
-            return self.code_fournisseur+' '+ self.nom_fournisseur      
+    def __str__(self):
+        return self.code_fournisseur+' '+ self.nom_fournisseur      
 
 class Banque(models.Model):
     code = models.CharField(max_length=3)
@@ -2261,8 +2261,6 @@ class Credit_S2(models.Model):
     def __str__(self):
         return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
        
-     
-    
 class Type_Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
     nature = models.CharField(max_length=150)
@@ -2277,11 +2275,13 @@ TYPE=(
 class Engagement(models.Model):
     num = models.IntegerField(null = True)
     date=models.DateField(null=True, blank=True)
-    type = models.CharField(max_length = 2, choices = TYPE, null=True, default='')   
+    type = models.CharField(max_length = 15, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
     montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
+
     
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type)
@@ -2291,7 +2291,7 @@ class Engagement(models.Model):
         if self.montant_operation :
             solde=solde+self.credit_alloue.credit_reste-self.montant_operation
             return solde
-      
+    
     def nouveau_solde_s1(self): 
         solde_s1=self.credit_alloue.credit_allouee/2
         if self.montant_operation :
@@ -2327,6 +2327,7 @@ class Mandat(models.Model):
         if self.montant_op :
             solde=solde+self.credit_s2.credit_reste-self.montant_op
             return solde
+            
 
     def nouveau_solde_s1_mandat(self): 
         solde_s1=self.credit_s2.credit_allouee/2
