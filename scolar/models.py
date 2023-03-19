@@ -2223,7 +2223,6 @@ class Immobilier(models.Model):
         return a
        
        #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################     
-
 class Banque(models.Model):
     code = models.CharField(max_length=3)
     abreviation = models.CharField(max_length=20)
@@ -2266,6 +2265,21 @@ class Type_Engagement_S2(models.Model):
     nature = models.CharField(max_length=150)
     def __str__(self):
         return  self.code + ' : ' + self.nature
+
+TYPE_FACTURE=(
+    ('Bon de commande','Bon de commande'),
+    ('Facture proformat','Facture proformat'),
+    ('Facture definitive','Facture definitive'),
+    ('Titre de perception','Titre de perception'),
+    ('Contrat','Contrat'),
+    ('Police assurance','Police assurance')
+    ) 
+class Facture(models.Model):
+    num_fact = models.IntegerField(null=True)
+    date_fact=models.DateField(null=True, blank=True)
+    type_fact = models.CharField(max_length = 15, choices = TYPE_FACTURE, null=True, default='') 
+    def __str__(self):
+        return  self.num_fact + ' : ' + self.type_fact  
 
 
 TYPE=(
