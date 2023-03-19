@@ -1135,7 +1135,7 @@ class FournisseurTable(tables.Table):
     
     class Meta:
         model =Fournisseur
-        fields=('code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur')
+        fields=('code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur', 'banque')
         template_name= "django_tables2/bootstrap4.html"        
                     
 

@@ -12796,16 +12796,34 @@ class FournisseursListView(TemplateView):
 class FournisseurCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_fournisseur'
     model = Fournisseur
-    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
+    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur', 'banque']
     template_name = 'scolar/create.html'
     success_message = "Le fournisseur a ete ajoute avec succes!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.helper = FormHelper()
-        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
-        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        self.success_url = reverse('fournisseurs_list')
+        try:
+            form.fields['banque'] = forms.ModelChoiceField(
+                queryset=Banque.objects.all().order_by('nom'),
+                label=u"Banque",
+                widget=ModelSelect2Widget(
+                    model=Banque,
+                    search_fields=['nom__icontains', ],
+                    # attrs={'style':'width:800px; height:10px;'}
+                ),
+                help_text="Choisir une banque.",
+                required=True
+            )
+            form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+            form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.success_url = reverse('fournisseurs_list')
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la creation d'un fournisseur .")
+   
         return form
 
     def get_context_data(self, **kwargs):
@@ -12818,7 +12836,7 @@ class FournisseurCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
 class FournisseurUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'scolar.change_fournisseur'
     model = Fournisseur
-    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
+    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur', 'banque']
     template_name = 'scolar/update.html'
     success_message = "Le fournisseur a ete modifie avec succes!"
  

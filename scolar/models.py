@@ -2222,18 +2222,7 @@ class Immobilier(models.Model):
             a=""
         return a
        
-       #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################
-
-class Fournisseur(models.Model):
-    code_fournisseur = models.CharField(max_length=10, null=True)
-    nom_fournisseur = models.CharField(max_length=200, null=True)
-    adresse_fournisseur = models.CharField(max_length=200, null=True)
-    num_cmpt_fournisseur = models.IntegerField(null=True)
-    cle_cmpt_fournisseur = models.IntegerField(null=True) 
-        
-
-    def __str__(self):
-        return self.code_fournisseur+' '+ self.nom_fournisseur      
+       #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################     
 
 class Banque(models.Model):
     code = models.CharField(max_length=3)
@@ -2243,6 +2232,17 @@ class Banque(models.Model):
         
     def __str__(self):
         return  self.nom + ' : ' + self.abreviation
+
+class Fournisseur(models.Model):
+    code_fournisseur = models.CharField(max_length=10, null=True)
+    nom_fournisseur = models.CharField(max_length=200, null=True)
+    adresse_fournisseur = models.CharField(max_length=200, null=True)
+    num_cmpt_fournisseur = models.IntegerField(null=True)
+    cle_cmpt_fournisseur = models.IntegerField(null=True) 
+    banque = models.ForeignKey(Banque, related_name='banque',on_delete= models.SET_NULL, null = True, blank = True)
+
+    def __str__(self):
+        return self.code_fournisseur+' '+ self.nom_fournisseur     
     
 class Credit_S2(models.Model):
     exercice = models.ForeignKey(Exercice, on_delete=CASCADE,default='' )
