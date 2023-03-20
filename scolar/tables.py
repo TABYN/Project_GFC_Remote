@@ -1240,7 +1240,7 @@ class DepenceTable(tables.Table):
 
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation','credit_alloue__credit_reste']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','date','fournisseur', 'facture__date_fact', 'facture__num_fact', 'facture__type_facture__type']
         template_name= "django_tables2/bootstrap4.html"
 
 class ExerciceTable(tables.Table):

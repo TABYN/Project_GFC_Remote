@@ -2266,20 +2266,19 @@ class Type_Engagement_S2(models.Model):
     def __str__(self):
         return  self.code + ' : ' + self.nature
 
-TYPE_FACTURE=(
-    ('Bon de commande','Bon de commande'),
-    ('Facture proformat','Facture proformat'),
-    ('Facture definitive','Facture definitive'),
-    ('Titre de perception','Titre de perception'),
-    ('Contrat','Contrat'),
-    ('Police assurance','Police assurance')
-    ) 
+class Type_Facture(models.Model):
+    code = models.CharField(max_length=3)
+    type = models.CharField(max_length=150)
+    def __str__(self):
+        return  self.code + ' : ' + self.type
+    
 class Facture(models.Model):
     num_fact = models.IntegerField(null=True)
     date_fact=models.DateField(null=True, blank=True)
-    type_fact = models.CharField(max_length = 15, choices = TYPE_FACTURE, null=True, default='') 
+    #type_fact = models.CharField(max_length = 100, null=True, blank=True) 
+    type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture' , null= True, blank=True, on_delete=models.SET_NULL) 
     def __str__(self):
-        return  self.num_fact + ' : ' + self.type_fact  
+        return  str(self.num_fact)+' '+str(self.type_facture.type)
 
 
 TYPE=(
@@ -2294,6 +2293,8 @@ class Engagement(models.Model):
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
     montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    fournisseur=models.ForeignKey(Fournisseur ,related_name='fournisseur' , null= True, blank=True, on_delete=models.SET_NULL)
+    facture=models.ForeignKey(Facture ,related_name='facture' , null= True, blank=True, on_delete=models.SET_NULL )
     mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
 
     

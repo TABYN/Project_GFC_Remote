@@ -13321,7 +13321,9 @@ def depence_create_view(request):
                     observation=data['observation'],
                     annee_budg=data['annee_budg'],
                     credit_alloue=data['credit_alloue'],
-                    montant_operation=data['montant_operation']
+                    montant_operation=data['montant_operation'],
+                    fournisseur=data['fournisseur'],
+                    facture=data['facture']
                     
                     )                         
                 
@@ -13370,6 +13372,8 @@ def depence_update_view(request, engagement_pk):
                 engagement_.observation=data['observation']
                 engagement_.credit_alloue=data['credit_alloue']
                 engagement_.montant_operation=data['montant_operation']
+                engagement_.fournisseur=data['fournisseur']
+                engagement_.facture=data['facture']
                 
                 engagement_.save()
                          
