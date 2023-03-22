@@ -2333,7 +2333,8 @@ class Mandat(models.Model):
     observation_mandat = models.CharField(max_length=300, default='')
     annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2_mandat' , null= True, blank=True, on_delete=models.SET_NULL)
-    
+    type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture_mandat' , null= True, blank=True, on_delete=models.SET_NULL) 
+
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 

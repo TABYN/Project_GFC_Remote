@@ -1790,8 +1790,13 @@ class Mandat_UpdateForm(forms.Form):
         self.helper=FormHelper()
         try:  
             mandat_= get_object_or_404(Mandat, id=mandat_pk)
-
-
+        
+            self.fields['annee_budge']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Annee budgetaire",
+                required = False,
+                initial=mandat_.annee_budge
+            ) 
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",
@@ -1802,6 +1807,17 @@ class Mandat_UpdateForm(forms.Form):
                  required = False,
                  initial=mandat_.fournisseur,
                  help_text = "Tapez le code ou le nom du fournisseur ",                                             
+            )    
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['type__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.type_facture,
+                 help_text = "Tapez le type de la facture ",                                             
             )    
 
             self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)

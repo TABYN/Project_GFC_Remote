@@ -13544,6 +13544,9 @@ def MandatCreate(request, crd):
     frn = Fournisseur.objects.all()
     fournisseur_id=request.POST.get('fournisseur')
     
+    type_fact=Type_Facture.objects.all()
+    type_facture_id=request.POST.get('type_facture')
+    
     if request.method == 'POST':
         mandat = Mandat(
             credit_s2 =Credit_S2.objects.get(pk=crd),
@@ -13554,6 +13557,7 @@ def MandatCreate(request, crd):
             observation_mandat=request.POST['observation_mandat'],
             annee_budge=AnneeUniv.objects.get(annee_univ=annee_budge_id),
             fournisseur=Fournisseur.objects.get(id=fournisseur_id),
+            type_facture=Type_Facture.objects.get(id=type_facture_id),
             
         )
         mandat.save()
@@ -13562,7 +13566,7 @@ def MandatCreate(request, crd):
     else:
         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
         mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
-        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg,})
+        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg, 'type_fact':type_fact})
 
 @login_required
 def MandatDelete(request, mandat):
@@ -13598,9 +13602,11 @@ def mandat_update_view(request, mandat_pk):
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
                 
+                mandat_.annee_budge=data['annee_budge']
                 mandat_.num_mandat=data['num_mandat']      
                 mandat_.date=data['date']
                 mandat_.fournisseur=data['fournisseur']
+                mandat_.type_facture=data['type_facture']
                 mandat_.observation_mandat=data['observation_mandat']
                 mandat_.montant_op=data['montant_op']
                 

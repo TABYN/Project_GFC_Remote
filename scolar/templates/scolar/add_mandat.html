@@ -92,6 +92,20 @@ table {
 								</div>
 							</div>
 							<div class="row">
+							<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Type Facture</label>
+										<div class="col-sm-9">
+											<select class="form-control"  name="type_facture" >
+											   {% for type_fact in type_fact %}
+											   <option value="{{ type_fact.id }}">{{ type_fact.type }}</option>
+											   {% endfor %}
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
 								<div class="col-md-4">
 									<a href="{% url 'mandatlist' %}" class="btn btn-secondary btn-block">
 										<i class="fa fa-list"></i> Retour
@@ -118,6 +132,7 @@ table {
 													<th>Annee budgetaire</th>
 													<th>Date</th>
 													<th>Fournisseur</th>
+													<th>Type facture</th>
 													<th>Montant operation</th>
 													<th>Observation</th>
 													<th style="color: blue;">Edit</th>
@@ -132,6 +147,7 @@ table {
 													<td>{{mandat.annee_budge.annee_univ}}</td>
 													<td>{{mandat.date}}</td>
 													<td>{{mandat.fournisseur.code_fournisseur}} {{mandat.fournisseur.nom_fournisseur}}</td>
+											        <td>{{mandat.type_facture.type}}</td>
 													<td>{{mandat.montant_op}}</td>
 													<td>{{mandat.observation_mandat}}</td>
 													<td>
