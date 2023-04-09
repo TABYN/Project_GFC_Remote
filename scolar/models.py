@@ -2286,7 +2286,7 @@ TYPE=(
     ('Depence','Depence')
     ) 
 class Engagement(models.Model):
-    num = models.IntegerField(null = True)
+    num = models.IntegerField(unique=True, null=True)
     date=models.DateField(null=True, blank=True)
     type = models.CharField(max_length = 15, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
@@ -2296,11 +2296,25 @@ class Engagement(models.Model):
     fournisseur=models.ForeignKey(Fournisseur ,related_name='fournisseur' , null= True, blank=True, on_delete=models.SET_NULL)
     facture=models.ForeignKey(Facture ,related_name='facture' , null= True, blank=True, on_delete=models.SET_NULL )
     mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
-
+    
+     
     
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type)
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+            last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
+            if last_object:
+                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+                self.num = last_object.num + 1
+            else:
+                # Si aucun objet n'existe, commencez à 1
+                self.num = 1
+        super(Engagement, self).save(*args, **kwargs)
 
+        
     def nouveau_solde(self): 
         solde=0      
         if self.montant_operation :

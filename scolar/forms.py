@@ -1633,13 +1633,13 @@ class Depence_CreateForm(forms.Form):
                 label=u"facture",
                 widget = ModelSelect2Widget(
                     model=Facture,
-                    search_fields=['num_fact__icontains'],
+                    search_fields=['type_facture__type__icontains'],
                     ),
                 help_text = "Choisir le type .",
              )  
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
-            self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
+            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
 
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
             self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
@@ -1704,7 +1704,7 @@ class Depence_UpdateForm(forms.Form):
              )  
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
-            self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
+            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
     
              
             self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
@@ -1770,7 +1770,7 @@ class Depence_DetailForm(forms.Form):
              )  
             self.fields['date']=forms.DateField(label="Date", required=False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
-            self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
+            #self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
             
             for key_ in self.fields.keys():
                 self.fields[key_].disabled=True

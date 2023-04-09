@@ -13318,7 +13318,7 @@ def depence_create_view(request):
                     type=data['type'],
                     num=data['num'],
                     date=data['date'],
-                    observation=data['observation'],
+                    #observation=data['observation'],
                     annee_budg=data['annee_budg'],
                     credit_alloue=data['credit_alloue'],
                     montant_operation=data['montant_operation'],
@@ -13369,7 +13369,7 @@ def depence_update_view(request, engagement_pk):
                 engagement_.type=data['type']
                 engagement_.date=data['date']
                 engagement_.num=data['num']
-                engagement_.observation=data['observation']
+                #engagement_.observation=data['observation']
                 engagement_.credit_alloue=data['credit_alloue']
                 engagement_.montant_operation=data['montant_operation']
                 engagement_.fournisseur=data['fournisseur']
