@@ -15,7 +15,8 @@ from django.core.exceptions import ValidationError
 import re
 from djmoney.models.fields import MoneyField
 import os
-
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.template.defaultfilters import default
 
 class User(AbstractUser):
@@ -2286,7 +2287,7 @@ TYPE=(
     ('Depence','Depence')
     ) 
 class Engagement(models.Model):
-    num = models.IntegerField(unique=True, null=True)
+    num = models.IntegerField(null=True)
     date=models.DateField(null=True, blank=True)
     type = models.CharField(max_length = 15, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
@@ -2303,16 +2304,19 @@ class Engagement(models.Model):
         return "Engagement "+ str(self.num)+' '+str(self.type)
     
     def save(self, *args, **kwargs):
-        if not self.pk:
+      #  if not self.pk:
             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
-            last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
-            if last_object:
+        print("bonjour")
+        last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
+        
+        if last_object:
                 # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
-                self.num = last_object.num + 1
-            else:
+            self.num = last_object.num + 1
+        else:
                 # Si aucun objet n'existe, commencez à 1
                 self.num = 1
         super(Engagement, self).save(*args, **kwargs)
+        #super().save(*args, **kwargs)
 
         
     def nouveau_solde(self): 
