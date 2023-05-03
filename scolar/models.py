@@ -2284,7 +2284,8 @@ class Facture(models.Model):
 
 TYPE=(
     ('Prise en charge','Prise en charge'),
-    ('Depence','Depence')
+    ('Depence','Depence'),
+    ('Fiche de regularisation de la provision', 'Fiche de regularisation de la provision')
     ) 
 class Engagement(models.Model):
     num = models.IntegerField(null=True)

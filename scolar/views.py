@@ -13135,7 +13135,7 @@ class Prise_en_charge_ListView(TemplateView):
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Prises en charge '
+        context['titre'] = 'Liste des Prises en charge et engagement de provision '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
             'Ajouter nouvelle prise en charge': reverse('prise_en_charge_create'),
@@ -13283,7 +13283,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Depence_ListView, self).get_context_data(**kwargs)
   
-        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='Depence').order_by('num'))
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(Q(type='Depence') | Q(type='Fiche de regularisation de la provision')).order_by('num'))
   
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -13511,7 +13511,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
 
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
  
 
