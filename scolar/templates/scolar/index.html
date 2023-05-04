@@ -194,6 +194,12 @@
 			<li>
 			 <a  class="list-group-item" href="{% url 'exercice_list' %}">{% icon 'tasks' %} Liste exercices</a>
 			</li>  
+			<li>
+			<strong>Factures</strong>
+			</li>
+			<li>
+			 <a  class="list-group-item" href="{% url 'factures_list' %}">{% icon 'tasks' %} Liste factures</a>
+			</li>  
 			<!-- <li>
 			{% for exercice in user.exercice_list %}
 		 	  	<a class="list-group-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  ">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	

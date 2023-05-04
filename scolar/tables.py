@@ -1276,4 +1276,23 @@ class Mandat_1_Filter(django_filters.FilterSet):
     class Meta:
         model = Credit_S2
         fields = ['code_art']
+
+class FactureTable(tables.Table):
+    action = '{% load icons %}\
+                <a href="{% url "facture_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>\
+                <a href="{% url "facture_delete" pk=record.id %}" > {% icon "trash" %} </a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+    date_fact = tables.DateTimeColumn(format ='d/m/Y')
+    class Meta:
+        model= Facture
+        fields = ['num_fact', 'date_fact', 'type_facture']
+        template_name= "django_tables2/bootstrap4.html"
+    
+
+class FactureFilter(django_filters.FilterSet):
+    #code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+   
+    class Meta:
+        model = Facture
+        fields = ['num_fact']
               

@@ -383,5 +383,10 @@ urlpatterns = [
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
     path('Mandat_PDFView/<mandat_pk>/', views.Mandat_PDFView.as_view(), name='Mandat_PDFView'),
-
+ 
+    path('factures_list', views.FacturesListView.as_view(), name='factures_list'),
+    path('facture_create', views.FacturesCreateView.as_view(), name='facture_create'),
+    re_path(r'^facture_update/(?P<pk>\d+)/$',views.FactureUpdateView.as_view(), name='facture_update'),
+    re_path(r'^facture_delete/(?P<pk>\d+)/$',views.FactureDeleteView.as_view(), name='facture_delete'), 
+    
     ]

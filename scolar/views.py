@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, FactureTable, FactureFilter
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -13649,4 +13649,100 @@ class Mandat_PDFView(PDFTemplateView):
         self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
         return context
 
+class FacturesListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(FacturesListView, self).get_context_data(**kwargs)
+
+        filter_ = FactureFilter(self.request.GET, queryset=Facture.objects.all().order_by('num_fact'))
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = FactureTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des factures '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+                'Ajouter facture': reverse('facture_create')
+                
+            }
+        return context
+    
+class FacturesCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_facture'
+    model = Facture
+    fields = ['num_fact', 'date_fact', 'type_facture']
+    template_name = 'scolar/create.html'
+    success_message = "La facture a ete ajoute avec succes!"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        try:
+            form.fields['type_facture'] = forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all().order_by('code'),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                    model=Type_Facture,
+                    search_fields=['type__icontains', ],
+                    # attrs={'style':'width:800px; height:10px;'}
+                ),
+                help_text="Choisir un type.",
+                required=True
+            )
+            form.fields['date_fact'] = forms.DateField(label='Date facture', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+
+            form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+            form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.success_url = reverse('factures_list')
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la creation d'une facture .")
+   
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super(FacturesCreateView, self).get_context_data(**kwargs)
+        titre = 'Ajouter une nouvelle facture'
+        context['titre'] = titre
+        return context
+
+class FactureUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_facture'
+    model = Facture
+    fields = ['num_fact', 'date_fact', 'type_facture']
+    template_name = 'scolar/update.html'
+    success_message = "La facture a ete modifie avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        try:
+            form.fields['date_fact'] = forms.DateField(label='Date facture', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False)
+
+            form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+            form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.success_url = reverse('factures_list')
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la creation d'une facture .")
+   
+        return form
+ 
+ 
+class FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Facture
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_facture'
+    success_message = "La facture a bien ete supprimee"
+ 
+    def get_success_url(self):
+        return reverse('factures_list')
