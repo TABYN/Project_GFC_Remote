@@ -1295,4 +1295,26 @@ class FactureFilter(django_filters.FilterSet):
     class Meta:
         model = Facture
         fields = ['num_fact']
-              
+
+class Type_FactureFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+    type = django_filters.CharFilter(field_name='type', lookup_expr='icontains', label='type')
+   
+    class Meta:
+        model= Type_Facture
+        fields = ['code', 'type']           
+         
+class Type_FactureTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "typesfactures_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "typesfactures_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Type_Facture
+        fields = ['code', 'type']
+        template_name= "django_tables2/bootstrap4.html"
+    
+
+  

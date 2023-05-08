@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, FactureTable, FactureFilter
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -13737,7 +13737,6 @@ class FactureUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
    
         return form
  
- 
 class FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
     model = Facture
     template_name = 'scolar/delete.html'
@@ -13746,3 +13745,78 @@ class FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
  
     def get_success_url(self):
         return reverse('factures_list')
+
+class Type_FactureListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+ 
+    def get_context_data(self, **kwargs):
+        context = super(Type_FactureListView, self).get_context_data(**kwargs)
+ 
+        filter_ = Type_FactureFilter(self.request.GET, queryset=Type_Facture.objects.all().order_by('code'))
+ 
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Type_FactureTable(filter_.qs, exclude=exclude_columns_)
+        RequestConfig(self.request).configure(table)
+ 
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des types des factures '
+        if self.request.user.is_staff_only():
+            context['btn_list'] = {
+            'Ajouter type facture': reverse('typesfactures_create'),
+                 
+            }
+        return context    
+
+class Type_FactureCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_type_facture'
+    model = Type_Facture
+    fields = ['code', 'type']
+    template_name = 'scolar/create.html'
+    success_message = "Type des factures a ete cree avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+#         form.fields['pays'] = forms.ModelChoiceField(queryset=Pays.objects.all().order_by('nom'), initial='DZ',
+#                                                      required=True)
+        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('typesfactures_list')
+        return form
+ 
+    def get_context_data(self, **kwargs):
+        context = super(Type_FactureCreateView, self).get_context_data(**kwargs)
+        titre = 'Creer un nouveau type de facture'
+        context['titre'] = titre
+        return context
+
+class Type_FacturesUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_type_facture'
+    model = Type_Facture
+    fields = ['code', 'type']
+    template_name = 'scolar/update.html'
+    success_message = "Le type des factures a ete modifie avec succe"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        #form.fields['sigle'].widget.attrs['readonly'] = True
+        form.fields['code'].required = True
+        form.fields['type'].required = True
+ 
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('typesfactures_list')
+        return form
+ 
+class Type_FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Type_Facture
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_type_facture'
+    success_message = "Le type des factures a bien ete supprime"
+ 
+    def get_success_url(self):
+        return reverse('typesfactures_list')  
+           

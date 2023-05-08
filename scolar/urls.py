@@ -389,4 +389,9 @@ urlpatterns = [
     re_path(r'^facture_update/(?P<pk>\d+)/$',views.FactureUpdateView.as_view(), name='facture_update'),
     re_path(r'^facture_delete/(?P<pk>\d+)/$',views.FactureDeleteView.as_view(), name='facture_delete'), 
     
+    path('typesfactures_list', views.Type_FactureListView.as_view(), name='typesfactures_list'),
+    path('typesfactures_create', views.Type_FactureCreateView.as_view(), name='typesfactures_create'),
+    re_path(r'^typesfactures_update/(?P<pk>\d+)/$',views.Type_FacturesUpdateView.as_view(), name='typesfactures_update'),
+    re_path(r'^typesfactures_delete/(?P<pk>\d+)/$',views.Type_FactureDeleteView.as_view(), name='typesfactures_delete'), 
+
     ]
