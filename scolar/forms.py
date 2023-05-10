@@ -1467,7 +1467,6 @@ class Prise_en_charge_CreateForm(forms.Form):
                 label=u"Année budgetaire",
             )
             
-
             self.fields['credit_alloue'] = forms.ModelChoiceField(
                  queryset=Credit_S2.objects.all(),
                  label=u"Article",
@@ -1477,65 +1476,12 @@ class Prise_en_charge_CreateForm(forms.Form):
                      ),
                 help_text = "Tapez le code de l'article.",
              ) 
-
-         
-
-            self.fields['credit_S2'] = forms.ModelChoiceField(
-                queryset=Credit_S2.objects.all(),
-                label=u"Credit a Engager",
-                widget=ModelSelect2Widget(
-                        model=Credit_S2,
-                        search_fields=['exercice__annee_budg'],
-   
-                    ),
-                help_text = "Tapez le code de l Exercice pour afficher la liste des chapitre_article a engager , par exemple 2022 ",
-                #required = False
-            ) 
-             
-            #===================================================================
-            # self.fields['chapitre'] = forms.ModelChoiceField(
-            #     queryset=Chapitre.objects.all(),
-            #     label=u"Chapitre",
-            #     widget=ModelSelect2Widget(
-            #             model=Chapitre,
-            #             search_fields=['code_chap__icontains', 'libelle_chap_FR__icontains'],
-            #          
-            #         ),
-            #     help_text = "Tapez le code du chapitre, ou tappez 2 lettres ou plus du libelle du chapitre",
-            #     #required = False
-            # ) 
-            # self.fields['article'] = forms.ModelChoiceField(
-            #     queryset=Article.objects.all(),
-            #     label=u"Article",
-            #     widget=ModelSelect2Widget(
-            #             model=Article,
-            #             search_fields=['code_art__icontains', 'libelle_art_FR__icontains'],
-            #             #dependent_fields={'chapitre':'chapitre'},
-            #         ),
-            #     help_text = "Tapez le code de l'article, ou tappez 2 lettres ou plus du libelle de l'article",                                           
-            #     #required = False
-            #===================================================================
-           # ) 
-
-            self.fields['type_engagement']=forms.ModelChoiceField(
-                queryset=Type_Engagement_S2.objects.all(),
-                label=u"Nature engagement",
-                widget=ModelSelect2Widget(
-                        model=Type_Engagement_S2,
-                        search_fields=['nature__icontains',],
-                    ),
-                help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
-                #required = True,
-            )
-            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, help_text = "Remplir ce champ si c'est une depence ")
-
-
             self.fields['type'] = forms.ChoiceField(
                 choices=TYPE,
                 label=u"Type",
                 help_text = "Choisir le type ",
-            ) 
-
+            )
+            
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
             self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
@@ -1673,10 +1619,27 @@ class Depence_CreateForm(forms.Form):
                 required = True
             ) 
             self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2,)
-
+            self.fields['fournisseur'] = forms.ModelChoiceField(
+                 queryset=Fournisseur.objects.all(),
+                 label=u"Fournisseur",
+                 widget=ModelSelect2Widget(
+                         model=Fournisseur,
+                         search_fields=['code_fournisseur__icontains'],
+                     ),
+                help_text = "Tapez le code du fournisseur.",
+             ) 
+            self.fields['facture'] = forms.ModelChoiceField(
+                queryset=Facture.objects.all(),
+                label=u"facture",
+                widget = ModelSelect2Widget(
+                    model=Facture,
+                    search_fields=['type_facture__type__icontains'],
+                    ),
+                help_text = "Choisir le type .",
+             )  
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
-            self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
+            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
 
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
             self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
@@ -1719,9 +1682,29 @@ class Depence_UpdateForm(forms.Form):
                 required = False
             )  
             self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, initial=engagement_.montant_operation,  localize=True)
+            self.fields['fournisseur'] = forms.ModelChoiceField(
+                 queryset=Fournisseur.objects.all(),
+                 label=u"Fournisseur",
+                 widget=ModelSelect2Widget(
+                         model=Fournisseur,
+                         search_fields=['code_fournisseur__icontains'],
+                     ),
+                required = False,
+                initial=engagement_.fournisseur
+             ) 
+            self.fields['facture'] = forms.ModelChoiceField(
+                queryset=Facture.objects.all(),
+                label=u"facture",
+                widget = ModelSelect2Widget(
+                    model=Facture,
+                    search_fields=['num_fact__icontains'],
+                    ),
+                required = False,
+                initial=engagement_.facture
+             )  
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
-            self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
+            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
     
              
             self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
@@ -1765,9 +1748,29 @@ class Depence_DetailForm(forms.Form):
                 required = False
             ) 
             self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False,  localize=True, initial=engagement_.montant_operation)
+            self.fields['fournisseur'] = forms.ModelChoiceField(
+                 queryset=Fournisseur.objects.all(),
+                 label=u"Fournisseur",
+                 widget=ModelSelect2Widget(
+                         model=Fournisseur,
+                         search_fields=['code_fournisseur__icontains'],
+                     ),
+                required = False,
+                initial=engagement_.fournisseur
+             ) 
+            self.fields['facture'] = forms.ModelChoiceField(
+                queryset=Facture.objects.all(),
+                label=u"facture",
+                widget = ModelSelect2Widget(
+                    model=Facture,
+                    search_fields=['num_fact__icontains'],
+                    ),
+                required = False,
+                initial=engagement_.facture
+             )  
             self.fields['date']=forms.DateField(label="Date", required=False, initial=engagement_.date)
             self.fields['num'] = forms.IntegerField(label='Numero engagement', required = False, initial=engagement_.num)
-            self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
+            #self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
             
             for key_ in self.fields.keys():
                 self.fields[key_].disabled=True
@@ -1787,8 +1790,13 @@ class Mandat_UpdateForm(forms.Form):
         self.helper=FormHelper()
         try:  
             mandat_= get_object_or_404(Mandat, id=mandat_pk)
-
-
+        
+            self.fields['annee_budge']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Annee budgetaire",
+                required = False,
+                initial=mandat_.annee_budge
+            ) 
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",
@@ -1799,6 +1807,17 @@ class Mandat_UpdateForm(forms.Form):
                  required = False,
                  initial=mandat_.fournisseur,
                  help_text = "Tapez le code ou le nom du fournisseur ",                                             
+            )    
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['type__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.type_facture,
+                 help_text = "Tapez le type de la facture ",                                             
             )    
 
             self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)

@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -12796,16 +12796,34 @@ class FournisseursListView(TemplateView):
 class FournisseurCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'scolar.add_fournisseur'
     model = Fournisseur
-    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
+    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur', 'banque']
     template_name = 'scolar/create.html'
     success_message = "Le fournisseur a ete ajoute avec succes!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.helper = FormHelper()
-        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
-        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
-        self.success_url = reverse('fournisseurs_list')
+        try:
+            form.fields['banque'] = forms.ModelChoiceField(
+                queryset=Banque.objects.all().order_by('nom'),
+                label=u"Banque",
+                widget=ModelSelect2Widget(
+                    model=Banque,
+                    search_fields=['nom__icontains', ],
+                    # attrs={'style':'width:800px; height:10px;'}
+                ),
+                help_text="Choisir une banque.",
+                required=True
+            )
+            form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+            form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.success_url = reverse('fournisseurs_list')
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la creation d'un fournisseur .")
+   
         return form
 
     def get_context_data(self, **kwargs):
@@ -12818,7 +12836,7 @@ class FournisseurCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionR
 class FournisseurUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'scolar.change_fournisseur'
     model = Fournisseur
-    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur']
+    fields = ['code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur', 'banque']
     template_name = 'scolar/update.html'
     success_message = "Le fournisseur a ete modifie avec succes!"
  
@@ -13012,6 +13030,7 @@ def CreditAssociate_S2(request,exe,art):
                 credit_S2.credit_reste=float(request.POST['credit_allouee']) - float(consom)
                 credit_S2.credit_allouee=request.POST['credit_allouee']
                 credit_S2.save()
+                
                 pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount +(Ancien_crdt-credit_S2.credit_allouee.amount)
                 pexe.save(update_fields=['credit_non_allouee'])
                 messages.success(request, 'Credit modifie avec suuces.')
@@ -13116,7 +13135,7 @@ class Prise_en_charge_ListView(TemplateView):
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Prises en charge '
+        context['titre'] = 'Liste des Prises en charge et engagement de provision '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
             'Ajouter nouvelle prise en charge': reverse('prise_en_charge_create'),
@@ -13168,10 +13187,10 @@ def prise_en_charge_create_view(request):
 
 
     
-class EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+class Prise_En_ChargeDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
     model = Engagement
     template_name = 'scolar/delete.html'
-    success_message = "Engagement a bien supprime."
+    success_message = "La prise en charge a bien supprime."
     
     def test_func(self):
         return self.request.user.is_budget()
@@ -13264,7 +13283,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Depence_ListView, self).get_context_data(**kwargs)
   
-        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='Depence').order_by('num'))
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(Q(type='Depence') | Q(type='Fiche de regularisation de la provision')).order_by('num'))
   
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -13274,7 +13293,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Depences '
+        context['titre'] = 'Liste des Depences et fiches de regularisation de la provision '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
             'Ajouter nouvelle depence': reverse('depence_create'),
@@ -13299,10 +13318,12 @@ def depence_create_view(request):
                     type=data['type'],
                     num=data['num'],
                     date=data['date'],
-                    observation=data['observation'],
+                    #observation=data['observation'],
                     annee_budg=data['annee_budg'],
                     credit_alloue=data['credit_alloue'],
-                    montant_operation=data['montant_operation']
+                    montant_operation=data['montant_operation'],
+                    fournisseur=data['fournisseur'],
+                    facture=data['facture']
                     
                     )                         
                 
@@ -13348,9 +13369,11 @@ def depence_update_view(request, engagement_pk):
                 engagement_.type=data['type']
                 engagement_.date=data['date']
                 engagement_.num=data['num']
-                engagement_.observation=data['observation']
+                #engagement_.observation=data['observation']
                 engagement_.credit_alloue=data['credit_alloue']
                 engagement_.montant_operation=data['montant_operation']
+                engagement_.fournisseur=data['fournisseur']
+                engagement_.facture=data['facture']
                 
                 engagement_.save()
                          
@@ -13371,6 +13394,17 @@ def depence_update_view(request, engagement_pk):
     context['form']=form
   
     return render(request, 'scolar/update.html', context)
+
+class DepenseDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    model = Engagement
+    template_name = 'scolar/delete.html'
+    success_message = "La depence a bien supprime."
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+
+    def get_success_url(self):
+        return reverse('Depence_List')
 
 class Depence_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'scolar/engagement_detail.html'
@@ -13418,7 +13452,7 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_prise_en_charge'+str(engagement_.id) + '.pdf'
         return context
     
        
@@ -13438,7 +13472,7 @@ class Engagement_de_la_provision_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
 
 class Depence_PDFView(PDFTemplateView):
@@ -13457,7 +13491,7 @@ class Depence_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_depence'+str(engagement_.id) + '.pdf'
         return context
     
 
@@ -13477,7 +13511,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
 
-        self.filename ='engagement_'+str(engagement_.id) + '.pdf'
+        self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
  
 
@@ -13510,6 +13544,9 @@ def MandatCreate(request, crd):
     frn = Fournisseur.objects.all()
     fournisseur_id=request.POST.get('fournisseur')
     
+    type_fact=Type_Facture.objects.all()
+    type_facture_id=request.POST.get('type_facture')
+    
     if request.method == 'POST':
         mandat = Mandat(
             credit_s2 =Credit_S2.objects.get(pk=crd),
@@ -13520,6 +13557,7 @@ def MandatCreate(request, crd):
             observation_mandat=request.POST['observation_mandat'],
             annee_budge=AnneeUniv.objects.get(annee_univ=annee_budge_id),
             fournisseur=Fournisseur.objects.get(id=fournisseur_id),
+            type_facture=Type_Facture.objects.get(id=type_facture_id),
             
         )
         mandat.save()
@@ -13528,7 +13566,7 @@ def MandatCreate(request, crd):
     else:
         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
         mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
-        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg,})
+        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg, 'type_fact':type_fact})
 
 @login_required
 def MandatDelete(request, mandat):
@@ -13564,9 +13602,11 @@ def mandat_update_view(request, mandat_pk):
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
                 
+                mandat_.annee_budge=data['annee_budge']
                 mandat_.num_mandat=data['num_mandat']      
                 mandat_.date=data['date']
                 mandat_.fournisseur=data['fournisseur']
+                mandat_.type_facture=data['type_facture']
                 mandat_.observation_mandat=data['observation_mandat']
                 mandat_.montant_op=data['montant_op']
                 
@@ -13606,7 +13646,177 @@ class Mandat_PDFView(PDFTemplateView):
         context['mandat_'] = mandat_
         context['mandat_letter'] = mandat_letter
   
-        self.filename ='mandat_'+str(mandat_.id) + '.pdf'
+        self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
         return context
 
+class FacturesListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(FacturesListView, self).get_context_data(**kwargs)
+
+        filter_ = FactureFilter(self.request.GET, queryset=Facture.objects.all().order_by('num_fact'))
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = FactureTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des factures '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+                'Ajouter facture': reverse('facture_create')
+                
+            }
+        return context
+    
+class FacturesCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_facture'
+    model = Facture
+    fields = ['num_fact', 'date_fact', 'type_facture']
+    template_name = 'scolar/create.html'
+    success_message = "La facture a ete ajoute avec succes!"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        try:
+            form.fields['type_facture'] = forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all().order_by('code'),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                    model=Type_Facture,
+                    search_fields=['type__icontains', ],
+                    # attrs={'style':'width:800px; height:10px;'}
+                ),
+                help_text="Choisir un type.",
+                required=True
+            )
+            form.fields['date_fact'] = forms.DateField(label='Date facture', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+
+            form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+            form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.success_url = reverse('factures_list')
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la creation d'une facture .")
+   
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super(FacturesCreateView, self).get_context_data(**kwargs)
+        titre = 'Ajouter une nouvelle facture'
+        context['titre'] = titre
+        return context
+
+class FactureUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_facture'
+    model = Facture
+    fields = ['num_fact', 'date_fact', 'type_facture']
+    template_name = 'scolar/update.html'
+    success_message = "La facture a ete modifie avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        try:
+            form.fields['date_fact'] = forms.DateField(label='Date facture', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False)
+
+            form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+            form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.success_url = reverse('factures_list')
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la creation d'une facture .")
+   
+        return form
+ 
+class FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Facture
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_facture'
+    success_message = "La facture a bien ete supprimee"
+ 
+    def get_success_url(self):
+        return reverse('factures_list')
+
+class Type_FactureListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+ 
+    def get_context_data(self, **kwargs):
+        context = super(Type_FactureListView, self).get_context_data(**kwargs)
+ 
+        filter_ = Type_FactureFilter(self.request.GET, queryset=Type_Facture.objects.all().order_by('code'))
+ 
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Type_FactureTable(filter_.qs, exclude=exclude_columns_)
+        RequestConfig(self.request).configure(table)
+ 
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des types des factures '
+        if self.request.user.is_staff_only():
+            context['btn_list'] = {
+            'Ajouter type facture': reverse('typesfactures_create'),
+                 
+            }
+        return context    
+
+class Type_FactureCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'scolar.add_type_facture'
+    model = Type_Facture
+    fields = ['code', 'type']
+    template_name = 'scolar/create.html'
+    success_message = "Type des factures a ete cree avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+#         form.fields['pays'] = forms.ModelChoiceField(queryset=Pays.objects.all().order_by('nom'), initial='DZ',
+#                                                      required=True)
+        form.helper.add_input(Submit('submit', 'Ajouter', css_class='btn-primary'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('typesfactures_list')
+        return form
+ 
+    def get_context_data(self, **kwargs):
+        context = super(Type_FactureCreateView, self).get_context_data(**kwargs)
+        titre = 'Creer un nouveau type de facture'
+        context['titre'] = titre
+        return context
+
+class Type_FacturesUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_type_facture'
+    model = Type_Facture
+    fields = ['code', 'type']
+    template_name = 'scolar/update.html'
+    success_message = "Le type des factures a ete modifie avec succe"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        #form.fields['sigle'].widget.attrs['readonly'] = True
+        form.fields['code'].required = True
+        form.fields['type'].required = True
+ 
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('typesfactures_list')
+        return form
+ 
+class Type_FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, DeleteView):
+    model = Type_Facture
+    template_name = 'scolar/delete.html'
+    permission_required = 'scolar.delete_type_facture'
+    success_message = "Le type des factures a bien ete supprime"
+ 
+    def get_success_url(self):
+        return reverse('typesfactures_list')  
+           
