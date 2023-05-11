@@ -2290,7 +2290,7 @@ TYPE=(
 class Engagement(models.Model):
     num = models.IntegerField(null=True)
     date=models.DateField(null=True, blank=True)
-    type = models.CharField(max_length = 15, choices = TYPE, null=True, default='')   
+    type = models.CharField(max_length = 60, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)

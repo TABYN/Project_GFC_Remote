@@ -16,6 +16,7 @@ from django.utils.safestring import mark_safe
 from django.contrib import messages
 from scolar.admin import settings
 
+from django.core.validators import MinValueValidator
 
 
 
@@ -1618,7 +1619,7 @@ class Depence_CreateForm(forms.Form):
                 help_text = "Choisir le type ",
                 required = True
             ) 
-            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2,)
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
             self.fields['fournisseur'] = forms.ModelChoiceField(
                  queryset=Fournisseur.objects.all(),
                  label=u"Fournisseur",
@@ -1681,7 +1682,7 @@ class Depence_UpdateForm(forms.Form):
                 initial=engagement_.type,
                 required = False
             )  
-            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, initial=engagement_.montant_operation,  localize=True)
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, initial=engagement_.montant_operation,  localize=True, validators=[MinValueValidator(0)])
             self.fields['fournisseur'] = forms.ModelChoiceField(
                  queryset=Fournisseur.objects.all(),
                  label=u"Fournisseur",

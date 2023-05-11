@@ -13303,7 +13303,6 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
   
 @login_required
 def depence_create_view(request):
-
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = Depence_CreateForm(request, request.POST)
@@ -13313,7 +13312,6 @@ def depence_create_view(request):
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
                 
-
                 engagement_=Engagement.objects.create(
                     type=data['type'],
                     num=data['num'],
@@ -13324,9 +13322,15 @@ def depence_create_view(request):
                     montant_operation=data['montant_operation'],
                     fournisseur=data['fournisseur'],
                     facture=data['facture']
+                    )  
+#             engagement = Engagement.objects.get(pk=engagement_id)                           
+#                 if engagement.credit_alloue.credit_reste >= engagement.montant_operation:
+#                     engagement.credit_alloue.credit_reste -= engagement.montant_operation
+#                     engagement.credit_alloue.credit_reste.save()
+#                     message = "Engagement effectuee avec succes."
+#                 else:
+#                     message = "Credit restant insuffisant pour effectuer engagement."
                     
-                    )                         
-                
             except Exception:
                 if settings.DEBUG:
                     raise Exception
@@ -13346,6 +13350,8 @@ def depence_create_view(request):
     context['form']=form
     return render(request, 'scolar/create.html', context)
 
+
+        
 @login_required
 def depence_update_view(request, engagement_pk):
     engagement_=get_object_or_404(Engagement, id=engagement_pk)
@@ -13589,7 +13595,7 @@ def mandat_update_view(request, mandat_pk):
     if request.user.is_budget():
         pass       
     else :
-        messages.error(request,"Vous .............. cette operation")
+        messages.error(request,"Vous ne pouvez pas etablir cette operation")
         return redirect('/accounts/login/?next=%s' % request.path)   
     context={} 
     context['mandat']=mandat_
@@ -13819,4 +13825,5 @@ class Type_FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permission
  
     def get_success_url(self):
         return reverse('typesfactures_list')  
-           
+
+   
