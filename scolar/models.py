@@ -2290,7 +2290,7 @@ TYPE=(
 class Engagement(models.Model):
     num = models.IntegerField(null=True)
     date=models.DateField(null=True, blank=True)
-    type = models.CharField(max_length = 15, choices = TYPE, null=True, default='')   
+    type = models.CharField(max_length = 60, choices = TYPE, null=True, default='')   
     observation = models.CharField(max_length=300, default='')
     annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
@@ -2305,25 +2305,24 @@ class Engagement(models.Model):
         return "Engagement "+ str(self.num)+' '+str(self.type)
     
     def save(self, *args, **kwargs):
-      #  if not self.pk:
-            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+
         print("bonjour")
         last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
         
         if last_object:
-                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+            
             self.num = last_object.num + 1
         else:
-                # Si aucun objet n'existe, commencez à 1
+         
                 self.num = 1
         super(Engagement, self).save(*args, **kwargs)
-        #super().save(*args, **kwargs)
+
 
         
     def nouveau_solde(self): 
         solde=0      
         if self.montant_operation :
-            solde=solde+self.credit_alloue.credit_reste-self.montant_operation
+            solde=solde+self.credit_alloue.credit_reste
             return solde
     
     def nouveau_solde_s1(self): 
