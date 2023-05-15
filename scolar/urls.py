@@ -353,7 +353,7 @@ urlpatterns = [
     re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
     re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
 
-    
+    path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'), 
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
     path('engagement_S2_list', views.Type_EngagementListView.as_view(), name='engagement_S2_list'),
@@ -391,10 +391,13 @@ urlpatterns = [
     re_path(r'^detail_mandat/(?P<pk>\d+)/$', views.MandatDetailView.as_view(), name='detail_mandat'),
 
     path('articles_mandat_list', views.Articles_mandatListView.as_view(), name='articles_mandat_list'),
-    path('test/<int:mandat_pk>/', views.Article_MandatListView, name='test'),
+    path('test/<int:crd>/', views.Article_MandatListView, name='test'),# 'test/<int:mandat_pk>/'
     path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
     re_path(r'^mandat_update2/(?P<mandat_pk>\d+)/$', views.mandat_update_view2, name='mandat_update2'),
     
+    
+    path('Transfert_List', views.Transfert_ListView.as_view(), name='Transfert_List'),
+    path('Transfert_create', views.Transfert_create_view, name='Transfert_create'),
     
     #path('test/<mandat_pk>/', views.Article_MeateandatListView.as_view(), name='test'),#path('test/<mandat_pk>/', views.Article_MandatListView, name='test'),
 

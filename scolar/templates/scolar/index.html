@@ -184,7 +184,7 @@
 			</li> 
 			   
 			<li>
-			 <a  class="list-group-item" href="">{% icon 'tasks' %} Transfert</a>
+			 <a  class="list-group-item" href="{% url 'Transfert_List' %}">{% icon 'tasks' %} Transfert</a>
 			</li>  
 			<li>
 			<strong>Benificiares et Banques</strong>
@@ -198,6 +198,11 @@
 			<li>
 			
 			<li>
+			 <a  class="list-group-item" href="{% url 'exercice_list' %}">{% icon 'tasks' %} Liste exercices</a>
+			</li>  
+			
+			
+			<!-- <li>
 				<strong>Repartition des credits</strong>
 				
 					{% for exercice in user.exercice_list %}
@@ -206,7 +211,7 @@
 		        	{% endfor %}	
 				
 				  
-				</li>  
+				</li>   -->
 			 
 			
 			

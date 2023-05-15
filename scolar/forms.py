@@ -2005,4 +2005,56 @@ class Mandat_UpdateForm2(forms.Form):
             else:
                 messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification du mandat. Merci de le signaler a l'administrateur")
                 
+
+class Transfert_CreateForm(forms.Form):
+    
+    def __init__(self, request, *args, **kwargs):
+        super(Transfert_CreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+
+            self.fields['annee_budgi']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Année budgetaire",
+                #required = False,
+                
+            )
+            
+            self.fields['num_transfert'] = forms.IntegerField(initial=0, label='Numero du transfert')
+            self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            
+            self.fields['article_source'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.all(),
+                 label=u"Article_source",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                     ),
+                help_text = "Tapez le code de l'article.",
+                 #required = False
+             ) 
+            
+            self.fields['article_destination'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.all(),
+                 label=u"Article_destination",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                     ),
+                help_text = "Tapez le code de l'article.",
+                 #required = False
+             ) 
+            
+
+            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = True, max_digits=9, decimal_places=2,)
+
+
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'engagement. Merci de le signaler à l'administrateur")    
               

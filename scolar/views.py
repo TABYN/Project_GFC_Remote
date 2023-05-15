@@ -38,7 +38,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, MandatFilter, MandatTable, Article_mandatFilter, Article_mandatTable
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable, MandatFilter, MandatTable, Article_mandatFilter, Article_mandatTable, TransfertTable, TransfertFilter
 
     
 
@@ -61,7 +61,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm,Mandat_UpdateForm2, Mandat_DetailForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm,Mandat_UpdateForm2, Mandat_DetailForm, Transfert_CreateForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -12923,6 +12923,22 @@ class BanqueDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequir
     def get_success_url(self):
         return reverse('banque_list')
     
+class ExerciceListView(LoginRequiredMixin, TemplateView):
+    template_name='scolar/list.html'
+    
+    def get_queryset(self,**kwargs):
+        return Exercice.objects.all().order_by('annee_budg')
+    
+    def get_context_data(self, **kwargs):
+        context = super(ExerciceListView, self).get_context_data(**kwargs)
+        exclude_=[]
+        table = ExerciceTable(self.get_queryset(**kwargs), exclude=exclude_)
+        RequestConfig(self.request).configure(table)
+        context['titre'] = 'Liste des exercices budgetaires'
+        context['table'] = table
+        context['back'] = reverse('home')
+        return context    
+    
 @login_required
 def CreditCreate_S2(request,exe):
     article = Article.objects.all()
@@ -13713,7 +13729,7 @@ class Articles_mandatListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Articles_mandatListView, self).get_context_data(**kwargs)
 
-        filter_ = Article_mandatFilter(self.request.GET, queryset=Article.objects.all())
+        filter_ = Article_mandatFilter(self.request.GET, queryset=Credit_S2.objects.all())
 
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -13775,15 +13791,19 @@ class Articles_mandatListView(TemplateView):
 
 
 
-def Article_MandatListView (request, mandat_pk):      
-    article= Article.objects.get(pk = mandat_pk)
+def Article_MandatListView (request, crd):#   mandat_pk   
+    #article= Article.objects.get(pk = mandat_pk)
+    crdt= Credit_S2.objects.get(pk=crd)
+    #arti=Article.objects.get(pk=art)
     fournisseurs= Fournisseur.objects.all()
     annee_budgets=AnneeUniv.objects.all()
     fournisseur_id=request.POST.get('fournisseur')
     annee_budget_id=request.POST.get('annee_budget')
     if request.method == 'POST':
         mandat = Mandat(
-            article_mandat=Article.objects.get(pk=mandat_pk),
+            #article_mandat=Article.objects.get(pk=mandat_pk),
+            credit_s2 =Credit_S2.objects.get(pk=crd),
+            #article=Article.objects.get(pk=art),
             num_mandat=request.POST['num_mandat'],
             annee_budget= AnneeUniv.objects.get(annee_univ=annee_budget_id),#annee_budget=request.POST['annee_budget'],
             montant_operatio=request.POST['montant_operatio'],
@@ -13795,9 +13815,15 @@ def Article_MandatListView (request, mandat_pk):
         messages.success(request, 'Mandat enregistree.')
         return redirect(request.path_info)
     else:
-        mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=mandat_pk))
-        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'article': article, 'fournisseurs':fournisseurs, 'annee_budgets': annee_budgets})   
-#     
+        #mandats = Mandat.objects.filter(article_mandat=Article.objects.get(pk=mandat_pk))
+        mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
+        return render(request, 'scolar/article_mandat_list.html', {'mandats': mandats, 'crdt': crdt, 'fournisseurs':fournisseurs, 'annee_budgets': annee_budgets}) #'article': article  
+        
+        #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
+        #return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg,})
+
+        
+        
     #mandat_total=mandats.count() 
     #context= {'article':article, 'mandats':mandats}#, 'mandat_total':mandat_total
      
@@ -13862,4 +13888,126 @@ def mandat_update_view2(request, mandat_pk):
   
     return render(request, 'scolar/update.html', context)
 
-                     
+TransfertTable, TransfertFilter
+
+class Transfert_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/filter_list.html'
+   
+    def test_func(self):
+        return self.request.user.is_budget()
+       
+    def get_context_data(self, **kwargs):
+        context = super(Transfert_ListView, self).get_context_data(**kwargs)
+ 
+        filter_ = TransfertFilter(self.request.GET, queryset=Transfert.objects.order_by('num_transfert'))
+ 
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = TransfertTable(filter_.qs)
+
+        RequestConfig(self.request).configure(table)
+ 
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Transferts '
+        if self.request.user.is_staff_only():
+         context['btn_list'] = {
+             'Ajouter nouveau transfert': reverse('Transfert_create'),
+                  
+             }
+        return context      
+
+def Transfert_create_view(request):
+    if request.method == 'POST':
+        form = Transfert_CreateForm(request, request.POST)
+        if form.is_valid():
+            try:
+                data = form.cleaned_data
+                transfert_ = Transfert.objects.create(
+                    annee_budgi=data['annee_budgi'],
+                    num_transfert=data['num_transfert'],
+                    date_transfert=data['date_transfert'],
+                    article_source=data['article_source'],
+                    article_destination=data['article_destination'],
+                    montant_transfert=data['montant_transfert']
+                )
+                #source = Credit_S2.objects.get(article=data.get('article_source'))
+                source = Credit_S2.objects.get(article__article=data.get('article_source'))
+
+                #destination = Credit_S2.objects.get(article=data.get('article_destination'))
+                destination = Credit_S2.objects.get(article__article=data.get('article_destination'))
+                if source.credit_reste >= data['montant_transfert']:
+                    source.credit_reste -= data['montant_transfert']
+                    source.save()
+                    destination.credit_reste += data['montant_transfert']
+                    destination.save()
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la creation du transfert. Veuillez le signaler a l administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+            return HttpResponseRedirect(reverse('Transfert_List'))
+    else:
+        form = Transfert_CreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouveau transfert")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+
+    
+# def Transfert_create_view(request):
+# 
+#     if request.method == 'POST':
+#         # create a form instance and populate it with data from the request:
+#         form = Transfert_CreateForm(request, request.POST)
+#         # check whether it's valid:
+#         if form.is_valid():
+#             try:
+#                 # process the data in form.cleaned_data as required
+#                 data=form.cleaned_data
+#                 
+# 
+#                 transfert_=Transfert.objects.create(
+#                     annee_budgi=data['annee_budgi'],                    
+#                     num_transfert=data['num_transfert'],                    
+#                     date_transfert=data['date_transfert'],
+#                     article_source=data['article_source'],
+#                     article_destination=data['article_destination'],
+#                     montant_transfert=data['montant_transfert']
+#                     
+#                     )                         
+#             # Recuperation des articles budgetaires 
+#             #source = Credit_S2.objects.get(article=transfert_.article_source)
+#             #source = Credit_S2.objects.get(article=transfert_.article_source)
+#             source = Credit_S2.objects.get(article=data['article_source'])
+#             destination = Credit_S2.objects.get(article=transfert_.article_destination)
+#            # Verification que le solde de l article source est suffisant
+#             if source.credit_reste >=montant_transfert:
+#                 # Deduction du montant de l article source
+#                 source.credit_reste -= montant_transfert 
+#                 source.save() 
+#                 # Ajout du montant a l article destination
+#                 destination.credit_reste += montant_transfert 
+#                 destination.save()
+#             except Exception:
+#                 if settings.DEBUG:
+#                     raise Exception
+#                 else:
+#                     messages.error(request, "ERREUR: lors de la création du transfert. Veuillez le signaler à l'administrateur.")
+#                     return render(request, 'scolar/create.html', {'form': form })
+# 
+#             return HttpResponseRedirect(reverse('Transfert_List'))
+#                     
+# 
+#     # if a GET (or any other method) we'll create a blank form
+#     else:
+#         form = Transfert_CreateForm(request)
+#         messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle depence")
+#     
+#     context={}  
+#     context['form']=form
+#     return render(request, 'scolar/create.html', context)
+                   

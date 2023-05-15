@@ -23,7 +23,7 @@ table {
 			<div class="col-md-12 grid-margin stretch-card">
 				<div class="card">
 					<div class="card-body">
-						<h3>Suivi des Mandats de l'article: ( {{article.code_art}} )</h3>
+						<h3>Suivi des Mandats de l': ( {{credit_s2.article.code_art}} )</h3>
 						<br>
 						<form class="forms-sample">
 							<div class="row">
@@ -112,7 +112,7 @@ table {
 								<div class="col-md-12 grid-margin stretch-card">
 									<div class="card">
 										<div class="card-body">
-											<p class="lead font-italic">La liste des mandats de l'article : {{article.libelle_art_FR}} ( {{article.code_art}} )</p>
+											<p class="lead font-italic">La liste des mandats de l'article : {{credit_s2.article.libelle_art_FR}} ( {{credit_s2.article.code_art}} )</p>
 											<hr class="my-4">
 											<table class="table table-borderless">
 												<thead class="border-bottom font-weight-bold">
@@ -137,7 +137,7 @@ table {
 												<tbody>
 												{% for mandat in mandats %}
 												<tr>
-													<td>{{mandat.article_mandat.code_art}}</td>
+													<td>{{mandat.credit_s2.article_mandat.code_art}}</td>
 													<td>{{mandat.annee_budget.annee_univ}}</td>
 													<td>{{mandat.num_mandat}}</td>
 													<td>{{mandat.montant_operatio}}</td>
