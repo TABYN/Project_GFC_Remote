@@ -13293,7 +13293,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Depences et fiches de regularisation de la provision '
+        context['titre'] = 'Liste des Depences  '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
             'Ajouter nouvelle depence': reverse('depence_create'),
@@ -13311,7 +13311,7 @@ def depence_create_view(request):
             try:
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
-                
+                 
                 engagement_=Engagement.objects.create(
                     type=data['type'],
                     num=data['num'],
@@ -13322,25 +13322,28 @@ def depence_create_view(request):
                     montant_operation=data['montant_operation'],
                     fournisseur=data['fournisseur'],
                     facture=data['facture']
-                    )  
-#             engagement = Engagement.objects.get(pk=engagement_id)                           
-#                 if engagement.credit_alloue.credit_reste >= engagement.montant_operation:
-#                     engagement.credit_alloue.credit_reste -= engagement.montant_operation
-#                     engagement.credit_alloue.credit_reste.save()
-#                     message = "Engagement effectuee avec succes."
-#                 else:
-#                     message = "Credit restant insuffisant pour effectuer engagement."
-                    
+                    ) 
+                 
+                credit_reste_s2=Credit_S2.objects.get(pk=engagement_.credit_alloue.id).credit_reste
+                credit_S2_=Credit_S2.objects.get(pk=engagement_.credit_alloue.id)
+                credit_S2_.credit_reste.amount =credit_reste_s2.amount - engagement_.montant_operation.amount
+                assert credit_S2_.credit_reste.amount >= 0
+                credit_S2_.save(update_fields=['credit_reste'])  
+               
             except Exception:
-                if settings.DEBUG:
+               
+                if AssertionError:
+                    messages.error(request, "ERREUR: Veuillez verifier le montant introduit sachant que le reste comme credit pour cet article : "
+                                + str(credit_reste_s2.amount) + "DZD" )          
+                    return render(request, 'scolar/create.html', {'form': form })
+                elif settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: lors de la création de la depence. Veuillez le signaler à l'administrateur.")
+                    messages.error(request, "ERREUR: lors de la creation de la depence. Veuillez le signaler.")
                     return render(request, 'scolar/create.html', {'form': form })
 
             return HttpResponseRedirect(reverse('Depence_List'))
-                    
-
+    
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Depence_CreateForm(request)
@@ -13349,12 +13352,12 @@ def depence_create_view(request):
     context={}  
     context['form']=form
     return render(request, 'scolar/create.html', context)
-
-
         
 @login_required
 def depence_update_view(request, engagement_pk):
     engagement_=get_object_or_404(Engagement, id=engagement_pk)
+    ancien_montant=engagement_.montant_operation.amount
+
     if request.user.is_budget():
         pass       
     else :
@@ -13381,13 +13384,25 @@ def depence_update_view(request, engagement_pk):
                 engagement_.fournisseur=data['fournisseur']
                 engagement_.facture=data['facture']
                 
+                credit_reste_s2=Credit_S2.objects.get(pk=engagement_.credit_alloue.id).credit_reste
+                credit_S2_=Credit_S2.objects.get(pk=engagement_.credit_alloue.id)
+                if engagement_.montant_operation:
+                    credit_reste_s2.amount =credit_S2_.credit_reste.amount+ancien_montant
+                    credit_S2_.credit_reste.amount =credit_reste_s2.amount - engagement_.montant_operation.amount
+                    assert credit_S2_.credit_reste.amount >= 0
+                    credit_S2_.save(update_fields=['credit_reste'])
+                
                 engagement_.save()
                          
             except Exception:
-                if settings.DEBUG:
+                if AssertionError:
+                    messages.error(request, "ERREUR: Veuillez verifier le montant introduit sachant que le reste comme credit pour cet article : "
+                                + str(credit_reste_s2.amount) + "DZD" )          
+                    return render(request, 'scolar/update.html', {'form': form })
+                elif settings.DEBUG:
                     raise Exception
                 else:
-                    messages.error(request, "ERREUR: lors de la modification du l'engagement. Veuillez le signaler à l'administrateur.")
+                    messages.error(request, "ERREUR: lors de la modification du l'engagement. Veuillez le signaler .")
                     return render(request, 'scolar/update.html', {'form': form })
 
             return HttpResponseRedirect(reverse('Depence_List'))
