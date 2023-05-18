@@ -13917,12 +13917,36 @@ class Transfert_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
              }
         return context      
 
-def Transfert_create_view(request):# LoginRequiredMixin, SuccessMessageMixin , UserPassesTestMixin, TemplateView
+def Transfert_create_view(request):
     if request.method == 'POST':
         form = Transfert_CreateForm(request, request.POST)
         if form.is_valid():
             try:
+                
                 data = form.cleaned_data
+                
+                annee_budgi=data['annee_budgi']
+                num_transfert=data['num_transfert']
+                date_transfert=data['date_transfert']
+                article_source=data['article_source']
+                article_destination=data['article_destination']
+                montant_transfert=data['montant_transfert']
+                
+               
+                credit_reste_s2_source=Credit_S2.objects.get(pk=article_source.id).credit_reste
+                
+                credit_reste_s2_destination=Credit_S2.objects.get(pk=article_destination.id).credit_reste
+                
+                credit_S2_source=Credit_S2.objects.get(pk=article_source.id)
+                
+                credit_S2_destination=Credit_S2.objects.get(pk=article_destination.id)
+               
+                
+                
+                credit_S2_source.credit_reste.amount =credit_reste_s2_source.amount - montant_transfert
+                credit_S2_destination.credit_reste.amount =credit_reste_s2_destination.amount + montant_transfert
+                 
+                assert credit_S2_source.credit_reste.amount >= 0
                 transfert_ = Transfert.objects.create(
                     annee_budgi=data['annee_budgi'],
                     num_transfert=data['num_transfert'],
@@ -13930,44 +13954,30 @@ def Transfert_create_view(request):# LoginRequiredMixin, SuccessMessageMixin , U
                     article_source=data['article_source'],
                     article_destination=data['article_destination'],
                     montant_transfert=data['montant_transfert']
-                     )
-                
-                credit_reste_s2_source=Credit_S2.objects.get(pk=transfert_.article_source.id).credit_reste
-                credit_reste_s2_destination=Credit_S2.objects.get(pk=transfert_.article_destination.id).credit_reste
-                credit_S2_source=Credit_S2.objects.get(pk=transfert_.article_source.id)
-                credit_S2_destination=Credit_S2.objects.get(pk=transfert_.article_destination.id)
-                credit_S2_source.credit_reste.amount =credit_reste_s2_source.amount - transfert_.montant_transfert.amount
-                credit_S2_destination.credit_reste.amount =credit_reste_s2_destination.amount + transfert_.montant_transfert.amount
-
-                print('______________________')
-                print(credit_reste_s2_source.amount)
-                print(transfert_.montant_transfert.amount)
-                print(credit_S2_source.credit_reste.amount)
-                print('______________________')
-                print(credit_S2_destination.credit_reste.amount)
-                print(credit_reste_s2_destination.amount)
-                assert credit_S2_source.credit_reste.amount >= 0
+                    )
                 credit_S2_source.save(update_fields=['credit_reste'])  
                 credit_S2_destination.save(update_fields=['credit_reste'])
                    
     
-                #save()
+                
             except Exception:
               
                 if AssertionError:
                     messages.error(request, "ERREUR: Veuillez verifier le montant de transfert sachant que le reste comme credit pour cet article source : "
                                 + str(credit_reste_s2_source.amount) + "DZD" )          
                     return render(request, 'scolar/create.html', {'form': form })
+                    
                 elif settings.DEBUG:
                     raise Exception
                 else:
                     messages.error(request, "ERREUR: lors de la creation du transfert. Veuillez le signaler a l administrateur.")
                     return render(request, 'scolar/create.html', {'form': form })
-
+                
+            messages.success(request, "Le transfert est fait avec succes")
             return HttpResponseRedirect(reverse('Transfert_List'))
     else:
         form = Transfert_CreateForm(request)
-        messages.info(request, "Utilisez ce formulaire pour ajouter une nouveau transfert")
+        messages.info(request, "Utilisez ce formulaire pour ajouter un nouveau transfert")
     
     context={}  
     context['form']=form
@@ -13975,56 +13985,4 @@ def Transfert_create_view(request):# LoginRequiredMixin, SuccessMessageMixin , U
 
 
     
-# def Transfert_create_view(request):
-# 
-#     if request.method == 'POST':
-#         # create a form instance and populate it with data from the request:
-#         form = Transfert_CreateForm(request, request.POST)
-#         # check whether it's valid:
-#         if form.is_valid():
-#             try:
-#                 # process the data in form.cleaned_data as required
-#                 data=form.cleaned_data
-#                 
-# 
-#                 transfert_=Transfert.objects.create(
-#                     annee_budgi=data['annee_budgi'],                    
-#                     num_transfert=data['num_transfert'],                    
-#                     date_transfert=data['date_transfert'],
-#                     article_source=data['article_source'],
-#                     article_destination=data['article_destination'],
-#                     montant_transfert=data['montant_transfert']
-#                     
-#                     )                         
-#             # Recuperation des articles budgetaires 
-#             #source = Credit_S2.objects.get(article=transfert_.article_source)
-#             #source = Credit_S2.objects.get(article=transfert_.article_source)
-#             source = Credit_S2.objects.get(article=data['article_source'])
-#             destination = Credit_S2.objects.get(article=transfert_.article_destination)
-#            # Verification que le solde de l article source est suffisant
-#             if source.credit_reste >=montant_transfert:
-#                 # Deduction du montant de l article source
-#                 source.credit_reste -= montant_transfert 
-#                 source.save() 
-#                 # Ajout du montant a l article destination
-#                 destination.credit_reste += montant_transfert 
-#                 destination.save()
-#             except Exception:
-#                 if settings.DEBUG:
-#                     raise Exception
-#                 else:
-#                     messages.error(request, "ERREUR: lors de la création du transfert. Veuillez le signaler à l'administrateur.")
-#                     return render(request, 'scolar/create.html', {'form': form })
-# 
-#             return HttpResponseRedirect(reverse('Transfert_List'))
-#                     
-# 
-#     # if a GET (or any other method) we'll create a blank form
-#     else:
-#         form = Transfert_CreateForm(request)
-#         messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle depence")
-#     
-#     context={}  
-#     context['form']=form
-#     return render(request, 'scolar/create.html', context)
-                   
+                 
