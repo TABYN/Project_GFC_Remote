@@ -1334,6 +1334,11 @@ class Article_mandatTable(tables.Table):
 class TransfertTable(tables.Table):
 
     date_transfert = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "transfert_update" transfert_pk=record.id %}" > {% icon "pencil-alt" %}</a>'#\
+#             <a href="" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
 #     action='{% load icons %}\
 #             <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
 #             <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      

@@ -51,5 +51,37 @@ def depence_create_view(request):
                     return render(request, 'scolar/create.html', {'form': form })
 
             return HttpResponseRedirect(reverse('Depence_List'))
+
+
+
+
+@login_required
+def CreditDelete(request,avc, art):
+    pavc= Avance.objects.get(pk=avc)
+    credit = Credit.objects.get(article=art,avance=avc)
+    cpt_bord_liees= Bordereau.objects.filter(credit_id=credit).count()
+    exe= pavc.exercice
+    
+    article = Article.objects.all()
+    crdt = Credit.objects.all()
+    delete = 3
+    if request.method == "POST":
+        if cpt_bord_liees>0 : 
+             messages.error(request,  "Vous ne pouvez pas supprimer ce credit , des borderaux sont deja liee")
+        else :
+            credit.delete()
+            messages.success(request, 'Credit supprimee definitivement')
+            messages.success(request, 'Il reste comme credit Non alloue : ' + str(
+             
+            pavc.credit_non_allouee.amount + (credit.credit_allouee.amount)) + "DZD")
+                            
+            pavc.credit_non_allouee.amount = pavc.credit_non_allouee.amount + (credit.credit_allouee.amount)
+            pavc.save(update_fields=['credit_non_allouee'])
+            
+            
+            
+            
+            return render(request, 'scolar/add_credit.html', {'article': article, 'crdt': crdt,'pavc':pavc, 'exe':exe })
+    return render(request, 'scolar/delete_item.html', {'delete': delete ,'pavc':pavc,'exe':exe })
                    
        

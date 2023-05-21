@@ -2057,4 +2057,58 @@ class Transfert_CreateForm(forms.Form):
                 raise Exception
             else:
                 messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'engagement. Merci de le signaler à l'administrateur")    
+ 
+ 
+####################
+class Transfert_UpdateForm(forms.Form):
+    
+    def __init__(self, transfert_pk, request, *args, **kwargs):
+        super(Transfert_UpdateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+            transfert_= get_object_or_404(Transfert, id=transfert_pk)
+
+            self.fields['annee_budgi']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Année budgetaire",
+                required = False,
+                initial=transfert_.annee_budgi
+            )
+            
+            self.fields['num_transfert'] = forms.IntegerField(label='Numero du transfert' , required = False, initial=transfert_.num_transfert)
+            self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'),required = False, initial=transfert_.date_transfert)#    initial=datetime.date.today()
+            
+            self.fields['article_source'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.all(),
+                 label=u"Article_source",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                    ),
+                 required = False,
+                 initial=transfert_.article_source                                             
+            )    
+           
+            self.fields['article_destination'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.all(),
+                 label=u"Article_destination",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                    ),
+                 required = False,
+                 initial=transfert_.article_destination                                             
+            )    
+            
+            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = False, max_digits=9, decimal_places=2,initial=transfert_.montant_transfert)
+            
+            self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification du Transfert. Merci de le signaler à l'administrateur")
+
               

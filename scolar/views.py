@@ -61,7 +61,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm,Mandat_UpdateForm2, Mandat_DetailForm, Transfert_CreateForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm,Mandat_UpdateForm2, Mandat_DetailForm, Transfert_CreateForm, Transfert_UpdateForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -13538,7 +13538,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
 
 
 
-
+###################################################   Mandat   #############################
 
 class MandatListView(TemplateView):
     template_name = 'scolar/filter_list.html'
@@ -13889,6 +13889,7 @@ def mandat_update_view2(request, mandat_pk):
     return render(request, 'scolar/update.html', context)
 
 TransfertTable, TransfertFilter
+###############################################            Transfert                #######################
 
 class Transfert_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'scolar/filter_list.html'
@@ -13983,6 +13984,53 @@ def Transfert_create_view(request):
     context['form']=form
     return render(request, 'scolar/create.html', context)
 
+
+###########################
+@login_required
+def transfert_update_view(request, transfert_pk):
+    transfert_=get_object_or_404(Transfert, id=transfert_pk)
+    if request.user.is_budget():
+         pass       
+    else :
+         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+         return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['transfert']=transfert_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Transfert_UpdateForm(transfert_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                      
+                transfert_.annee_budgi=data['annee_budgi']
+                transfert_.num_transfert=data['num_transfert']
+                transfert_.date_transfert=data['date_transfert']
+                transfert_.article_source=data['article_source']
+                transfert_.article_destination=data['article_destination']
+                transfert_.montant_transfert=data['montant_transfert']
+                
+                transfert_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du transfert. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('Transfert_List'))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Transfert_UpdateForm(transfert_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier le transfert")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
 
     
                  
