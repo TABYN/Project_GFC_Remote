@@ -13424,16 +13424,25 @@ def depence_update_view(request, engagement_pk):
   
     return render(request, 'scolar/update.html', context)
 
-class DepenseDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
-    model = Engagement
-    template_name = 'scolar/delete.html'
-    success_message = "La depence a bien supprime."
-    
-    def test_func(self):
-        return self.request.user.is_budget()
 
-    def get_success_url(self):
-        return reverse('Depence_List')
+@login_required
+def depence_delete(request, engagement_pk):
+    engagement_=Engagement.objects.get(id=engagement_pk)
+    montant=engagement_.montant_operation.amount
+    
+    delete = 7
+    if request.method == "POST":
+        engagement_.delete()
+        credit_reste_s2=Credit_S2.objects.get(pk=engagement_.credit_alloue.id).credit_reste
+        credit_S2_=Credit_S2.objects.get(pk=engagement_.credit_alloue.id)
+        credit_S2_.credit_reste.amount =credit_reste_s2.amount + montant
+        assert credit_S2_.credit_reste.amount >= 0 
+        credit_S2_.save(update_fields=['credit_reste'])
+        
+        messages.success(request, 'Depence supprimee.')
+        return redirect('Depence_List')
+    return render(request, 'scolar/delete_item.html', {'delete': delete})
+
 
 class Depence_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'scolar/engagement_detail.html'

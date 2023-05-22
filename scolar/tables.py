@@ -1222,7 +1222,7 @@ class DepenceTable(tables.Table):
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "depence_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "depence_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
