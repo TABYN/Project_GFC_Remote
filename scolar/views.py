@@ -13312,24 +13312,34 @@ def depence_create_view(request):
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
                  
+                
+                type=data['type']
+                num=data['num']
+                date=data['date']
+                annee_budg=data['annee_budg']
+                credit_alloue=data['credit_alloue']
+                montant_operation=data['montant_operation']
+                fournisseur=data['fournisseur']
+                facture=data['facture']
+                   
+                 
+                credit_reste_s2=Credit_S2.objects.get(pk=credit_alloue.id).credit_reste
+                credit_S2_=Credit_S2.objects.get(pk=credit_alloue.id)
+                credit_S2_.credit_reste.amount =credit_reste_s2.amount - montant_operation
+                assert credit_S2_.credit_reste.amount >= 0
+                
                 engagement_=Engagement.objects.create(
                     type=data['type'],
                     num=data['num'],
                     date=data['date'],
-                    #observation=data['observation'],
                     annee_budg=data['annee_budg'],
                     credit_alloue=data['credit_alloue'],
                     montant_operation=data['montant_operation'],
                     fournisseur=data['fournisseur'],
                     facture=data['facture']
                     ) 
-                 
-                credit_reste_s2=Credit_S2.objects.get(pk=engagement_.credit_alloue.id).credit_reste
-                credit_S2_=Credit_S2.objects.get(pk=engagement_.credit_alloue.id)
-                credit_S2_.credit_reste.amount =credit_reste_s2.amount - engagement_.montant_operation.amount
-                assert credit_S2_.credit_reste.amount >= 0
                 credit_S2_.save(update_fields=['credit_reste'])  
-               
+                         
             except Exception:
                
                 if AssertionError:
@@ -13337,7 +13347,7 @@ def depence_create_view(request):
                                 + str(credit_reste_s2.amount) + "DZD" )          
                     return render(request, 'scolar/create.html', {'form': form })
                 elif settings.DEBUG:
-                    raise Exception
+                    raise exception
                 else:
                     messages.error(request, "ERREUR: lors de la creation de la depence. Veuillez le signaler.")
                     return render(request, 'scolar/create.html', {'form': form })
@@ -13378,7 +13388,6 @@ def depence_update_view(request, engagement_pk):
                 engagement_.type=data['type']
                 engagement_.date=data['date']
                 engagement_.num=data['num']
-                #engagement_.observation=data['observation']
                 engagement_.credit_alloue=data['credit_alloue']
                 engagement_.montant_operation=data['montant_operation']
                 engagement_.fournisseur=data['fournisseur']
@@ -13386,11 +13395,10 @@ def depence_update_view(request, engagement_pk):
                 
                 credit_reste_s2=Credit_S2.objects.get(pk=engagement_.credit_alloue.id).credit_reste
                 credit_S2_=Credit_S2.objects.get(pk=engagement_.credit_alloue.id)
-                if engagement_.montant_operation:
-                    credit_reste_s2.amount =credit_S2_.credit_reste.amount+ancien_montant
-                    credit_S2_.credit_reste.amount =credit_reste_s2.amount - engagement_.montant_operation.amount
-                    assert credit_S2_.credit_reste.amount >= 0
-                    credit_S2_.save(update_fields=['credit_reste'])
+                credit_reste_s2.amount =credit_S2_.credit_reste.amount+ancien_montant
+                credit_S2_.credit_reste.amount =credit_reste_s2.amount - engagement_.montant_operation.amount
+                assert credit_S2_.credit_reste.amount >= 0
+                credit_S2_.save(update_fields=['credit_reste'])
                 
                 engagement_.save()
                          

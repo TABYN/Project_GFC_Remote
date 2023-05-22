@@ -2320,11 +2320,11 @@ class Engagement(models.Model):
         #super().save(*args, **kwargs)
 
         
-    def nouveau_solde(self): 
-        solde=0      
-        if self.montant_operation :
-            solde=solde+self.credit_alloue.credit_reste-self.montant_operation
-            return solde
+#     def nouveau_solde(self): 
+#         solde=0      
+#         if self.montant_operation :
+#             solde=solde+self.credit_alloue.credit_reste-self.montant_operation
+#             return solde
     
     def nouveau_solde_s1(self): 
         solde_s1=self.credit_alloue.credit_allouee/2
@@ -2357,25 +2357,6 @@ class Mandat(models.Model):
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 
-    def nouveau_solde_mandat(self): 
-        solde=0      
-        if self.montant_op :
-            solde=solde+self.credit_s2.credit_reste-self.montant_op
-            return solde
-            
 
-    def nouveau_solde_s1_mandat(self): 
-        solde_s1=self.credit_s2.credit_allouee/2
-        if self.montant_op :
-            solde_s1=solde_s1-self.montant_op
-            return solde_s1
-        
-    def nouveau_solde_s2_mandat(self):  
-        solde_s2=self.credit_s2.credit_allouee/2
-        if self.nouveau_solde_s1() :
-            solde_s2=solde_s2+self.nouveau_solde_s1()
-            return solde_s2
-        else:
-            return solde_s2
     
  
