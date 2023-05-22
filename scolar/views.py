@@ -13985,10 +13985,12 @@ def Transfert_create_view(request):
     return render(request, 'scolar/create.html', context)
 
 
-###########################
 @login_required
 def transfert_update_view(request, transfert_pk):
     transfert_=get_object_or_404(Transfert, id=transfert_pk)
+    encien_montant= transfert_.montant_transfert.amount 
+    encien_source= transfert_.article_source
+    encien_destination= transfert_.article_destination
     if request.user.is_budget():
          pass       
     else :
@@ -14002,6 +14004,19 @@ def transfert_update_view(request, transfert_pk):
         # check whether it's valid:
         if form.is_valid():
             try:
+                ########################   modifier l'encien montant
+                credit_reste_s2_source_encien=Credit_S2.objects.get(pk=encien_source.id).credit_reste                
+                credit_reste_s2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id).credit_reste
+                
+                credit_S2_source_encien=Credit_S2.objects.get(pk=encien_source.id)
+                credit_S2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id)
+                
+                credit_S2_source_encien.credit_reste.amount =credit_reste_s2_source_encien.amount + encien_montant
+                credit_S2_destination_encien.credit_reste.amount =credit_reste_s2_destination_encien.amount - encien_montant
+                credit_S2_source_encien.save(update_fields=['credit_reste'])  
+                credit_S2_destination_encien.save(update_fields=['credit_reste'])
+                ######################
+
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
                       
@@ -14011,6 +14026,24 @@ def transfert_update_view(request, transfert_pk):
                 transfert_.article_source=data['article_source']
                 transfert_.article_destination=data['article_destination']
                 transfert_.montant_transfert=data['montant_transfert']
+                
+                #######################    calculer le nouveau montant
+                
+                credit_reste_s2_source=Credit_S2.objects.get(pk=transfert_.article_source.id).credit_reste                
+                credit_reste_s2_destination=Credit_S2.objects.get(pk=transfert_.article_destination.id).credit_reste                
+                credit_S2_source=Credit_S2.objects.get(pk=transfert_.article_source.id)               
+                credit_S2_destination=Credit_S2.objects.get(pk=transfert_.article_destination.id)
+                
+                credit_S2_source.credit_reste.amount =credit_reste_s2_source.amount - transfert_.montant_transfert.amount
+                credit_S2_destination.credit_reste.amount =credit_reste_s2_destination.amount + transfert_.montant_transfert.amount
+                 
+                assert credit_S2_source.credit_reste.amount >= 0
+                
+                credit_S2_source.save(update_fields=['credit_reste'])  
+                credit_S2_destination.save(update_fields=['credit_reste'])
+                   
+                
+                ##########################
                 
                 transfert_.save()
                          
