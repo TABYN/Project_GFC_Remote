@@ -373,6 +373,8 @@ urlpatterns = [
     re_path(r'^depence_delete/(?P<engagement_pk>\d+)/$', views.depence_delete, name='depence_delete'),
     re_path(r'^detail_depence/(?P<pk>\d+)/$', views.Depence_DetailView.as_view(), name='detail_depence'),
     
+    path('Fiches_regularisation_provision_List', views.Fiche_regularisation_provision_ListView.as_view(), name='Fiches_regularisation_provision_List'),
+
 
     path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),
     path('mandatCreate/<int:crd>/', views.MandatCreate, name="mandatCreate"),

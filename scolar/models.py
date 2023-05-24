@@ -2307,7 +2307,6 @@ class Engagement(models.Model):
     def save(self, *args, **kwargs):
       #  if not self.pk:
             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
-        print("bonjour")
         last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
         
         if last_object:
@@ -2316,6 +2315,8 @@ class Engagement(models.Model):
         else:
                 # Si aucun objet n'existe, commencez à 1
                 self.num = 1
+        
+                  
         super(Engagement, self).save(*args, **kwargs)
         #super().save(*args, **kwargs)
 

@@ -13283,7 +13283,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Depence_ListView, self).get_context_data(**kwargs)
   
-        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(Q(type='Depence') | Q(type='Fiche de regularisation de la provision')).order_by('num'))
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type='Depence').order_by('num'))
   
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -13474,6 +13474,33 @@ class Depence_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                   
         return context      
 
+class Fiche_regularisation_provision_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/filter_list.html'
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+        
+    def get_context_data(self, **kwargs):
+        context = super(Fiche_regularisation_provision_ListView, self).get_context_data(**kwargs)
+  
+        filter_ = EngagementFilter(self.request.GET, queryset=Engagement.objects.filter(type="Fiche de regularisation de la provision").order_by('num'))
+  
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = DepenceTable(filter_.qs)
+
+        RequestConfig(self.request).configure(table)
+  
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Fiches de regularisation de la provision  '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+            'Ajouter nouvelle Fiche de regularisation de la provision': reverse('depence_create'),
+                  
+            }
+        return context
+    
 class Prise_en_chargeS2_PDFView(PDFTemplateView):
     template_name= 'scolar/Prise en charge.html'
     cmd_options = {
