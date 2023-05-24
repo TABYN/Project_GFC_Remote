@@ -61,7 +61,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm,Mandat_UpdateForm2, Mandat_DetailForm, Transfert_CreateForm, Transfert_UpdateForm
+    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, MandatCreateForm, Mandat_UpdateForm,Mandat_UpdateForm2, Mandat_DetailForm, Transfert_CreateForm, Transfert_UpdateForm, Transfert_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -14065,5 +14065,64 @@ def transfert_update_view(request, transfert_pk):
   
     return render(request, 'scolar/update.html', context)
 
+@login_required
+def transfert_delete(request, transfert_pk):
+    transfert_=Transfert.objects.get(id=transfert_pk)
+    encien_montant= transfert_.montant_transfert.amount 
+    encien_source= transfert_.article_source
+    encien_destination= transfert_.article_destination
+    
+    
+    delete = 8
+    if request.method == "POST":
+        
+        ###################   modifier l'encien montant pour (source et destination)    ###########################
+        credit_reste_s2_source_encien=Credit_S2.objects.get(pk=encien_source.id).credit_reste                
+        credit_reste_s2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id).credit_reste
+                
+        credit_S2_source_encien=Credit_S2.objects.get(pk=encien_source.id)
+        credit_S2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id)
+                
+        credit_S2_source_encien.credit_reste.amount =credit_reste_s2_source_encien.amount + encien_montant
+        credit_S2_destination_encien.credit_reste.amount =credit_reste_s2_destination_encien.amount - encien_montant
+        credit_S2_source_encien.save(update_fields=['credit_reste'])  
+        credit_S2_destination_encien.save(update_fields=['credit_reste'])
+        #########################################################################################################################        
+        transfert_.delete()
+        
+        messages.success(request, 'Transfert supprime.')
+        return redirect('Transfert_List')
+    return render(request, 'scolar/delete_item.html', {'delete': delete})
+    
+ 
+class Transfert_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/transfert_detail.html'
+
+    def test_func(self): 
+        transfert_=get_object_or_404(Transfert, id=self.kwargs.get("pk"))   
+        return self.request.user.is_budget()
+        
+    def get_context_data(self, **kwargs):
+        context = super(Transfert_DetailView, self).get_context_data(**kwargs)
+        titre='Trasfert detail '
+        context['titre'] = titre
+
+        transfert_=get_object_or_404(Transfert, id=self.kwargs.get("pk"))
+        
+        context['transfert_form'] = Transfert_DetailForm(transfert_pk=transfert_.id)
+        
+        exclude_columns_=[]
+        if not self.request.user.is_authenticated:
+            exclude_columns_.append('expert')
+            exclude_columns_.append('action')
+            exclude_columns_.append('edit')
+            exclude_columns_.append('admin')
+        else :
+            if (not self.request.user.is_budget()):
+                exclude_columns_.append('edit')
+                exclude_columns_.append('admin')
+                exclude_columns_.append('expert')
+                  
+        return context      
     
                  

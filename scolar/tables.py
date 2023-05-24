@@ -1335,27 +1335,14 @@ class TransfertTable(tables.Table):
 
     date_transfert = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
-            <a href="{% url "transfert_update" transfert_pk=record.id %}" > {% icon "pencil-alt" %}</a>'#\
-#             <a href="" > {% icon "trash" %}</a>'      
+            <a href="{% url "transfert_update" transfert_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "transfert_delete" transfert_pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
-    
-#     action='{% load icons %}\
-#             <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-#             <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
-#     edit   = tables.TemplateColumn(action, orderable=False)
-#    
-#     action= '{% load icons %}\
-#             <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> '
-#                
-#     detail   = tables.TemplateColumn(action, orderable=False)
-#    
-#     action= '{% if  not record.credit_alloue.article.posteriori %}\
-#             <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
-#             {% else %}\
-#             <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id %}" > Imprimer fiche de regularisation de la provision</a>\
-#             {% endif %}'
-#
-#     Imprimer=tables.TemplateColumn(action, orderable=False)          
+      
+    action= '{% load icons %}\
+            <a href=" {% url "detail_transfert" pk=record.id %}" > {% icon "eye" %}</a> '
+                
+    detail   = tables.TemplateColumn(action, orderable=False)
 
     class Meta:
         model= Transfert
