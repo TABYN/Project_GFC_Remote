@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable, TransfertTable, TransfertFilter
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -59,7 +59,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
     Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, \
-    Mandat_UpdateForm, Mandat_DetailForm
+    Mandat_UpdateForm, Mandat_DetailForm, Transfert_CreateForm, Transfert_UpdateForm, Transfert_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -13885,4 +13885,235 @@ class Type_FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permission
     def get_success_url(self):
         return reverse('typesfactures_list')  
 
+class Transfert_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/filter_list.html'
    
+    def test_func(self):
+        return self.request.user.is_budget()
+       
+    def get_context_data(self, **kwargs):
+        context = super(Transfert_ListView, self).get_context_data(**kwargs)
+ 
+        filter_ = TransfertFilter(self.request.GET, queryset=Transfert.objects.order_by('num_transfert'))
+ 
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = TransfertTable(filter_.qs)
+
+        RequestConfig(self.request).configure(table)
+ 
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Transferts '
+        if self.request.user.is_staff_only():
+         context['btn_list'] = {
+             'Ajouter nouveau transfert': reverse('Transfert_create'),
+                  
+             }
+        return context   
+    
+def Transfert_create_view(request):
+    if request.method == 'POST':
+        form = Transfert_CreateForm(request, request.POST)
+        if form.is_valid():
+            try:
+                
+                data = form.cleaned_data
+                
+                annee_budgi=data['annee_budgi']
+                num_transfert=data['num_transfert']
+                date_transfert=data['date_transfert']
+                article_source=data['article_source']
+                article_destination=data['article_destination']
+                montant_transfert=data['montant_transfert']
+                
+               
+                credit_reste_s2_source=Credit_S2.objects.get(pk=article_source.id).credit_reste
+                
+                credit_reste_s2_destination=Credit_S2.objects.get(pk=article_destination.id).credit_reste
+                
+                credit_S2_source=Credit_S2.objects.get(pk=article_source.id)
+                
+                credit_S2_destination=Credit_S2.objects.get(pk=article_destination.id)
+               
+                
+                
+                credit_S2_source.credit_reste.amount =credit_reste_s2_source.amount - montant_transfert
+                credit_S2_destination.credit_reste.amount =credit_reste_s2_destination.amount + montant_transfert
+                 
+                assert credit_S2_source.credit_reste.amount >= 0
+                transfert_ = Transfert.objects.create(
+                    annee_budgi=data['annee_budgi'],
+                    num_transfert=data['num_transfert'],
+                    date_transfert=data['date_transfert'],
+                    article_source=data['article_source'],
+                    article_destination=data['article_destination'],
+                    montant_transfert=data['montant_transfert']
+                    )
+                credit_S2_source.save(update_fields=['credit_reste'])  
+                credit_S2_destination.save(update_fields=['credit_reste'])
+                   
+    
+                
+            except Exception:
+              
+                if AssertionError:
+                    messages.error(request, "ERREUR: Veuillez verifier le montant de transfert sachant que le reste comme credit pour cet article source : "
+                                + str(credit_reste_s2_source.amount) + "DZD" )          
+                    return render(request, 'scolar/create.html', {'form': form })
+                    
+                elif settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la creation du transfert. Veuillez le signaler a l administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+                
+            messages.success(request, "Le transfert est fait avec succes")
+            return HttpResponseRedirect(reverse('Transfert_List'))
+    else:
+        form = Transfert_CreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter un nouveau transfert")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+@login_required
+def transfert_update_view(request, transfert_pk):
+    transfert_=get_object_or_404(Transfert, id=transfert_pk)
+    encien_montant= transfert_.montant_transfert.amount 
+    encien_source= transfert_.article_source
+    encien_destination= transfert_.article_destination
+    if request.user.is_budget():
+         pass       
+    else :
+         messages.error(request,"Vous n'avez pas les permissions d'accès à cette opération")
+         return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['transfert']=transfert_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Transfert_UpdateForm(transfert_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                ########################   modifier l'encien montant
+                credit_reste_s2_source_encien=Credit_S2.objects.get(pk=encien_source.id).credit_reste                
+                credit_reste_s2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id).credit_reste
+                
+                credit_S2_source_encien=Credit_S2.objects.get(pk=encien_source.id)
+                credit_S2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id)
+                
+                credit_S2_source_encien.credit_reste.amount =credit_reste_s2_source_encien.amount + encien_montant
+                credit_S2_destination_encien.credit_reste.amount =credit_reste_s2_destination_encien.amount - encien_montant
+                credit_S2_source_encien.save(update_fields=['credit_reste'])  
+                credit_S2_destination_encien.save(update_fields=['credit_reste'])
+                ######################
+
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                      
+                transfert_.annee_budgi=data['annee_budgi']
+                transfert_.num_transfert=data['num_transfert']
+                transfert_.date_transfert=data['date_transfert']
+                transfert_.article_source=data['article_source']
+                transfert_.article_destination=data['article_destination']
+                transfert_.montant_transfert=data['montant_transfert']
+                
+                #######################    calculer le nouveau montant
+                
+                credit_reste_s2_source=Credit_S2.objects.get(pk=transfert_.article_source.id).credit_reste                
+                credit_reste_s2_destination=Credit_S2.objects.get(pk=transfert_.article_destination.id).credit_reste                
+                credit_S2_source=Credit_S2.objects.get(pk=transfert_.article_source.id)               
+                credit_S2_destination=Credit_S2.objects.get(pk=transfert_.article_destination.id)
+                
+                credit_S2_source.credit_reste.amount =credit_reste_s2_source.amount - transfert_.montant_transfert.amount
+                credit_S2_destination.credit_reste.amount =credit_reste_s2_destination.amount + transfert_.montant_transfert.amount
+                 
+                assert credit_S2_source.credit_reste.amount >= 0
+                
+                credit_S2_source.save(update_fields=['credit_reste'])  
+                credit_S2_destination.save(update_fields=['credit_reste'])
+                   
+                
+                ##########################
+                
+                transfert_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du transfert. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('Transfert_List'))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Transfert_UpdateForm(transfert_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier le transfert")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
+
+@login_required
+def transfert_delete(request, transfert_pk):
+    transfert_=Transfert.objects.get(id=transfert_pk)
+    encien_montant= transfert_.montant_transfert.amount 
+    encien_source= transfert_.article_source
+    encien_destination= transfert_.article_destination
+    
+    
+    delete = 8
+    if request.method == "POST":
+        
+        ###################   modifier l'encien montant pour (source et destination)    ###########################
+        credit_reste_s2_source_encien=Credit_S2.objects.get(pk=encien_source.id).credit_reste                
+        credit_reste_s2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id).credit_reste
+                
+        credit_S2_source_encien=Credit_S2.objects.get(pk=encien_source.id)
+        credit_S2_destination_encien=Credit_S2.objects.get(pk=encien_destination.id)
+                
+        credit_S2_source_encien.credit_reste.amount =credit_reste_s2_source_encien.amount + encien_montant
+        credit_S2_destination_encien.credit_reste.amount =credit_reste_s2_destination_encien.amount - encien_montant
+        credit_S2_source_encien.save(update_fields=['credit_reste'])  
+        credit_S2_destination_encien.save(update_fields=['credit_reste'])
+        #########################################################################################################################        
+        transfert_.delete()
+        
+        messages.success(request, 'Transfert supprime.')
+        return redirect('Transfert_List')
+    return render(request, 'scolar/delete_item.html', {'delete': delete})
+
+class Transfert_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/transfert_detail.html'
+
+    def test_func(self): 
+        transfert_=get_object_or_404(Transfert, id=self.kwargs.get("pk"))   
+        return self.request.user.is_budget()
+        
+    def get_context_data(self, **kwargs):
+        context = super(Transfert_DetailView, self).get_context_data(**kwargs)
+        titre='Trasfert detail '
+        context['titre'] = titre
+
+        transfert_=get_object_or_404(Transfert, id=self.kwargs.get("pk"))
+        
+        context['transfert_form'] = Transfert_DetailForm(transfert_pk=transfert_.id)
+        
+        exclude_columns_=[]
+        if not self.request.user.is_authenticated:
+            exclude_columns_.append('expert')
+            exclude_columns_.append('action')
+            exclude_columns_.append('edit')
+            exclude_columns_.append('admin')
+        else :
+            if (not self.request.user.is_budget()):
+                exclude_columns_.append('edit')
+                exclude_columns_.append('admin')
+                exclude_columns_.append('expert')
+                  
+        return context     
+              

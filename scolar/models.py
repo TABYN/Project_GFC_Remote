@@ -2299,8 +2299,6 @@ class Engagement(models.Model):
     facture=models.ForeignKey(Facture ,related_name='facture' , null= True, blank=True, on_delete=models.SET_NULL )
     mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
     
-     
-    
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type)
     
@@ -2358,6 +2356,16 @@ class Mandat(models.Model):
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
 
-
+class Transfert(models.Model):
+    annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
+    num_transfert = models.IntegerField(null = True)
+    date_transfert=models.DateField(null=True, blank=True)
+    article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL)
+    article_destination=models.ForeignKey(Credit_S2 ,related_name='destination' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_transfert=MoneyField(decimal_places=2, max_digits=9)
+   
+       
+#     def __str__(self):
+#         return  self.article_source_id+ ' ----> ' + self.article_destination_id
     
  

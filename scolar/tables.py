@@ -1316,5 +1316,29 @@ class Type_FactureTable(tables.Table):
         fields = ['code', 'type']
         template_name= "django_tables2/bootstrap4.html"
     
+class TransfertTable(tables.Table):
 
+    date_transfert = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "transfert_update" transfert_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "transfert_delete" transfert_pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+      
+    action= '{% load icons %}\
+            <a href=" {% url "detail_transfert" pk=record.id %}" > {% icon "eye" %}</a> '
+                
+    detail   = tables.TemplateColumn(action, orderable=False)
+
+    class Meta:
+        model= Transfert
+        fields = ['annee_budgi','num_transfert','date_transfert','article_source__chapitre','article_source__article','article_destination__chapitre','article_destination__article','montant_transfert']
+        template_name= "django_tables2/bootstrap4.html"
+
+
+class TransfertFilter(django_filters.FilterSet):
+    num_transfert = django_filters.CharFilter(field_name='num_transfert', lookup_expr='icontains', label="numero du transfert")
+    
+    class Meta:
+        model = Transfert
+        fields = ['annee_budgi','date_transfert', 'num_transfert'] 
   

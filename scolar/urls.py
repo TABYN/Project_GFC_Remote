@@ -396,5 +396,12 @@ urlpatterns = [
     path('typesfactures_create', views.Type_FactureCreateView.as_view(), name='typesfactures_create'),
     re_path(r'^typesfactures_update/(?P<pk>\d+)/$',views.Type_FacturesUpdateView.as_view(), name='typesfactures_update'),
     re_path(r'^typesfactures_delete/(?P<pk>\d+)/$',views.Type_FactureDeleteView.as_view(), name='typesfactures_delete'), 
+ 
+    path('Transfert_List', views.Transfert_ListView.as_view(), name='Transfert_List'),
+    path('Transfert_create', views.Transfert_create_view, name='Transfert_create'),
+    re_path(r'^transfert_update/(?P<transfert_pk>\d+)/$', views.transfert_update_view, name='transfert_update'),
+    re_path(r'^transfert_delete/(?P<transfert_pk>\d+)/$', views.transfert_delete, name='transfert_delete'),
+    re_path(r'^detail_transfert/(?P<pk>\d+)/$', views.Transfert_DetailView.as_view(), name='detail_transfert'),
+
 
     ]
