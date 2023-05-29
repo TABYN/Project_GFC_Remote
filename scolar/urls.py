@@ -352,7 +352,9 @@ urlpatterns = [
     re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
     re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
     
-    path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'),    
+    path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'),   
+    path('exercice_s2_create', views.exercice_s2_create_view, name='exercice_s2_create'),
+
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
     

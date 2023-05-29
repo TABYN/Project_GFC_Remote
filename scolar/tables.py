@@ -1337,7 +1337,8 @@ class TransfertTable(tables.Table):
 
 class TransfertFilter(django_filters.FilterSet):
     num_transfert = django_filters.CharFilter(field_name='num_transfert', lookup_expr='icontains', label="numero du transfert")
-    
+    annee_budgi = django_filters.ModelChoiceFilter(field_name='annee_budgi', queryset=AnneeUniv.objects.all().order_by('-annee_univ'), label='Année budgetaire', empty_label='Année budgetaire')
+
     class Meta:
         model = Transfert
         fields = ['annee_budgi','date_transfert', 'num_transfert'] 

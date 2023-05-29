@@ -2114,8 +2114,8 @@ class Exercice(models.Model):
     annee_budg=models.CharField(max_length=4, unique=True)
     debut=models.DateField()
     fin=models.DateField()
-    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
-    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
+    total=MoneyField(decimal_places=2, max_digits=9,null= True, blank=True)
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     
     def __str__(self):
         return self.annee_budg

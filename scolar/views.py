@@ -58,7 +58,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     InstitutionDetailForm, \
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
-    Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, \
+    Exercice_S2_CreateForm, Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, \
     Mandat_UpdateForm, Mandat_DetailForm, Transfert_CreateForm, Transfert_UpdateForm, Transfert_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
@@ -12949,9 +12949,51 @@ class ExerciceListView(LoginRequiredMixin, TemplateView):
         RequestConfig(self.request).configure(table)
         context['titre'] = 'Liste des exercices budgetaires'
         context['table'] = table
+        context['btn_list'] = {
+            'Ajouter Exercice': reverse('exercice_s2_create'), }
         context['back'] = reverse('home')
         return context
-        
+
+@login_required
+def exercice_s2_create_view(request):
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Exercice_S2_CreateForm(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+                exercice_=Exercice.objects.create(
+                    annee_budg=data['annee_budg'],
+                    debut=data['debut'],
+                    fin=data['fin'],
+                    total=data['total'],
+                    credit_non_allouee=data['credit_non_allouee']
+                    )                         
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la création de l'exercice. Veuillez le signaler à l'administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('exercice_list'))
+                    
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Exercice_S2_CreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter un nouveau exercice")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+   
+          
 @login_required
 def CreditCreate_S2(request,exe):
     article = Article.objects.all()
@@ -12996,7 +13038,9 @@ def CreditAssociate_S2(request,exe,art):
                             credit_S2.save()          
                             messages.success(request, 'credit enregistree.')
                             messages.success(request, 'Il reste comme credit Non alloue : ' + str(
-                                  pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)) + "DZD")
+                                pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)) + "DZD")
+                            return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
+                            return redirect(request.path_info)
                              
                             pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)
                             pexe.save(update_fields=['credit_non_allouee'])
@@ -13064,7 +13108,7 @@ class Type_EngagementListView(TemplateView):
         context['titre'] = 'Liste des Natures des engagements '
         if self.request.user.is_staff_only():
             context['btn_list'] = {
-            'Creer Nature eng': reverse('engagement_S2_create'),
+            'Créer Nature eng': reverse('engagement_S2_create'),
                  
             }
         return context
@@ -13074,7 +13118,7 @@ class Type_EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, Permiss
     model = Type_Engagement_S2
     fields = ['code', 'nature']
     template_name = 'scolar/create.html'
-    success_message = "Nature d'engagement a ete cree avec succes!"
+    success_message = "Nature d'engagement a été crée avec succés!"
  
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -13088,7 +13132,7 @@ class Type_EngagementCreateView(LoginRequiredMixin, SuccessMessageMixin, Permiss
  
     def get_context_data(self, **kwargs):
         context = super(Type_EngagementCreateView, self).get_context_data(**kwargs)
-        titre = 'Creer une nouvelle Nature d''Engagement'
+        titre = "Créer une nouvelle Nature d'Engagement"
         context['titre'] = titre
         return context
      
@@ -13097,7 +13141,7 @@ class Type_EngagementUpdateView(LoginRequiredMixin, SuccessMessageMixin, Permiss
     model = Type_Engagement_S2
     fields = ['code', 'nature']
     template_name = 'scolar/update.html'
-    success_message = "La Nature dengagement a ete modifiee avec succe"
+    success_message = "La Nature dengagement a été modifiée avec succés"
  
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -13115,7 +13159,7 @@ class Type_EngagementDeleteView(LoginRequiredMixin, SuccessMessageMixin, Permiss
     model = Type_Engagement_S2
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_engagement_S2'
-    success_message = "La nature dengagement a bien ete supprimee"
+    success_message = "La nature d'engagement  été bien supprimée"
  
     def get_success_url(self):
         return reverse('engagement_S2_list')
@@ -13190,7 +13234,7 @@ def prise_en_charge_create_view(request):
 class Prise_En_ChargeDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
     model = Engagement
     template_name = 'scolar/delete.html'
-    success_message = "La prise en charge a bien supprime."
+    success_message = "La prise en charge àété bien supprime."
     
     def test_func(self):
         return self.request.user.is_budget()
@@ -13253,7 +13297,7 @@ class Prise_en_chargeDetailView(LoginRequiredMixin, UserPassesTestMixin, Templat
         
     def get_context_data(self, **kwargs):
         context = super(Prise_en_chargeDetailView, self).get_context_data(**kwargs)
-        titre='Engagement Peise en charge'#+ self.kwargs.get("pk")
+        titre='Engagement Prise en charge'#+ self.kwargs.get("pk")
         context['titre'] = titre
 
         engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
@@ -13296,7 +13340,7 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         context['titre'] = 'Liste des Depences  '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
-            'Ajouter nouvelle depence': reverse('depence_create'),
+            'Ajouter nouvelle dépence': reverse('depence_create'),
                   
             }
         return context
@@ -13343,13 +13387,13 @@ def depence_create_view(request):
             except Exception:
                
                 if AssertionError:
-                    messages.error(request, "ERREUR: Veuillez verifier le montant introduit sachant que le reste comme credit pour cet article : "
+                    messages.error(request, "ERREUR: Veuillez verifier le montant introduit sachant que le reste comme crédit pour cet article : "
                                 + str(credit_reste_s2.amount) + "DZD" )          
                     return render(request, 'scolar/create.html', {'form': form })
                 elif settings.DEBUG:
                     raise exception
                 else:
-                    messages.error(request, "ERREUR: lors de la creation de la depence. Veuillez le signaler.")
+                    messages.error(request, "ERREUR: lors de la création de la dépence. Veuillez le signaler.")
                     return render(request, 'scolar/create.html', {'form': form })
 
             return HttpResponseRedirect(reverse('Depence_List'))
@@ -13357,7 +13401,7 @@ def depence_create_view(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Depence_CreateForm(request)
-        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle depence")
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle dépence")
     
     context={}  
     context['form']=form
@@ -13404,7 +13448,7 @@ def depence_update_view(request, engagement_pk):
                          
             except Exception:
                 if AssertionError:
-                    messages.error(request, "ERREUR: Veuillez verifier le montant introduit sachant que le reste comme credit pour cet article : "
+                    messages.error(request, "ERREUR: Veuillez verifier le montant introduit sachant que le reste comme crédit pour cet article : "
                                 + str(credit_reste_s2.amount) + "DZD" )          
                     return render(request, 'scolar/update.html', {'form': form })
                 elif settings.DEBUG:
@@ -13417,7 +13461,7 @@ def depence_update_view(request, engagement_pk):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Depence_UpdateForm(engagement_pk, request)
-        messages.info(request, "Utilisez ce formulaire pour modifier la depence")
+        messages.info(request, "Utilisez ce formulaire pour modifier la dépence")
 
         
     context['form']=form
@@ -13439,7 +13483,7 @@ def depence_delete(request, engagement_pk):
         assert credit_S2_.credit_reste.amount >= 0 
         credit_S2_.save(update_fields=['credit_reste'])
         
-        messages.success(request, 'Depence supprimee.')
+        messages.success(request, 'Dépence supprimée.')
         return redirect('Depence_List')
     return render(request, 'scolar/delete_item.html', {'delete': delete})
 
@@ -13493,10 +13537,10 @@ class Fiche_regularisation_provision_ListView(LoginRequiredMixin, UserPassesTest
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Fiches de regularisation de la provision  '
+        context['titre'] = 'Liste des Fiches de régularisation de la provision  '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
-            'Ajouter nouvelle Fiche de regularisation de la provision': reverse('depence_create'),
+            'Ajouter nouvelle Fiche de régularisation de la provision': reverse('depence_create'),
                   
             }
         return context
@@ -13626,7 +13670,7 @@ def MandatCreate(request, crd):
             
         )
         mandat.save()
-        messages.success(request, 'Mandat enregistree.')
+        messages.success(request, 'Mandat enregistré.')
         return redirect(request.path_info)
     else:
         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
@@ -13641,7 +13685,7 @@ def MandatDelete(request, mandat):
     delete = 6
     if request.method == "POST":
         mandat.delete()
-        messages.success(request, 'mandat supprime.')
+        messages.success(request, 'mandat supprimé.')
         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=article))
         mandats = Mandat.objects.filter(credit_s2=Credit_S2.objects.get(pk=credit_s2))
 
@@ -13742,7 +13786,7 @@ class FacturesCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
     model = Facture
     fields = ['num_fact', 'date_fact', 'type_facture']
     template_name = 'scolar/create.html'
-    success_message = "La facture a ete ajoute avec succes!"
+    success_message = "La facture a été ajouté avec succés!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -13768,7 +13812,7 @@ class FacturesCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequ
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la creation d'une facture .")
+                messages.error(self.request, "ERREUR: lors de la création d'une facture .")
    
         return form
 
@@ -13783,7 +13827,7 @@ class FactureUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     model = Facture
     fields = ['num_fact', 'date_fact', 'type_facture']
     template_name = 'scolar/update.html'
-    success_message = "La facture a ete modifie avec succes!"
+    success_message = "La facture a été modifié avec succés!"
  
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -13798,7 +13842,7 @@ class FactureUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
             if settings.DEBUG:
                 raise Exception
             else:
-                messages.error(self.request, "ERREUR: lors de la creation d'une facture .")
+                messages.error(self.request, "ERREUR: lors de la création d'une facture .")
    
         return form
  
@@ -13806,7 +13850,7 @@ class FactureDeleteView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequi
     model = Facture
     template_name = 'scolar/delete.html'
     permission_required = 'scolar.delete_facture'
-    success_message = "La facture a bien ete supprimee"
+    success_message = "La facture a bien été supprimée"
  
     def get_success_url(self):
         return reverse('factures_list')
@@ -13839,7 +13883,7 @@ class Type_FactureCreateView(LoginRequiredMixin, SuccessMessageMixin, Permission
     model = Type_Facture
     fields = ['code', 'type']
     template_name = 'scolar/create.html'
-    success_message = "Type des factures a ete cree avec succes!"
+    success_message = "Type des factures a été crée avec succés!"
  
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -13853,7 +13897,7 @@ class Type_FactureCreateView(LoginRequiredMixin, SuccessMessageMixin, Permission
  
     def get_context_data(self, **kwargs):
         context = super(Type_FactureCreateView, self).get_context_data(**kwargs)
-        titre = 'Creer un nouveau type de facture'
+        titre = 'Créer un nouveau type de facture'
         context['titre'] = titre
         return context
 
