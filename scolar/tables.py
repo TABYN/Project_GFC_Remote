@@ -1332,6 +1332,17 @@ class Article_mandatTable(tables.Table):
 
 
 class TransfertTable(tables.Table):
+    
+#     chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+#     def render_chapitre(self,value,record):
+#         if record.chapitre :
+#             return str(record.chapitre)
+############################
+#     article_source=tables.Column(empty_values=(), orderable=False, verbose_name="Article_Source")
+#     def render_article_source(self,value,record):
+#         if record.article_source :
+#             return str(record.article_source)
+    
 
     date_transfert = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
