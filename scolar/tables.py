@@ -1135,7 +1135,7 @@ class FournisseurTable(tables.Table):
     
     class Meta:
         model =Fournisseur
-        fields=('code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur')
+        fields=('code_fournisseur', 'nom_fournisseur', 'adresse_fournisseur', 'num_cmpt_fournisseur', 'cle_cmpt_fournisseur', 'banque')
         template_name= "django_tables2/bootstrap4.html"        
                     
 
@@ -1195,7 +1195,7 @@ class Prise_en_chargeTable(tables.Table):
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "prise_en_charge_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "prise_en_charge_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
@@ -1222,7 +1222,7 @@ class DepenceTable(tables.Table):
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "engagement_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "depence_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
@@ -1230,17 +1230,17 @@ class DepenceTable(tables.Table):
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
-    action= '{% if  not record.credit_alloue.article.posteriori %}\
-            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
-            {% else %}\
+    action= '{% if  record.credit_alloue.article.posteriori %}\
             <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id  %}" > Imprimer fiche de regularisation de la provision</a>\
+            {% else %}\
+            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
             {% endif %}'
 
     Imprimer=tables.TemplateColumn(action, orderable=False)          
 
     class Meta:
         model= Engagement
-        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','type','date', 'credit_alloue__credit_allouee','montant_operation']
+        fields = ['annee_budg','num','credit_alloue__chapitre','credit_alloue__article','date','fournisseur', 'facture__date_fact', 'facture__num_fact', 'facture__type_facture__type']
         template_name= "django_tables2/bootstrap4.html"
 
 class ExerciceTable(tables.Table):
@@ -1276,4 +1276,45 @@ class Mandat_1_Filter(django_filters.FilterSet):
     class Meta:
         model = Credit_S2
         fields = ['code_art']
-              
+
+class FactureTable(tables.Table):
+    action = '{% load icons %}\
+                <a href="{% url "facture_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>\
+                <a href="{% url "facture_delete" pk=record.id %}" > {% icon "trash" %} </a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+    date_fact = tables.DateTimeColumn(format ='d/m/Y')
+    class Meta:
+        model= Facture
+        fields = ['num_fact', 'date_fact', 'type_facture']
+        template_name= "django_tables2/bootstrap4.html"
+    
+
+class FactureFilter(django_filters.FilterSet):
+    #code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+   
+    class Meta:
+        model = Facture
+        fields = ['num_fact']
+
+class Type_FactureFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+    type = django_filters.CharFilter(field_name='type', lookup_expr='icontains', label='type')
+   
+    class Meta:
+        model= Type_Facture
+        fields = ['code', 'type']           
+         
+class Type_FactureTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "typesfactures_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "typesfactures_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Type_Facture
+        fields = ['code', 'type']
+        template_name= "django_tables2/bootstrap4.html"
+    
+
+  

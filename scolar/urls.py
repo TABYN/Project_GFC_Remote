@@ -363,13 +363,14 @@ urlpatterns = [
     
     path('Prise_en_charge_list', views.Prise_en_charge_ListView.as_view(), name='Prise_en_charge_list'),
     path('prise_en_charge_create', views.prise_en_charge_create_view, name='prise_en_charge_create'),
-    re_path(r'^engagement_delete/(?P<pk>\d+)/$', views.EngagementDeleteView.as_view(), name='engagement_delete'),
+    re_path(r'^prise_en_charge_delete/(?P<pk>\d+)/$', views.Prise_En_ChargeDeleteView.as_view(), name='prise_en_charge_delete'),
     re_path(r'^prise_en_charge_update/(?P<engagement_pk>\d+)/$', views.prise_en_charge_update_view, name='prise_en_charge_update'),
     re_path(r'^detail_prise_en_charge/(?P<pk>\d+)/$', views.Prise_en_chargeDetailView.as_view(), name='detail_prise_en_charge'),
 
     path('Depence_List', views.Depence_ListView.as_view(), name='Depence_List'),
     path('depence_create', views.depence_create_view, name='depence_create'),
     re_path(r'^depence_update/(?P<engagement_pk>\d+)/$', views.depence_update_view, name='depence_update'),
+    re_path(r'^depence_delete/(?P<pk>\d+)/$', views.DepenseDeleteView.as_view(), name='depence_delete'),
     re_path(r'^detail_depence/(?P<pk>\d+)/$', views.Depence_DetailView.as_view(), name='detail_depence'),
 
     path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),
@@ -382,5 +383,15 @@ urlpatterns = [
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
     path('Mandat_PDFView/<mandat_pk>/', views.Mandat_PDFView.as_view(), name='Mandat_PDFView'),
+ 
+    path('factures_list', views.FacturesListView.as_view(), name='factures_list'),
+    path('facture_create', views.FacturesCreateView.as_view(), name='facture_create'),
+    re_path(r'^facture_update/(?P<pk>\d+)/$',views.FactureUpdateView.as_view(), name='facture_update'),
+    re_path(r'^facture_delete/(?P<pk>\d+)/$',views.FactureDeleteView.as_view(), name='facture_delete'), 
+    
+    path('typesfactures_list', views.Type_FactureListView.as_view(), name='typesfactures_list'),
+    path('typesfactures_create', views.Type_FactureCreateView.as_view(), name='typesfactures_create'),
+    re_path(r'^typesfactures_update/(?P<pk>\d+)/$',views.Type_FacturesUpdateView.as_view(), name='typesfactures_update'),
+    re_path(r'^typesfactures_delete/(?P<pk>\d+)/$',views.Type_FactureDeleteView.as_view(), name='typesfactures_delete'), 
 
     ]
