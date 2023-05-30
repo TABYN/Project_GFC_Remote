@@ -2115,8 +2115,8 @@ class Exercice(models.Model):
     annee_budg=models.CharField(max_length=4, unique=True)
     debut=models.DateField()
     fin=models.DateField()
-    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
-    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
+    total=MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     
     def __str__(self):
         return self.annee_budg
@@ -2387,5 +2387,18 @@ class Transfert(models.Model):
 #     def __str__(self):
 #         return  self.article_source_id+ ' ----> ' + self.article_destination_id
           
+class Type_Facture(models.Model):
+    code = models.CharField(max_length=3)
+    type = models.CharField(max_length=150)
+    def __str__(self):
+        return  self.code + ' : ' + self.type
+    
+class Facture(models.Model):
+    num_fact = models.IntegerField(null=True)
+    date_fact=models.DateField(null=True, blank=True)
+    #type_fact = models.CharField(max_length = 100, null=True, blank=True) 
+    type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture' , null= True, blank=True, on_delete=models.SET_NULL) 
+    def __str__(self):
+        return  str(self.num_fact)+' '+str(self.type_facture.type)
     
  

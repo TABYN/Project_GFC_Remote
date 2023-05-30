@@ -17,6 +17,8 @@ from django.utils.safestring import mark_safe
 from django.contrib import messages
 from scolar.admin import settings
 
+from django.core.validators import MinValueValidator
+
 
 
 
@@ -2164,4 +2166,28 @@ class Transfert_DetailForm(forms.Form):
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation du transfert")
 
 
+#########################   add 
+
+class Exercice_S2_CreateForm(forms.Form):
+
+    def __init__(self, request, *args, **kwargs):
+        super(Exercice_S2_CreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+
+            self.fields['annee_budg']=forms.CharField(label="Annee budgetaire")
+
+            self.fields['debut'] = forms.DateField(label='Date debut', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            self.fields['fin'] = forms.DateField(label='Date fin', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            self.fields['total'] = forms.DecimalField(label='totale exercice', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+            self.fields['credit_non_allouee'] = forms.DecimalField(label='credit non alloue', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'exercice. Merci de le signaler a l'administrateur")    
               

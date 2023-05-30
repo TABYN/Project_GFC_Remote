@@ -353,8 +353,11 @@ urlpatterns = [
     re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
     re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
 
-    path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'), 
+
+    path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'),   
+    path('exercice_s2_create', views.exercice_s2_create_view, name='exercice_s2_create'),
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
+    
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
     path('engagement_S2_list', views.Type_EngagementListView.as_view(), name='engagement_S2_list'),
     path('engagement_S2_create', views.Type_EngagementCreateView.as_view(), name='engagement_S2_create'),
@@ -402,7 +405,16 @@ urlpatterns = [
     re_path(r'^transfert_delete/(?P<transfert_pk>\d+)/$', views.transfert_delete, name='transfert_delete'),
     re_path(r'^detail_transfert/(?P<pk>\d+)/$', views.Transfert_DetailView.as_view(), name='detail_transfert'),
 
+    path('factures_list', views.FacturesListView.as_view(), name='factures_list'),
+    path('facture_create', views.FacturesCreateView.as_view(), name='facture_create'),
+    re_path(r'^facture_update/(?P<pk>\d+)/$',views.FactureUpdateView.as_view(), name='facture_update'),
+    re_path(r'^facture_delete/(?P<pk>\d+)/$',views.FactureDeleteView.as_view(), name='facture_delete'), 
     
+    path('typesfactures_list', views.Type_FactureListView.as_view(), name='typesfactures_list'),
+    path('typesfactures_create', views.Type_FactureCreateView.as_view(), name='typesfactures_create'),
+    re_path(r'^typesfactures_update/(?P<pk>\d+)/$',views.Type_FacturesUpdateView.as_view(), name='typesfactures_update'),
+    re_path(r'^typesfactures_delete/(?P<pk>\d+)/$',views.Type_FactureDeleteView.as_view(), name='typesfactures_delete'), 
+
     #path('test/<mandat_pk>/', views.Article_MeateandatListView.as_view(), name='test'),#path('test/<mandat_pk>/', views.Article_MandatListView, name='test'),
 
         

@@ -1352,9 +1352,49 @@ class TransfertTable(tables.Table):
 
 class TransfertFilter(django_filters.FilterSet):
     num_transfert = django_filters.CharFilter(field_name='num_transfert', lookup_expr='icontains', label="numero du transfert")
-    
+    annee_budgi = django_filters.ModelChoiceFilter(field_name='annee_budgi', queryset=AnneeUniv.objects.all().order_by('-annee_univ'), label='Année budgetaire', empty_label='Année budgetaire')
+
     class Meta:
         model = Transfert
         fields = ['annee_budgi','date_transfert', 'num_transfert']    
+ 
+class FactureTable(tables.Table):
+    action = '{% load icons %}\
+                <a href="{% url "facture_update" pk=record.id %}" > {% icon "pencil-alt" %} </a>\
+                <a href="{% url "facture_delete" pk=record.id %}" > {% icon "trash" %} </a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+    date_fact = tables.DateTimeColumn(format ='d/m/Y')
+    class Meta:
+        model= Facture
+        fields = ['num_fact', 'date_fact', 'type_facture']
+        template_name= "django_tables2/bootstrap4.html"
+    
+
+class FactureFilter(django_filters.FilterSet):
+    #code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+   
+    class Meta:
+        model = Facture
+        fields = ['num_fact']
+
+class Type_FactureFilter(django_filters.FilterSet):
+    code = django_filters.CharFilter(field_name='code', lookup_expr='icontains', label='code')
+    type = django_filters.CharFilter(field_name='type', lookup_expr='icontains', label='type')
+   
+    class Meta:
+        model= Type_Facture
+        fields = ['code', 'type']           
+         
+class Type_FactureTable(tables.Table):
+    action='{% load icons %}\
+            <a href="{% url "typesfactures_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "typesfactures_delete" pk=record.id %}" > {% icon "trash" %}</a>'
+            
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model= Type_Facture
+        fields = ['code', 'type']
+        template_name= "django_tables2/bootstrap4.html"
         
          
