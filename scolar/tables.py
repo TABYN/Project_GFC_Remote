@@ -1250,7 +1250,7 @@ class ExerciceTable(tables.Table):
     
     class Meta:
         model = Exercice
-        fields=['annee_budg']
+        fields=['annee_budg', 'exe_encours']
         template_name= "django_tables2/bootstrap4.html"   
         
 class Mandat_1_Table(tables.Table):

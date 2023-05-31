@@ -1468,7 +1468,8 @@ class Exercice_S2_CreateForm(forms.Form):
             self.fields['fin'] = forms.DateField(label='Date fin', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['total'] = forms.DecimalField(label='totale exercice', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
             self.fields['credit_non_allouee'] = forms.DecimalField(label='credit non alloue', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
-
+            self.fields['exe_encours'] = forms.BooleanField(required=False, initial=False, help_text="Cochez pour definir l'exercice encours.",label='Encours')
+            
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
             self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
             self.helper.form_method='POST'

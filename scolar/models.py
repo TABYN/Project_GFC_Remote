@@ -2116,7 +2116,8 @@ class Exercice(models.Model):
     fin=models.DateField()
     total=MoneyField(decimal_places=2, max_digits=9,null= True, blank=True)
     credit_non_allouee=MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
-    
+    exe_encours=models.BooleanField(default='False', blank=True)
+
     def __str__(self):
         return self.annee_budg
 
@@ -2365,7 +2366,7 @@ class Transfert(models.Model):
     montant_transfert=MoneyField(decimal_places=2, max_digits=9)
    
        
-#     def __str__(self):
-#         return  self.article_source_id+ ' ----> ' + self.article_destination_id
+    def __str__(self):
+        return  str(self.article_source_id+ ' ----> ' + self.article_destination_id)
     
  

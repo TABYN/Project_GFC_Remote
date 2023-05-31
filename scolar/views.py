@@ -12971,7 +12971,8 @@ def exercice_s2_create_view(request):
                     debut=data['debut'],
                     fin=data['fin'],
                     total=data['total'],
-                    credit_non_allouee=data['credit_non_allouee']
+                    credit_non_allouee=data['credit_non_allouee'],
+                    exe_encours=data['exe_encours']
                     )                         
                 
             except Exception:
@@ -13190,7 +13191,7 @@ class Prise_en_charge_ListView(TemplateView):
 @login_required
 def prise_en_charge_create_view(request):
 
-    if request.method == 'POST':
+    if request.method == 'POST'  :
         # create a form instance and populate it with data from the request:
         form = Prise_en_charge_CreateForm(request, request.POST)
         # check whether it's valid:
