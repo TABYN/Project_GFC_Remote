@@ -1480,11 +1480,11 @@ class Exercice_S2_CreateForm(forms.Form):
                 messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'exercice. Merci de le signaler à l'administrateur")    
     
     
-class Prise_en_charge_CreateForm(forms.Form):
-    
+class Prise_en_charge_CreateForm(forms.Form):  
     def __init__(self, request, *args, **kwargs):
         super(Prise_en_charge_CreateForm, self).__init__(*args, **kwargs)
         self.helper=FormHelper()
+      
         try:
 
             self.fields['annee_budg']=forms.ModelChoiceField(
@@ -1502,10 +1502,15 @@ class Prise_en_charge_CreateForm(forms.Form):
                 help_text = "Tapez le code de l'article.",
              ) 
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Prise en charge', 'Prise en charge')],
+                initial='Prise en charge',
+                #choices=TYPE,
                 label=u"Type",
                 help_text = "Choisir le type ",
+                #widget=forms.HiddenInput(),
+                
             )
+            
             
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
@@ -1546,7 +1551,8 @@ class Prise_en_charge_UpdateForm(forms.Form):
                 initial=engagement_.credit_alloue
             )  
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Prise en charge', 'Prise en charge')],
+                #choices=TYPE,
                 label=u"Type",
                 help_text = "Choisir le type ",
                 initial=engagement_.type,
@@ -1638,7 +1644,9 @@ class Depence_CreateForm(forms.Form):
                  #required = False
              ) 
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Depence', 'Depence')],
+                initial='Depence',
+                #choices=TYPE,
                 label=u"Type",
                 help_text = "Choisir le type ",
                 required = True
@@ -1701,7 +1709,8 @@ class Depence_UpdateForm(forms.Form):
                 initial=engagement_.credit_alloue
             )  
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Depence', 'Depence')],
+                #choices=TYPE,
                 label=u"Type",
                 initial=engagement_.type,
                 required = False

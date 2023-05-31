@@ -13191,7 +13191,9 @@ class Prise_en_charge_ListView(TemplateView):
 @login_required
 def prise_en_charge_create_view(request):
 
-    if request.method == 'POST'  :
+
+    if request.method == 'POST' and Engagement.objects.filter(credit_alloue__exercice__exe_encours=True) :
+    
         # create a form instance and populate it with data from the request:
         form = Prise_en_charge_CreateForm(request, request.POST)
         # check whether it's valid:

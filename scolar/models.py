@@ -2367,6 +2367,6 @@ class Transfert(models.Model):
    
        
     def __str__(self):
-        return  str(self.article_source_id+ ' ----> ' + self.article_destination_id)
+        return  str(self.article_source)+ ' ----> ' + str(self.article_destination)
     
  
