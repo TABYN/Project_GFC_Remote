@@ -2048,7 +2048,7 @@ class Transfert_CreateForm(forms.Form):
              ) 
             
 
-            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = True, max_digits=9, decimal_places=2,)
+            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)])
 
 
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
@@ -2102,8 +2102,8 @@ class Transfert_UpdateForm(forms.Form):
                  initial=transfert_.article_destination                                             
             )    
             
-            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = False, max_digits=9, decimal_places=2,initial=transfert_.montant_transfert)
-            
+            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = False, max_digits=9, decimal_places=2,initial=transfert_.montant_transfert, localize=True, validators=[MinValueValidator(0)])
+                                                                                                                                             
             self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
             self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
             self.helper.form_method='POST'
@@ -2152,7 +2152,7 @@ class Transfert_DetailForm(forms.Form):
                  initial=transfert_.article_destination                                             
             )    
             
-            self.fields['montant_transfert'] = forms.DecimalField(label='Montant_transfert', required = False, localize=True, initial=transfert_.montant_transfert)
+            self.fields['montant_transfert'] = forms.DecimalField(label='Montant_transfert', required = False, localize=True, initial=transfert_.montant_transfert, validators=[MinValueValidator(0)])
             
             for key_ in self.fields.keys():
                 self.fields[key_].disabled=True

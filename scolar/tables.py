@@ -1338,10 +1338,16 @@ class TransfertTable(tables.Table):
 #         if record.chapitre :
 #             return str(record.chapitre)
 ############################
-#     article_source=tables.Column(empty_values=(), orderable=False, verbose_name="Article_Source")
-#     def render_article_source(self,value,record):
-#         if record.article_source :
-#             return str(record.article_source)
+    article_source=tables.Column(empty_values=(), orderable=False, verbose_name="Article_Source")
+    def render_article_source(self,value,record):
+        if record.article_source :
+            return str(record.article_source)
+        
+    article_destination=tables.Column(empty_values=(), orderable=False, verbose_name="Article_Destination")
+    def render_article_destination(self,value,record):
+        if record.article_destination :
+            return str(record.article_destination)
+        
     
 
     date_transfert = tables.DateTimeColumn(format ='d/m/Y')
@@ -1357,7 +1363,9 @@ class TransfertTable(tables.Table):
 
     class Meta:
         model= Transfert
-        fields = ['annee_budgi','num_transfert','date_transfert','article_source__chapitre','article_source__article','article_destination__chapitre','article_destination__article','montant_transfert']
+        #fields = ['annee_budgi','num_transfert','date_transfert','article_source__chapitre','article_source__article','article_destination__chapitre','article_destination__article','montant_transfert']
+        
+        fields = ['annee_budgi','num_transfert','date_transfert','montant_transfert']
         template_name= "django_tables2/bootstrap4.html"
 
 
