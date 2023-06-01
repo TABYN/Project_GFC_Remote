@@ -12966,15 +12966,18 @@ def exercice_s2_create_view(request):
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
                 
-                exercice_=Exercice.objects.create(
+                new_exercice=Exercice.objects.create(
                     annee_budg=data['annee_budg'],
                     debut=data['debut'],
                     fin=data['fin'],
                     total=data['total'],
                     credit_non_allouee=data['credit_non_allouee'],
                     exe_encours=data['exe_encours']
-                    )                         
+                    )  
                 
+                if data['exe_encours']:  
+                    Exercice.objects.exclude(id=new_exercice.id).update(exe_encours=False)
+                 
             except Exception:
                 if settings.DEBUG:
                     raise Exception
@@ -12983,8 +12986,6 @@ def exercice_s2_create_view(request):
                     return render(request, 'scolar/create.html', {'form': form })
 
             return HttpResponseRedirect(reverse('exercice_list'))
-                    
-
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Exercice_S2_CreateForm(request)
