@@ -13192,7 +13192,7 @@ class Prise_en_charge_ListView(TemplateView):
 def prise_en_charge_create_view(request):
 
 
-    if request.method == 'POST' and Engagement.objects.filter(credit_alloue__exercice__exe_encours=True) :
+    if request.method == 'POST':
     
         # create a form instance and populate it with data from the request:
         form = Prise_en_charge_CreateForm(request, request.POST)

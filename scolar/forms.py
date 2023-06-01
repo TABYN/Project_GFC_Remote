@@ -1493,7 +1493,7 @@ class Prise_en_charge_CreateForm(forms.Form):
             )
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -1508,12 +1508,11 @@ class Prise_en_charge_CreateForm(forms.Form):
                 label=u"Type",
                 help_text = "Choisir le type ",
                 #widget=forms.HiddenInput(),
-                
             )
             
             
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
-            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
+            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement', widget=forms.HiddenInput(),)
             self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
 
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
@@ -1541,7 +1540,7 @@ class Prise_en_charge_UpdateForm(forms.Form):
             )  
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                queryset=Credit_S2.objects.all(),
+                queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                 label=u"Article",
                 widget=ModelSelect2Widget(
                         model=Credit_S2,
@@ -1634,7 +1633,7 @@ class Depence_CreateForm(forms.Form):
             )
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -1671,7 +1670,7 @@ class Depence_CreateForm(forms.Form):
                 help_text = "Choisir le type .",
              )  
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
-            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
+            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement', widget=forms.HiddenInput(),)
             #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
 
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
@@ -1699,7 +1698,7 @@ class Depence_UpdateForm(forms.Form):
             )  
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                queryset=Credit_S2.objects.all(),
+                queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                 label=u"Article",
                 widget=ModelSelect2Widget(
                         model=Credit_S2,
@@ -1953,7 +1952,7 @@ class Transfert_CreateForm(forms.Form):
             self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             
             self.fields['article_source'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article_source",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -1964,7 +1963,7 @@ class Transfert_CreateForm(forms.Form):
              ) 
             
             self.fields['article_destination'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article_destination",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -2006,7 +2005,7 @@ class Transfert_UpdateForm(forms.Form):
             self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'),required = False, initial=transfert_.date_transfert)#    initial=datetime.date.today()
             
             self.fields['article_source'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article_source",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -2017,7 +2016,7 @@ class Transfert_UpdateForm(forms.Form):
             )    
            
             self.fields['article_destination'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article_destination",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
