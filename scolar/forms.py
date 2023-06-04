@@ -1948,7 +1948,7 @@ class Transfert_CreateForm(forms.Form):
                 
             )
             
-            self.fields['num_transfert'] = forms.IntegerField(initial=0, label='Numero du transfert')
+            self.fields['num_transfert'] = forms.IntegerField(initial=0, label='Numero du transfert', widget=forms.HiddenInput(),)
             self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             
             self.fields['article_source'] = forms.ModelChoiceField(

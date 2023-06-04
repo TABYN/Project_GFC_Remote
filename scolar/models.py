@@ -2369,4 +2369,17 @@ class Transfert(models.Model):
     def __str__(self):
         return  str(self.article_source)+ ' ----> ' + str(self.article_destination)
     
- 
+    def save(self, *args, **kwargs):
+      #  if not self.pk:
+            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+        last_object = Transfert.objects.all().order_by('-num_transfert').first()
+         
+        if last_object:
+                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+            self.num_transfert = last_object.num_transfert + 1
+        else:
+                # Si aucun objet n'existe, commencez à 1
+                self.num_transfert = 1
+            
+        super(Transfert, self).save(*args, **kwargs)
+        #super().save(*args, **kwargs)
