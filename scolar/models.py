@@ -2372,7 +2372,7 @@ class Transfert(models.Model):
     def save(self, *args, **kwargs):
       #  if not self.pk:
             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
-        last_object = Transfert.objects.all().order_by('-num_transfert').first()
+        last_object = Transfert.objects.filter(annee_budgi=self.annee_budgi).order_by('-num_transfert').first()
          
         if last_object:
                 # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
