@@ -2304,18 +2304,17 @@ class Engagement(models.Model):
         return "Engagement "+ str(self.num)+' '+str(self.type)
     
     def save(self, *args, **kwargs):
-      #  if not self.pk:
+        if not self.pk:
             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
-        last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
+           last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
         
-        if last_object:
+           if last_object:
                 # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
-            self.num = last_object.num + 1
-        else:
+              self.num = last_object.num + 1
+           else:
                 # Si aucun objet n'existe, commencez à 1
                 self.num = 1
         
-                  
         super(Engagement, self).save(*args, **kwargs)
         #super().save(*args, **kwargs)
 
@@ -2370,14 +2369,14 @@ class Transfert(models.Model):
         return  str(self.article_source)+ ' ----> ' + str(self.article_destination)
     
     def save(self, *args, **kwargs):
-      #  if not self.pk:
+        if not self.pk:
             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
-        last_object = Transfert.objects.filter(annee_budgi=self.annee_budgi).order_by('-num_transfert').first()
+           last_object = Transfert.objects.filter(annee_budgi=self.annee_budgi).order_by('-num_transfert').first()
          
-        if last_object:
+           if last_object:
                 # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
-            self.num_transfert = last_object.num_transfert + 1
-        else:
+              self.num_transfert = last_object.num_transfert + 1
+           else:
                 # Si aucun objet n'existe, commencez à 1
                 self.num_transfert = 1
             
