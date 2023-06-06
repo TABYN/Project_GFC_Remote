@@ -1265,7 +1265,7 @@ class MandatTable(tables.Table):
                                 
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
-            <a href="{% url "mandat_update" mandat_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "mandat_update_priori" mandat_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
             <a href="{% url "mandat_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
     edit   = tables.TemplateColumn(action, orderable=False)
     

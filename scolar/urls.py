@@ -386,11 +386,11 @@ urlpatterns = [
 #     path('mandat_create', views.mandat_create_view, name='mandat_create'),
 #     re_path(r'^mandat_delete/(?P<pk>\d+)/$', views.MandatDeleteView.as_view(), name='mandat_delete'),
 #
-    path('mandat_list', views.MandatListView.as_view(), name='mandat_list'),
+    path('mandat_priori', views.Mandat_prioriView.as_view(), name='mandat_priori'),
     path('mandat_create', views.mandat_create_view, name='mandat_create'),
     re_path(r'^mandat_delete/(?P<pk>\d+)/$', views.MandatDeleteView.as_view(), name='mandat_delete'),
     path('Mandat_PDFView/<mandat_pk>/', views.Mandat_PDFView.as_view(), name='Mandat_PDFView'),
-    re_path(r'^mandat_update/(?P<mandat_pk>\d+)/$', views.mandat_update_view, name='mandat_update'),
+    re_path(r'^mandat_update_priori/(?P<mandat_pk>\d+)/$', views.mandat_update_view_priori, name='mandat_update_priori'),
     re_path(r'^detail_mandat/(?P<pk>\d+)/$', views.MandatDetailView.as_view(), name='detail_mandat'),
 
     path('articles_mandat_list', views.Articles_mandatListView.as_view(), name='articles_mandat_list'),

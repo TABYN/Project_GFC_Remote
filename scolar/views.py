@@ -13586,11 +13586,11 @@ class Regularisation_provision_PDFView(PDFTemplateView):
 
 ###################################################   Mandat   #############################
 
-class MandatListView(TemplateView):
+class Mandat_prioriView(TemplateView):
     template_name = 'scolar/filter_list.html'
   
     def get_context_data(self, **kwargs):
-        context = super(MandatListView, self).get_context_data(**kwargs)
+        context = super(Mandat_prioriView, self).get_context_data(**kwargs)
   
         filter_ = MandatFilter(self.request.GET, queryset=Mandat.objects.all().order_by('num_mandat'))
   
@@ -13641,7 +13641,7 @@ def mandat_create_view(request):
                     messages.error(request, "ERREUR: lors de la création de Mandat. Veuillez le signaler à l'administrateur.")
                     return render(request, 'scolar/create.html', {'form': form })
 
-            return HttpResponseRedirect(reverse('mandat_list'))
+            return HttpResponseRedirect(reverse('mandat_priori'))
                     
 
     # if a GET (or any other method) we'll create a blank form
@@ -13670,7 +13670,7 @@ class MandatDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMi
         return super(MandatDeleteView, self).delete(*args, **kwargs)
         
     def get_success_url(self):
-        return reverse('mandat_list')
+        return reverse('mandat_priori')
     
     
 class Mandat_PDFView(PDFTemplateView):
@@ -13695,7 +13695,7 @@ class Mandat_PDFView(PDFTemplateView):
 
 
 @login_required
-def mandat_update_view(request, mandat_pk):
+def mandat_update_view_priori(request, mandat_pk):
     mandat_=get_object_or_404(Mandat, id=mandat_pk)
     if request.user.is_budget():
          pass       
@@ -13727,7 +13727,7 @@ def mandat_update_view(request, mandat_pk):
                     messages.error(request, "ERREUR: lors de la modification du Mandat. Veuillez le signaler à l'administrateur.")
                     return render(request, 'scolar/update.html', {'form': form })
 
-            return HttpResponseRedirect(reverse('mandat_list'))
+            return HttpResponseRedirect(reverse('mandat_priori'))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Mandat_UpdateForm(mandat_pk, request)
