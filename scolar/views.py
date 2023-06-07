@@ -13627,7 +13627,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
  
-####################Mandat a posteriori######################
+####################  Mandat a posteriori  ######################
 
 class MandatListView(TemplateView):
     template_name = 'scolar/filter_list.html'
@@ -13674,6 +13674,7 @@ def MandatCreate(request, crd):
             type_facture=Type_Facture.objects.get(id=type_facture_id),
             
         )
+       
         mandat.save()
         messages.success(request, 'Mandat enregistré.')
         return redirect(request.path_info)

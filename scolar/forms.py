@@ -1633,7 +1633,7 @@ class Depence_CreateForm(forms.Form):
             )
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True).filter(article__posteriori=False),
                  label=u"Article",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -1698,7 +1698,7 @@ class Depence_UpdateForm(forms.Form):
             )  
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                queryset=Credit_S2.objects.filter(exercice__exe_encours=True).filter(article__posteriori=False),
                 label=u"Article",
                 widget=ModelSelect2Widget(
                         model=Credit_S2,
