@@ -2301,7 +2301,7 @@ class Engagement(models.Model):
     #mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
     
     def __str__(self):
-        return "Engagement "+ str(self.num)+' '+str(self.type)
+        return "Engagement :"+ str(self.num)+' '+str(self.type)+' '+str(self.credit_alloue.article.libelle_art_FR)
     
     def save(self, *args, **kwargs):
         if not self.pk:

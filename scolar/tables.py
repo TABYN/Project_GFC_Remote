@@ -1349,7 +1349,6 @@ class Type_FactureTable(tables.Table):
         template_name= "django_tables2/bootstrap4.html"
     
 class TransfertTable(tables.Table):
-
     article_source=tables.Column(empty_values=(), orderable=False, verbose_name="Article source")
     def render_article_source(self,value,record):
         if record.article_source :
