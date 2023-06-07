@@ -37,7 +37,7 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable, TransfertTable, TransfertFilter
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, MandatFilter,MandatTable, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable, TransfertTable, TransfertFilter
 
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
@@ -59,7 +59,7 @@ from scolar.forms import EnseignantDetailForm, AbsenceEtudiantReportSelectionFor
     SelectionInscriptionForm, ValidationPreInscriptionForm, EDTImportFileForm, EDTSelectForm, ExamenSelectForm, \
     AffichageExamenSelectForm, CreditForm, \
     Exercice_S2_CreateForm, Prise_en_charge_CreateForm, Prise_en_charge_UpdateForm, Prise_en_charge_DetailForm, Depence_CreateForm, Depence_UpdateForm, Depence_DetailForm, \
-    Mandat_UpdateForm, Mandat_DetailForm, Transfert_CreateForm, Transfert_UpdateForm, Transfert_DetailForm
+    Mandat_PrioriCreateForm, Mandat_Priori_UpdateForm, Mandat_Priori_DetailForm, Mandat_UpdateForm, Mandat_DetailForm, Transfert_CreateForm, Transfert_UpdateForm, Transfert_DetailForm
 # from scolar.forms import *
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -13627,6 +13627,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
  
+####################Mandat a posteriori######################
 
 class MandatListView(TemplateView):
     template_name = 'scolar/filter_list.html'
@@ -13634,7 +13635,7 @@ class MandatListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MandatListView, self).get_context_data(**kwargs)
 
-        filter_ = Mandat_1_Filter(self.request.GET, queryset=Credit_S2.objects.all())
+        filter_ = Mandat_1_Filter(self.request.GET, queryset=Credit_S2.objects.filter(exercice__exe_encours=True))
 
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -13742,7 +13743,6 @@ def mandat_update_view(request, mandat_pk):
     context['form']=form
     return render(request, 'scolar/update.html', context)
 
-
 class Mandat_PDFView(PDFTemplateView):
     template_name= 'scolar/mandat de paiement.html'
     cmd_options = {
@@ -13760,6 +13760,178 @@ class Mandat_PDFView(PDFTemplateView):
         context['mandat_letter'] = mandat_letter
   
         self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
+        return context
+
+###################################################   Mandat a priori   #############################
+
+class Mandat_PrioriListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+  
+    def get_context_data(self, **kwargs):
+        context = super(Mandat_PrioriListView, self).get_context_data(**kwargs)
+  
+        filter_ = MandatFilter(self.request.GET, queryset=Mandat.objects.all().order_by('num_mandat'))
+  
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = MandatTable(filter_.qs)
+        RequestConfig(self.request).configure(table)
+  
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Mandats '
+        #if self.request.user.is_staff_only():
+        context['btn_list'] = {
+            'Ajouter nouvelle Mandat': reverse('mandat_priori_create'),
+                  
+            }
+        return context
+
+@login_required
+
+def mandat_priori_create_view(request):
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Mandat_PrioriCreateForm(request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                
+                mandat_=Mandat.objects.create(
+                    #type_engagement=data['type_engagement'],
+                    num_mandat=data['num_mandat'],
+                    date=data['date'],
+                    fournisseur=data['fournisseur'],
+                    engagement=data['engagement'], 
+                    type_facture=data['type_facture']
+                    
+                    )                         
+                
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la creation de Mandat. Veuillez le signaler a l'administrateur.")
+                    return render(request, 'scolar/create.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('mandat_priori_list'))
+                    
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Mandat_PrioriCreateForm(request)
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle Mandat")
+    
+    context={}  
+    context['form']=form
+    return render(request, 'scolar/create.html', context)
+
+class MandatPrioriDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    model = Mandat
+    template_name = 'scolar/delete.html'
+    success_message = "Le Mandat est bien supprime."
+    
+    def test_func(self):
+        return self.request.user.is_budget()
+        
+    def get_success_url(self):
+        return reverse('mandat_priori_list')    
+    
+@login_required
+def mandat_priori_update_view(request, mandat_pk):
+    mandat_=get_object_or_404(Mandat, id=mandat_pk)
+    if request.user.is_budget():
+         pass       
+    else :
+         messages.error(request,"Vous n'avez pas les permissions d'acces a cette operation")
+         return redirect('/accounts/login/?next=%s' % request.path)   
+    context={} 
+    context['mandat']=mandat_
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Mandat_Priori_UpdateForm(mandat_pk, request, request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            try:
+                # process the data in form.cleaned_data as required
+                data=form.cleaned_data
+                      
+                mandat_.date=data['date']
+                mandat_.num_mandat=data['num_mandat']
+                mandat_.engagement=data['engagement']
+                mandat_.fournisseur=data['fournisseur']
+                mandat_.type_facture=data['type_facture']
+                
+                mandat_.save()
+                         
+            except Exception:
+                if settings.DEBUG:
+                    raise Exception
+                else:
+                    messages.error(request, "ERREUR: lors de la modification du Mandat. Veuillez le signaler a l'administrateur.")
+                    return render(request, 'scolar/update.html', {'form': form })
+
+            return HttpResponseRedirect(reverse('mandat_priori_list'))
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = Mandat_Priori_UpdateForm(mandat_pk, request)
+        messages.info(request, "Utilisez ce formulaire pour modifier le Mandat")
+
+        
+    context['form']=form
+  
+    return render(request, 'scolar/update.html', context)
+
+class MandatPrioriDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'scolar/mandat_detail.html'
+
+    def test_func(self): 
+        mandat_=get_object_or_404(Mandat, id=self.kwargs.get("pk"))   
+        return self.request.user.is_budget()
+        
+    def get_context_data(self, **kwargs):
+        context = super(MandatPrioriDetailView, self).get_context_data(**kwargs)
+        titre='Mandat N: '+ self.kwargs.get("pk")
+        context['titre'] = titre
+
+        mandat_=get_object_or_404(Mandat, id=self.kwargs.get("pk"))
+        
+        context['mandat_form'] = Mandat_Priori_DetailForm(mandat_pk=mandat_.id)
+        
+        exclude_columns_=[]
+        if not self.request.user.is_authenticated:
+            exclude_columns_.append('expert')
+            exclude_columns_.append('action')
+            exclude_columns_.append('edit')
+            exclude_columns_.append('admin')
+        else :
+            if (not self.request.user.is_budget()):
+                exclude_columns_.append('edit')
+                exclude_columns_.append('admin')
+                exclude_columns_.append('expert')
+                  
+        return context    
+
+class Mandat_Priori_PDFView(PDFTemplateView):
+    template_name= 'scolar/mandat de paiement.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        mandat_ = Mandat.objects.get(id=self.kwargs.get('mandat_pk'))
+        mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['mandat_'] = mandat_
+        context['mandat_letter'] = mandat_letter
+  
+#         self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
+        self.filename ='mandat_' '.pdf'
+
         return context
 
 class FacturesListView(TemplateView):

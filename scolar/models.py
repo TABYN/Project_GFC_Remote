@@ -2298,7 +2298,7 @@ class Engagement(models.Model):
     montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     fournisseur=models.ForeignKey(Fournisseur ,related_name='fournisseur' , null= True, blank=True, on_delete=models.SET_NULL)
     facture=models.ForeignKey(Facture ,related_name='facture' , null= True, blank=True, on_delete=models.SET_NULL )
-    mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
+    #mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
     
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type)
@@ -2307,14 +2307,14 @@ class Engagement(models.Model):
         if not self.pk:
             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
            last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
-        
+         
            if last_object:
                 # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
               self.num = last_object.num + 1
            else:
                 # Si aucun objet n'existe, commencez à 1
                 self.num = 1
-        
+         
         super(Engagement, self).save(*args, **kwargs)
         #super().save(*args, **kwargs)
 
@@ -2346,7 +2346,7 @@ class Mandat(models.Model):
     date=models.DateField(null=True, blank=True)
     #article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
     fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
-    #engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
     montant_op = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     observation_mandat = models.CharField(max_length=300, default='')
     annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
@@ -2354,7 +2354,7 @@ class Mandat(models.Model):
     type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture_mandat' , null= True, blank=True, on_delete=models.SET_NULL) 
 
     def __str__(self):
-        return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
+        return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
 
 class Transfert(models.Model):
     annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)

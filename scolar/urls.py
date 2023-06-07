@@ -383,12 +383,19 @@ urlpatterns = [
     path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
     re_path(r'^mandat_update/(?P<mandat_pk>\d+)/$', views.mandat_update_view, name='mandat_update'),
     
+    path('mandat_priori_list', views.Mandat_PrioriListView.as_view(), name='mandat_priori_list'),
+    path('mandat_priori_create', views.mandat_priori_create_view, name='mandat_priori_create'),
+    re_path(r'^mandat_priori_delete/(?P<pk>\d+)/$', views.MandatPrioriDeleteView.as_view(), name='mandat_priori_delete'),
+    re_path(r'^mandat_priori_update/(?P<mandat_pk>\d+)/$', views.mandat_priori_update_view, name='mandat_priori_update'),
+    re_path(r'^detail_mandat_priori/(?P<pk>\d+)/$', views.MandatPrioriDetailView.as_view(), name='detail_mandat_priori'),
+    
     path('Prise_en_chargeS2_PDFView/<engagement_pk>/', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),
     path('Engagement_de_la_provision_PDFView/<engagement_pk>/', views.Engagement_de_la_provision_PDFView.as_view(), name='Engagement_de_la_provision_PDFView'),
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
     path('Mandat_PDFView/<mandat_pk>/', views.Mandat_PDFView.as_view(), name='Mandat_PDFView'),
- 
+    path('Mandat_Priori_PDFView/<mandat_pk>/', views.Mandat_Priori_PDFView.as_view(), name='Mandat_Priori_PDFView'),
+
     path('factures_list', views.FacturesListView.as_view(), name='factures_list'),
     path('facture_create', views.FacturesCreateView.as_view(), name='facture_create'),
     re_path(r'^facture_update/(?P<pk>\d+)/$',views.FactureUpdateView.as_view(), name='facture_update'),

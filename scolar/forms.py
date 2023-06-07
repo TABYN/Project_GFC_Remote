@@ -1815,7 +1815,185 @@ class Depence_DetailForm(forms.Form):
                 raise Exception
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation d'engagement")
- 
+
+class Mandat_PrioriCreateForm(forms.Form):
+    
+    def __init__(self, request, *args, **kwargs):
+        super(Mandat_PrioriCreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+            self.fields['num_mandat'] = forms.IntegerField(initial=0, label='Numero Mandat')
+
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.filter(type='Depence'),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                help_text = "Tapez le numero d'engagement.",                                                
+                #required = False,
+            )   
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                help_text = "Tapez le nom ou le code du fournisseur.",                                                
+                #required = False,
+            )     
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['code__icontains',],
+                    ),
+                help_text = "Tapez le code du type de facture.",                                                
+                #required = False,
+            )   
+            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+           # self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
+
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de Mandat. Merci de le signaler a l'administrateur")    
+
+class Mandat_Priori_UpdateForm(forms.Form):
+    
+    def __init__(self, mandat_pk, request, *args, **kwargs):
+        super(Mandat_Priori_UpdateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:  
+            mandat_= get_object_or_404(Mandat, id=mandat_pk)
+
+            self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
+
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.filter(type='Depence'),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                #help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
+                required = False,
+                initial=mandat_.engagement
+            )    
+            
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.fournisseur                                             
+            )    
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['code__icontains',],
+                    ),
+                help_text = "Tapez le code du type de facture.",                                                
+                required = False,
+                initial=mandat_.type_facture 
+            )  
+
+            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
+            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
+    
+             
+            self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification d'engagement. Merci de le signaler a l'administrateur")
+  
+class Mandat_Priori_DetailForm(forms.Form):
+
+    def __init__(self, mandat_pk, *args, **kwargs):
+        super(Mandat_Priori_DetailForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try : 
+            mandat_= get_object_or_404(Mandat, id=mandat_pk)
+            
+            self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
+
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.all(),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                                                              
+                required = False,
+                initial=mandat_.engagement
+            ) 
+            
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.fournisseur                                             
+            )    
+               
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['code__icontains',],
+                    ),
+                help_text = "Tapez le code du type de facture.",                                                
+                required = False,
+                initial=mandat_.type_facture 
+            )  
+            
+            self.fields['credit_alloue']=forms.ModelChoiceField(
+                queryset = Credit_S2.objects.all(),
+                label=u"Article",
+                widget=ModelSelect2Widget(
+                    model=Credit_S2,
+                    search_fields=['engagement__article__code_art__icontains'],
+                ),
+                required=False,
+                initial=mandat_.engagement.credit_alloue   
+             )
+            
+            self.fields['date']=forms.DateField(label="Date", required=False, initial=mandat_.date)
+            #self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
+            
+            for key_ in self.fields.keys():
+                self.fields[key_].disabled=True
+        
+            self.helper.add_input(Button('cancel', 'Retour', css_class='btn-secondary', onclick="window.history.back()"))
+                    
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation de Mandat")
+                
+                 
 class Mandat_UpdateForm(forms.Form):
     
     def __init__(self, mandat_pk, request, *args, **kwargs):

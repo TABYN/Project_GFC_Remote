@@ -1276,6 +1276,38 @@ class Mandat_1_Filter(django_filters.FilterSet):
     class Meta:
         model = Credit_S2
         fields = ['code_art']
+        
+class MandatFilter(django_filters.FilterSet):
+    num_mandat = django_filters.CharFilter(field_name='num_mandat', lookup_expr='icontains', label="numero Mandat")
+    fournisseur = django_filters.ModelChoiceFilter(field_name='fournisseur', queryset = Fournisseur.objects.all(), empty_label ="Fournisseur")    
+
+    class Meta:
+        model = Mandat
+        fields = ['num_mandat','fournisseur', 'date']
+        
+class MandatTable(tables.Table):
+                                
+    date = tables.DateTimeColumn(format ='d/m/Y')
+    action='{% load icons %}\
+            <a href="{% url "mandat_priori_update" mandat_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "mandat_priori_delete" pk=record.id %}" > {% icon "trash" %}</a>'      
+    edit   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% load icons %}\
+            <a href=" {% url "detail_mandat_priori" pk=record.id %} " > {% icon "eye" %}</a> '      
+               
+    detail   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '<a href="{% url "Mandat_Priori_PDFView" mandat_pk=record.id %}" class="btn btn-info" role="button"> Imprimer</a>'
+    Imprimer=tables.TemplateColumn(action, orderable=False)
+      
+
+    class Meta:
+        model= Mandat
+
+        fields =['num_mandat', 'date', 'fournisseur__nom_fournisseur', 'engagement__num', 'type_facture']
+        template_name= "django_tables2/bootstrap4.html"
+        
 
 class FactureTable(tables.Table):
     action = '{% load icons %}\
