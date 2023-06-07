@@ -44,15 +44,16 @@ table {
                           
                              <tr >
                           <td style="border-bottom: none;">
-                          <!-- <p>{{engagement_.type_engagement.nature}}</p> -->
                           <br>
-                          <p>{{engagement_.observation}}</p>
+                         
+                          <p>Mandat {{engagement_.mandat.date}}</p>
+                          
                           <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                         
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                            <p style="text-align:right;">{{engagement_.montant_operation}}</p>
                           </td>
                           
                           </tr>
@@ -105,7 +106,7 @@ table {
 					
 						  <tr style="height:60px;"> 
 						<td colspan="6">	<div style="text-align:left;font-weight: bold;">
-						<p>Objet : {{engagement_.type_engagement.nature}}</p>
+						<p>Objet : {{engagement_.type}}</p>
 						</div></td>
 					
 						</tr>
@@ -127,7 +128,7 @@ table {
 						    <td style=" width: 10%;height:25;vertical-align: top;text-align:right;"><p></p></td>
 						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
 				        	<td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.montant_operation}}</p></td>
-						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.nouveau_solde}}</p></td>
+						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.credit_reste}}</p></td>
 						</tr>
 
 						</table>  

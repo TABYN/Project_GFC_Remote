@@ -1,0 +1,181 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+ <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+	<div class="content-wrapper">
+		<div class="row">
+			<div class="col-md-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+					<h3>Creation et liste des mandats </h3>
+						
+						<br>
+						<form class="forms-sample">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label" for="number1" >Numero du mandat</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="num_mandat" id="number1"  />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Annee budgetaire</label>
+										<div class="col-sm-9">
+											<select class="form-control"  name="annee_budge" >
+											   {% for annee_bdg in annee_bdg %}
+											   <option value="{{ annee_bdg.annee_univ }}">{{ annee_bdg.annee_univ }}</option>
+											   {% endfor %}
+											</select>
+											
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Date</label>
+										<div class="col-sm-9">
+											<input type="date" class="form-control" name="date" />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Fournisseur</label>
+										<div class="col-sm-9">
+											<select class="form-control"  name="fournisseur" >
+											   {% for frn in frn %}
+											   <option value="{{ frn.id }}">{{ frn.code_fournisseur }} {{ frn.nom_fournisseur }} </option>
+											   {% endfor %}
+											</select>
+											
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label" for="number1" >Montant operation</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control" name="montant_op" id="number1"  />
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Observation</label>
+										<div class="col-sm-9">
+											<input type="text" class="form-control"  name="observation_mandat" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+							<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Type Facture</label>
+										<div class="col-sm-9">
+											<select class="form-control"  name="type_facture" >
+											   {% for type_fact in type_fact %}
+											   <option value="{{ type_fact.id }}">{{ type_fact.type }}</option>
+											   {% endfor %}
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">
+									<a href="{% url 'mandatlist' %}" class="btn btn-secondary btn-block">
+										<i class="fa fa-list"></i> Retour
+									</a>
+								</div>
+								<div class="col-md-4">
+									<button type="submit" class="btn btn-primary btn-block" >
+										<i class="fa fa-database"></i>Enregistrer</button>
+								</div>
+							</div>
+						</form>
+						<div class="content-wrapper">
+							<div class="row">
+								<div class="col-md-12 grid-margin stretch-card">
+									<div class="card">
+										<div class="card-body">
+											<p class="lead font-italic">Listes des Mandats </p>
+											<hr class="my-4">
+											<table class="table table-borderless">
+												<thead class="border-bottom font-weight-bold">
+												<tr>
+													<th>code article</th>
+													<th>Numero mandat</th>
+													<th>Annee budgetaire</th>
+													<th>Date</th>
+													<th>Fournisseur</th>
+													<th>Type facture</th>
+													<th>Montant operation</th>
+													<th>Observation</th>
+													<th style="color: blue;">Edit</th>
+													<th style="color: blue;">Imprimer</th>
+												</tr>
+												</thead>
+												<tbody>
+												{% for mandat in mandats %}
+												<tr>
+													<td>{{mandat.credit_s2.article.code_art}}</td>
+													<td>{{mandat.num_mandat}}</td>
+													<td>{{mandat.annee_budge.annee_univ}}</td>
+													<td>{{mandat.date}}</td>
+													<td>{{mandat.fournisseur.code_fournisseur}} {{mandat.fournisseur.nom_fournisseur}}</td>
+											        <td>{{mandat.type_facture.type}}</td>
+													<td>{{mandat.montant_op}}</td>
+													<td>{{mandat.observation_mandat}}</td>
+													<td>
+														<a style="padding-left:30px;" href="{% url 'MandatDelete' mandat.id %}" class="d-inline" >
+															<i class="fa fa-trash-alt fa-lg "></i></a>
+														<a style="padding-left:30px;" href="{% url 'mandat_update' mandat.id %}" class="d-inline" >
+															<i class="fa fa-pencil-alt fa-lg "></i></a>
+													</td>
+													<td>
+														<a style="padding-left:30px;" href="{% url 'Mandat_PDFView' mandat.id %}" class="d-inline" >
+															<i class="fa fa-print fa-lg" ></i>
+														</a>
+													</td>
+												</tr>
+												{% endfor %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+ </form>
+</html>
+
+{% endblock %}

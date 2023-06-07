@@ -15,7 +15,8 @@ from django.core.exceptions import ValidationError
 import re
 from djmoney.models.fields import MoneyField
 import os
-
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.template.defaultfilters import default
 
 class User(AbstractUser):
@@ -82,7 +83,7 @@ class User(AbstractUser):
             return Inscription.objects.none()
         
     def exercice_list(self):
-        if self.is_regisseur() or self.is_top_management():
+        if self.is_regisseur() or self.is_top_management() or self.is_budget():
             return Exercice.objects.all()
         else:
             return Exercice.objects.none()
@@ -154,9 +155,7 @@ class User(AbstractUser):
         else:
             return self.is_direction()
         
-    def is_budget(self):
-        group_budget=get_object_or_404(Group, name='budget')
-        return group_budget in self.groups.all()
+
         
     
     def is_staff_only(self):
@@ -2115,65 +2114,66 @@ class Exercice(models.Model):
     annee_budg=models.CharField(max_length=4, unique=True)
     debut=models.DateField()
     fin=models.DateField()
-    total=MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    total=MoneyField(decimal_places=2, max_digits=9,null= True, blank=True)
     credit_non_allouee=MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
-    
+    exe_encours=models.BooleanField(default='False', blank=True)
+
     def __str__(self):
         return self.annee_budg
 
 class Avance(models.Model):
-        code_avance = models.CharField(max_length=12)
-        chapitres = models.ManyToManyField(Chapitre)
-        exercice = models.ForeignKey(Exercice, on_delete=CASCADE, default='')
-        encours=models.BooleanField(default='False',  blank=True)
-        total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
-        credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
+    code_avance = models.CharField(max_length=12)
+    chapitres = models.ManyToManyField(Chapitre)
+    exercice = models.ForeignKey(Exercice, on_delete=CASCADE, default='')
+    encours=models.BooleanField(default='False',  blank=True)
+    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
         
         
-        def str_encours(self):       
-          if self.encours :
+    def str_encours(self):       
+        if self.encours :
             return 'OUI'
-          else : 
+        else : 
             return 'NON'
         
 class Credit(models.Model):
-        avance = models.ForeignKey(Avance, on_delete=CASCADE,default='' )
-        article = models.ForeignKey(Article, on_delete=CASCADE)
-        chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
-        credit_allouee = MoneyField(decimal_places=2, max_digits=9)
-        credit_reste = MoneyField(decimal_places=2, max_digits=9)
+    avance = models.ForeignKey(Avance, on_delete=CASCADE,default='' )
+    article = models.ForeignKey(Article, on_delete=CASCADE)
+    chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
+    credit_allouee = MoneyField(decimal_places=2, max_digits=9)
+    credit_reste = MoneyField(decimal_places=2, max_digits=9)
 
         
 class Bordereau(models.Model):
-        credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
-        deseingnation = models.CharField(max_length=200, null=True, blank=True)
-        regisseur = models.CharField(max_length=50, null=True, blank=True)
-        cloture = models.BooleanField(default=False)
-        date_borderau = models.DateField(null=True, blank=True)
-        etat_borderau = models.BooleanField(default=True, null=True, blank=True)  #Rejeté ou accepté
+    credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
+    deseingnation = models.CharField(max_length=200, null=True, blank=True)
+    regisseur = models.CharField(max_length=50, null=True, blank=True)
+    cloture = models.BooleanField(default=False)
+    date_borderau = models.DateField(null=True, blank=True)
+    etat_borderau = models.BooleanField(default=True, null=True, blank=True)  #Rejeté ou accepté
 
 class Piece(models.Model):
-        credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
-        bordreau = models.ForeignKey(Bordereau, on_delete=CASCADE, default='')
-        deseingnation = models.CharField(max_length=200, null=True, blank=True)
-        montant = MoneyField(decimal_places=2, max_digits=9)
+    credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
+    bordreau = models.ForeignKey(Bordereau, on_delete=CASCADE, default='')
+    deseingnation = models.CharField(max_length=200, null=True, blank=True)
+    montant = MoneyField(decimal_places=2, max_digits=9)
         
 #################################### THIS PART FOR INVENTAIRE GESTION ###############################################
 
 class Bloc(models.Model):
-        Num_blc = models.CharField(max_length=10)
-        libelle_blc = models.CharField(max_length=200)
+    Num_blc = models.CharField(max_length=10)
+    libelle_blc = models.CharField(max_length=200)
     
         
 class Bureau(models.Model):
-        code_bur = models.CharField(max_length=10)
-        bloc = models.ForeignKey(Bloc, on_delete=CASCADE, default='', null=True, blank=True,related_name="bureaux")
-        libelle_bureau = models.CharField(max_length=200)
+    code_bur = models.CharField(max_length=10)
+    bloc = models.ForeignKey(Bloc, on_delete=CASCADE, default='', null=True, blank=True,related_name="bureaux")
+    libelle_bureau = models.CharField(max_length=200)
         
 class Immobilier(models.Model):
-        code_barre = models.CharField(max_length=10, null=False,blank=False)
-        deseingnation = models.CharField(max_length=200, null=True, blank=True)
-        FAMILLE=(
+    code_barre = models.CharField(max_length=10, null=False,blank=False)
+    deseingnation = models.CharField(max_length=200, null=True, blank=True)
+    FAMILLE=(
         ('01','Logiciels et Applicatifs'),
         ('02','Materiel informatique'),
         ('03','Materiel et Mobilier de bureau et d''enseingement '),
@@ -2199,44 +2199,32 @@ class Immobilier(models.Model):
         ('24','Audio visuelle '),
         ('25','Materiel medical '))
         
-        famille = models.CharField(max_length = 2, choices = FAMILLE)   
-        fournisseur = models.CharField(max_length=200, null=True, blank=True) 
-        num_inventaire = models.CharField(max_length=20) 
-        valeur = models.DecimalField(decimal_places=2, max_digits=9,default=0.0)
-        benificaire = models.ForeignKey(Personnel, on_delete=models.SET_NULL, null=True, blank=True)
-        Num_facture = models.CharField(max_length=20)  
-        Num_chassis = models.CharField(max_length=30) 
-        matricule = models.CharField(max_length=15) 
-        marque = models.CharField(max_length=15, null=True, blank=True) 
-        date_facture = models.DateField(null=True, blank=True)
-        duree_garantie=models.IntegerField(null=True) 
+    famille = models.CharField(max_length = 2, choices = FAMILLE)   
+    fournisseur = models.CharField(max_length=200, null=True, blank=True) 
+    num_inventaire = models.CharField(max_length=20) 
+    valeur = models.DecimalField(decimal_places=2, max_digits=9,default=0.0)
+    benificaire = models.ForeignKey(Personnel, on_delete=models.SET_NULL, null=True, blank=True)
+    Num_facture = models.CharField(max_length=20)  
+    Num_chassis = models.CharField(max_length=30) 
+    matricule = models.CharField(max_length=15) 
+    marque = models.CharField(max_length=15, null=True, blank=True) 
+    date_facture = models.DateField(null=True, blank=True)
+    duree_garantie=models.IntegerField(null=True) 
        
-        bureau = models.ForeignKey(Bureau, on_delete=models.SET_NULL, null=True, blank=True, default='01')
+    bureau = models.ForeignKey(Bureau, on_delete=models.SET_NULL, null=True, blank=True, default='01')
         
-        observation = models.TextField(max_length=300, null=True, blank=True) 
+    observation = models.TextField(max_length=300, null=True, blank=True) 
         
-        facture=models.FileField(upload_to='invent_files', null=True)
+    facture=models.FileField(upload_to='invent_files', null=True)
                
-        def lib_field(self):
-           try:
+    def lib_field(self):
+        try:
             a=os.path.basename(self.facture.file.name)
-           except :
+        except :
             a=""
-           return a
+        return a
        
-       #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################
-
-class Fournisseur(models.Model):
-        code_fournisseur = models.CharField(max_length=10, null=True)
-        nom_fournisseur = models.CharField(max_length=200, null=True)
-        adresse_fournisseur = models.CharField(max_length=200, null=True)
-        num_cmpt_fournisseur = models.IntegerField(null=True)
-        cle_cmpt_fournisseur = models.IntegerField(null=True) 
-        
-
-        def __str__(self):
-            return self.code_fournisseur+' '+ self.nom_fournisseur       
-
+       #################################### THIS PART FOR BUDGET GESTION 01/06/2022###############################################     
 class Banque(models.Model):
     code = models.CharField(max_length=3)
     abreviation = models.CharField(max_length=20)
@@ -2245,6 +2233,17 @@ class Banque(models.Model):
         
     def __str__(self):
         return  self.nom + ' : ' + self.abreviation
+
+class Fournisseur(models.Model):
+    code_fournisseur = models.CharField(max_length=10, null=True)
+    nom_fournisseur = models.CharField(max_length=200, null=True)
+    adresse_fournisseur = models.CharField(max_length=200, null=True)
+    num_cmpt_fournisseur = models.IntegerField(null=True)
+    cle_cmpt_fournisseur = models.IntegerField(null=True) 
+    banque = models.ForeignKey(Banque, related_name='banque',on_delete= models.SET_NULL, null = True, blank = True)
+
+    def __str__(self):
+        return self.code_fournisseur+' '+ self.nom_fournisseur     
     
 class Credit_S2(models.Model):
     exercice = models.ForeignKey(Exercice, on_delete=CASCADE,default='' )
@@ -2263,148 +2262,12 @@ class Credit_S2(models.Model):
     def __str__(self):
         return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
        
-     
-    
 class Type_Engagement_S2(models.Model):
     code = models.CharField(max_length=3)
     nature = models.CharField(max_length=150)
     def __str__(self):
         return  self.code + ' : ' + self.nature
 
-
-TYPE=(
-    ('01','Prise en charge'),
-    ('02','Depence')
-    ) 
-class Engagement(models.Model):
-    num = models.IntegerField(null = True)
-    date=models.DateField(null=True, blank=True)
-    type = models.CharField(max_length = 2, choices = TYPE, null=True, default='')   
-    observation = models.CharField(max_length=300, default='')
-    annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
-    credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
-    montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
-    
-    def nouveau_solde(self): 
-        solde=0      
-        if self.montant_operation :
-            solde=solde+self.credit_alloue.credit_allouee-self.montant_operation
-            return solde
-#         if self.nouveau_solde():
-#             self.credit_alloue.credit_reste=solde
-    def nouveau_solde_s1(self): 
-        solde_s1=self.credit_alloue.credit_allouee/2
-        if self.montant_operation :
-            solde_s1=solde_s1-self.montant_operation
-            return solde_s1
-        
-    def nouveau_solde_s2(self):  
-        solde_s2=self.credit_alloue.credit_allouee/2
-        if self.nouveau_solde_s1() :
-            solde_s2=solde_s2+self.nouveau_solde_s1()
-            return solde_s2
-             
-    
-    def __str__(self):
-        return "Engagement "+ str(self.num)
-
-class Mandat(models.Model):
-    num_mandat = models.IntegerField(null = True)
-    date=models.DateField(null=True, blank=True)
-    article_mandat = models.ForeignKey(Article,related_name='article_mandat' , on_delete= CASCADE, null = True, blank = True)
-    credit_allou=models.ForeignKey(Credit_S2 ,related_name='credit_allou' , null= True, blank=True, on_delete=models.SET_NULL)
-    montant_operatio = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
-    annee_budget=models.ForeignKey(AnneeUniv ,related_name='annee_budget' , null= True, blank=True, on_delete=models.SET_NULL)
-    observatio = models.CharField(max_length=300, default='')
-    fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
-    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
-    credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2_mandat' , null= True, blank=True, on_delete=models.SET_NULL)
-
-    def __str__(self):
-        return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
-
-    def nouveau_solde_mandat(self):
-        solde=0      
-        if self.montant_op :
-            solde=solde+self.credit_s2.credit_reste-self.montant_op
-            return solde
-
-    def nouveau_solde_s1_mandat(self):
-        solde_s1=self.credit_s2.credit_allouee/2
-        if self.montant_op :
-            solde_s1=solde_s1-self.montant_op
-            return solde_s1
-       
-    def nouveau_solde_s2_mandat(self):  
-        solde_s2=self.credit_s2.credit_allouee/2
-        if self.nouveau_solde_s1() :
-            solde_s2=solde_s2+self.nouveau_solde_s1()
-            return solde_s2
-        else:
-            return solde_s2
-    
-# class Mandat(models.Model):
-#     num_mandat = models.IntegerField(null = True)
-#     date=models.DateField(null=True, blank=True)
-#     article_mandat = models.ForeignKey(Article,related_name='article_mandat' , on_delete= CASCADE, null = True, blank = True)
-#     fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
-#     #engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
-#     observation = models.CharField(max_length=300, default='')
-#     annee_budget=models.ForeignKey(AnneeUniv ,related_name='annee_budget' , null= True, blank=True, on_delete=models.SET_NULL)
-#     credit_allou=models.ForeignKey(Credit_S2 ,related_name='credit_allou' , null= True, blank=True, on_delete=models.SET_NULL)
-#     montant_operatio = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
-#     
-#     def nouveau_solde(self): 
-#         solde=0      
-#         if self.montant_operatio :
-#             solde=solde+self.credit_allou.credit_allouee-self.montant_operatio
-#             return solde
-# #         if self.nouveau_solde():
-# #             self.credit_alloue.credit_reste=solde
-#     def nouveau_solde_s1(self): 
-#         solde_s1=self.credit_allou.credit_allouee/2
-#         if self.montant_operatio :
-#             solde_s1=solde_s1-self.montant_operatio
-#             return solde_s1
-#         
-#     def nouveau_solde_s2(self):  
-#         solde_s2=self.credit_allou.credit_allouee/2
-#         if self.nouveau_solde_s1() :
-#             solde_s2=solde_s2+self.nouveau_solde_s1()
-#             return solde_s2
-# 
-#     def __str__(self):
-#         return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
-class Transfert(models.Model):
-    annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
-    num_transfert = models.IntegerField(null = True)
-    date_transfert=models.DateField(null=True, blank=True)
-    article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL)
-    article_destination=models.ForeignKey(Credit_S2 ,related_name='destination' , null= True, blank=True, on_delete=models.SET_NULL)
-    montant_transfert=MoneyField(decimal_places=2, max_digits=9)
-   
-       
-    def __str__(self):
-        return  str(self.article_source)+ ' ----> ' + str(self.article_destination)
-    
-#     def save(self, *args, **kwargs):
-#       #  if not self.pk:
-#             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
-#         last_object = Transfert.objects.all().order_by('-num_transfert').first()
-#         
-#         if last_object:
-#                 # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
-#             self.num_transfert = last_object.num_transfert + 1
-#         else:
-#                 # Si aucun objet n'existe, commencez à 1
-#                 self.num_transfert = 1
-#         
-#                   
-#         super(Transfert, self).save(*args, **kwargs)
-#         #super().save(*args, **kwargs)
-    
-    
-          
 class Type_Facture(models.Model):
     code = models.CharField(max_length=3)
     type = models.CharField(max_length=150)
@@ -2418,5 +2281,104 @@ class Facture(models.Model):
     type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture' , null= True, blank=True, on_delete=models.SET_NULL) 
     def __str__(self):
         return  str(self.num_fact)+' '+str(self.type_facture.type)
+
+
+TYPE=(
+    ('Prise en charge','Prise en charge'),
+    ('Depence','Depence'),
+    ('Fiche de regularisation de la provision', 'Fiche de regularisation de la provision')
+    ) 
+class Engagement(models.Model):
+    num = models.IntegerField(null=True)
+    date=models.DateField(null=True, blank=True)
+    type = models.CharField(max_length = 60, choices = TYPE, null=True, default='')   
+    observation = models.CharField(max_length=300, default='')
+    annee_budg=models.ForeignKey(AnneeUniv ,related_name='annee_budg' , null= True, blank=True, on_delete=models.SET_NULL)
+    credit_alloue=models.ForeignKey(Credit_S2 ,related_name='credit_alloue' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    fournisseur=models.ForeignKey(Fournisseur ,related_name='fournisseur' , null= True, blank=True, on_delete=models.SET_NULL)
+    facture=models.ForeignKey(Facture ,related_name='facture' , null= True, blank=True, on_delete=models.SET_NULL )
+    #mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
     
- 
+    def __str__(self):
+        return "Engagement "+ str(self.num)+' '+str(self.type)
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+           last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
+         
+           if last_object:
+                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+              self.num = last_object.num + 1
+           else:
+                # Si aucun objet n'existe, commencez à 1
+                self.num = 1
+         
+        super(Engagement, self).save(*args, **kwargs)
+        #super().save(*args, **kwargs)
+
+        
+#     def nouveau_solde(self): 
+#         solde=0      
+#         if self.montant_operation :
+#             solde=solde+self.credit_alloue.credit_reste-self.montant_operation
+#             return solde
+    
+    def nouveau_solde_s1(self): 
+        solde_s1=self.credit_alloue.credit_allouee/2
+        if self.montant_operation :
+            solde_s1=solde_s1-self.montant_operation
+            return solde_s1
+        
+    def nouveau_solde_s2(self):  
+        solde_s2=self.credit_alloue.credit_allouee/2
+        if self.nouveau_solde_s1() :
+            solde_s2=solde_s2+self.nouveau_solde_s1()
+            return solde_s2
+        else:
+            return solde_s2
+             
+    
+    
+class Mandat(models.Model):
+    num_mandat = models.IntegerField(null = True)
+    date=models.DateField(null=True, blank=True)
+    #article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
+    fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
+    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    montant_op = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    observation_mandat = models.CharField(max_length=300, default='')
+    annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
+    credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2_mandat' , null= True, blank=True, on_delete=models.SET_NULL)
+    type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture_mandat' , null= True, blank=True, on_delete=models.SET_NULL) 
+
+    def __str__(self):
+        return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
+
+class Transfert(models.Model):
+    annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
+    num_transfert = models.IntegerField(null = True)
+    date_transfert=models.DateField(null=True, blank=True)
+    article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL)
+    article_destination=models.ForeignKey(Credit_S2 ,related_name='destination' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_transfert=MoneyField(decimal_places=2, max_digits=9)
+   
+       
+    def __str__(self):
+        return  str(self.article_source)+ ' ----> ' + str(self.article_destination)
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+           last_object = Transfert.objects.filter(annee_budgi=self.annee_budgi).order_by('-num_transfert').first()
+         
+           if last_object:
+                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+              self.num_transfert = last_object.num_transfert + 1
+           else:
+                # Si aucun objet n'existe, commencez à 1
+                self.num_transfert = 1
+            
+        super(Transfert, self).save(*args, **kwargs)
+        #super().save(*args, **kwargs)

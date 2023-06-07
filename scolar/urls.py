@@ -306,7 +306,7 @@ urlpatterns = [
     path('CreditCreate/<int:avc>/',views.CreditCreate, name="CreditCreate"),
     path('CreditAssociate/<int:avc>/<int:art>/', views.CreditAssociate, name="CreditAssociate"),
     path('CreditDelete/<int:avc>/<int:art>/',views.CreditDelete, name="CreditDelete"),
-   
+
     path('aa_avance_PDFView/<avance_pk>/', views.aa_avance_PDFView.as_view(), name='aa_avance_PDFView'),
     path('BordereauCreate/<int:crdt>/', views.BordereauCreate, name="BordereauCreate"),
     path('LitImput/<int:avc>/', views.LitImput, name='LitImput'),
@@ -328,9 +328,9 @@ urlpatterns = [
     path('ImmobilierShowFilter', views.ImmobilierShowFilter, name='ImmobilierShowFilter'),
     path('ImmobilierDelete/<int:id>/', views.ImmobilierDelete, name='ImmobilierDelete'),
     path('ImmobilierEdit/<int:id>/', views.ImmobilierEdit, name='ImmobilierEdit'),
- 
- ####################################################        section 2
- 
+
+    
+#############################################budget
 
     path('chapitres_list', views.ChapitresListView.as_view(), name='chapitres_list'),
     path('chapitre_create', views.ChapitreCreateView.as_view(), name='chapitre_create'),
@@ -347,18 +347,17 @@ urlpatterns = [
     re_path(r'^fournisseur_delete/(?P<pk>\d+)/$',views.FournisseurDeleteView.as_view(), name='fournisseur_delete'), 
     
  
-    
     path('banque_list', views.BanqueListView.as_view(), name='banque_list'),
     path('banque_create', views.BanqueCreateView.as_view(), name='banque_create'),
     re_path(r'^banque_update/(?P<pk>[ -_&@\w]+)/$', views.BanqueUpdateView.as_view(), name='banque_update'),
     re_path(r'^banque_delete/(?P<pk>[ -_&@\w]+)/$', views.BanqueDeleteView.as_view(), name='banque_delete'),
-
-
+    
     path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'),   
     path('exercice_s2_create', views.exercice_s2_create_view, name='exercice_s2_create'),
+
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
-    
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
+    
     path('engagement_S2_list', views.Type_EngagementListView.as_view(), name='engagement_S2_list'),
     path('engagement_S2_create', views.Type_EngagementCreateView.as_view(), name='engagement_S2_create'),
     re_path(r'^engagement_S2_update/(?P<pk>[ -_&@\w]+)/$', views.Type_EngagementUpdateView.as_view(), name='engagement_S2_update'),
@@ -366,44 +365,36 @@ urlpatterns = [
     
     path('Prise_en_charge_list', views.Prise_en_charge_ListView.as_view(), name='Prise_en_charge_list'),
     path('prise_en_charge_create', views.prise_en_charge_create_view, name='prise_en_charge_create'),
-    re_path(r'^engagement_delete/(?P<pk>\d+)/$', views.EngagementDeleteView.as_view(), name='engagement_delete'),
+    re_path(r'^prise_en_charge_delete/(?P<pk>\d+)/$', views.Prise_En_ChargeDeleteView.as_view(), name='prise_en_charge_delete'),
     re_path(r'^prise_en_charge_update/(?P<engagement_pk>\d+)/$', views.prise_en_charge_update_view, name='prise_en_charge_update'),
     re_path(r'^detail_prise_en_charge/(?P<pk>\d+)/$', views.Prise_en_chargeDetailView.as_view(), name='detail_prise_en_charge'),
 
     path('Depence_List', views.Depence_ListView.as_view(), name='Depence_List'),
     path('depence_create', views.depence_create_view, name='depence_create'),
     re_path(r'^depence_update/(?P<engagement_pk>\d+)/$', views.depence_update_view, name='depence_update'),
+    re_path(r'^depence_delete/(?P<engagement_pk>\d+)/$', views.depence_delete, name='depence_delete'),
     re_path(r'^detail_depence/(?P<pk>\d+)/$', views.Depence_DetailView.as_view(), name='detail_depence'),
+    
+    path('Fiches_regularisation_provision_List', views.Fiche_regularisation_provision_ListView.as_view(), name='Fiches_regularisation_provision_List'),
 
+
+    path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),
+    path('mandatCreate/<int:crd>/', views.MandatCreate, name="mandatCreate"),
+    path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
+    re_path(r'^mandat_update/(?P<mandat_pk>\d+)/$', views.mandat_update_view, name='mandat_update'),
+    
+    path('mandat_priori_list', views.Mandat_PrioriListView.as_view(), name='mandat_priori_list'),
+    path('mandat_priori_create', views.mandat_priori_create_view, name='mandat_priori_create'),
+    re_path(r'^mandat_priori_delete/(?P<pk>\d+)/$', views.MandatPrioriDeleteView.as_view(), name='mandat_priori_delete'),
+    re_path(r'^mandat_priori_update/(?P<mandat_pk>\d+)/$', views.mandat_priori_update_view, name='mandat_priori_update'),
+    re_path(r'^detail_mandat_priori/(?P<pk>\d+)/$', views.MandatPrioriDetailView.as_view(), name='detail_mandat_priori'),
     
     path('Prise_en_chargeS2_PDFView/<engagement_pk>/', views.Prise_en_chargeS2_PDFView.as_view(), name='Prise_en_chargeS2_PDFView'),
     path('Engagement_de_la_provision_PDFView/<engagement_pk>/', views.Engagement_de_la_provision_PDFView.as_view(), name='Engagement_de_la_provision_PDFView'),
     path('Depence_PDFView/<engagement_pk>/', views.Depence_PDFView.as_view(), name='Depence_PDFView'),
     path('Regularisation_provision_PDFView/<engagement_pk>/', views.Regularisation_provision_PDFView.as_view(), name='Regularisation_provision_PDFView'),
-
-
-#     path('mandat_list', views.MandatListView.as_view(), name='mandat_list'),
-#     path('mandat_create', views.mandat_create_view, name='mandat_create'),
-#     re_path(r'^mandat_delete/(?P<pk>\d+)/$', views.MandatDeleteView.as_view(), name='mandat_delete'),
-#
-    path('mandat_priori', views.Mandat_prioriView.as_view(), name='mandat_priori'),
-    path('mandat_create', views.mandat_create_view, name='mandat_create'),
-    re_path(r'^mandat_delete/(?P<pk>\d+)/$', views.MandatDeleteView.as_view(), name='mandat_delete'),
     path('Mandat_PDFView/<mandat_pk>/', views.Mandat_PDFView.as_view(), name='Mandat_PDFView'),
-    re_path(r'^mandat_update_priori/(?P<mandat_pk>\d+)/$', views.mandat_update_view_priori, name='mandat_update_priori'),
-    re_path(r'^detail_mandat/(?P<pk>\d+)/$', views.MandatDetailView.as_view(), name='detail_mandat'),
-
-    path('articles_mandat_list', views.Articles_mandatListView.as_view(), name='articles_mandat_list'),
-    path('test/<int:crd>/', views.Article_MandatListView, name='test'),# 'test/<int:mandat_pk>/'
-    path('MandatDelete/<int:mandat>/', views.MandatDelete, name="MandatDelete"),
-    re_path(r'^mandat_update2/(?P<mandat_pk>\d+)/$', views.mandat_update_view2, name='mandat_update2'),
-    
-    
-    path('Transfert_List', views.Transfert_ListView.as_view(), name='Transfert_List'),
-    path('Transfert_create', views.Transfert_create_view, name='Transfert_create'),
-    re_path(r'^transfert_update/(?P<transfert_pk>\d+)/$', views.transfert_update_view, name='transfert_update'),
-    re_path(r'^transfert_delete/(?P<transfert_pk>\d+)/$', views.transfert_delete, name='transfert_delete'),
-    re_path(r'^detail_transfert/(?P<pk>\d+)/$', views.Transfert_DetailView.as_view(), name='detail_transfert'),
+    path('Mandat_Priori_PDFView/<mandat_pk>/', views.Mandat_Priori_PDFView.as_view(), name='Mandat_Priori_PDFView'),
 
     path('factures_list', views.FacturesListView.as_view(), name='factures_list'),
     path('facture_create', views.FacturesCreateView.as_view(), name='facture_create'),
@@ -414,8 +405,12 @@ urlpatterns = [
     path('typesfactures_create', views.Type_FactureCreateView.as_view(), name='typesfactures_create'),
     re_path(r'^typesfactures_update/(?P<pk>\d+)/$',views.Type_FacturesUpdateView.as_view(), name='typesfactures_update'),
     re_path(r'^typesfactures_delete/(?P<pk>\d+)/$',views.Type_FactureDeleteView.as_view(), name='typesfactures_delete'), 
+ 
+    path('Transfert_List', views.Transfert_ListView.as_view(), name='Transfert_List'),
+    path('Transfert_create', views.Transfert_create_view, name='Transfert_create'),
+    re_path(r'^transfert_update/(?P<transfert_pk>\d+)/$', views.transfert_update_view, name='transfert_update'),
+    re_path(r'^transfert_delete/(?P<transfert_pk>\d+)/$', views.transfert_delete, name='transfert_delete'),
+    re_path(r'^detail_transfert/(?P<pk>\d+)/$', views.Transfert_DetailView.as_view(), name='detail_transfert'),
 
-    #path('test/<mandat_pk>/', views.Article_MeateandatListView.as_view(), name='test'),#path('test/<mandat_pk>/', views.Article_MandatListView, name='test'),
 
-        
     ]

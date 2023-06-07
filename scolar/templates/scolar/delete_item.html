@@ -67,23 +67,31 @@ table {
 								</div>
 										
 								   {% endif %}
-								             {% if delete == 6 %}
+								   
+								   {% if delete == 6 %}
 								<div class="col-md-2">
-							      	{% csrf_token %}
-								   		<a class="btn btn-warning" href="/scolar/test/{{ article }}/">Retour</a>	
-								</div>
 								
-								 {% endif %}
-								 
-								 	   {% if delete == 8 %}
+								   		<a class="btn btn-warning" href="/scolar/mandatCreate/{{ credit_s2 }}/">Retour</a>
+
+								</div>
+								{% endif %}
+								
+								{% if delete == 7 %}
 								<div class="col-md-2">
-								    {% csrf_token %}
+								
+								   		<a class="btn btn-warning" href="/scolar/Depence_List">Retour</a>
+
+								</div>
+								{% endif %}
+								
+								{% if delete == 8 %}
+								<div class="col-md-2">
+								
 								   		<a class="btn btn-warning" href="/scolar/Transfert_List">Retour</a>
 
 								</div>
 								{% endif %}
-								 
-								   
+								
 								   <div class="col">	
 
 										<input class="btn btn-danger" type="submit"  value="OK"/>

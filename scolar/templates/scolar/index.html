@@ -2,6 +2,8 @@
 {% load static usergroup icons bootstrap4 %}
 {% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
 {% block sidebar %}
+
+
 	{% if user.is_authenticated %}
 	 {% csrf_token %}
 		{% if request.user|has_group:"top-management" %}
@@ -151,9 +153,7 @@
 		
 		{% if request.user|has_group:"budget" %}
 			<ul class="nav list-group">
-			<li>
 			<strong>CHAPITRES ET ARTICLES</strong>
-			</li>
 			<li>
 			 <a class="list-group-item" href="{% url 'chapitres_list' %}">{% icon 'tasks' %} Chapitres</a>
 			</li>
@@ -161,47 +161,46 @@
 			 <a class="list-group-item" href="{% url 'articles_list' %}">{% icon 'tasks' %} Articles</a>
 			</li>
 			<li>
+			
+			<strong>Repartition des credits</strong>
+			<li>
+			 <a  class="list-group-item" href="{% url 'exercice_list' %}">{% icon 'tasks' %} Liste exercices</a>
+			</li>  
+			<li>
+			
 			<strong>Engagement</strong>
 			</li>
 			<li class="list-group-item">
 				  <a class="dropdown-toggle" data-toggle="dropdown" href="#">{% icon 'tasks' %} Engagement</a>
 				  <div class="dropdown-menu">	
-				    <a class="dropdown-item" href="{% url 'engagement_S2_list' %}">{% icon 'book' %} Liste Natures Engagements</a>		  
-				 	<a class="dropdown-item" href="{% url 'Prise_en_charge_list' %}">{% icon 'book' %} Liste des Prises en charge</a>		  
-				 	<a class="dropdown-item" href="{% url 'Depence_List' %}">{% icon 'book' %} Liste des Depences</a>		  
+<!-- 				    <a class="dropdown-item" href="{% url 'engagement_S2_list' %}">{% icon 'book' %} Liste Natures Engagements</a>		  
+ -->				 	<a class="dropdown-item" href="{% url 'Prise_en_charge_list' %}">{% icon 'book' %} Liste des Prises en charge et engagement de provision</a>		  
+				 	<a class="dropdown-item" href="{% url 'Depence_List' %}">{% icon 'book' %} Liste des Depences </a>	
+				 	<a class="dropdown-item" href="{% url 'Fiches_regularisation_provision_List' %}">{% icon 'book' %} Liste des Fiches de regularisation et de la provision </a>	  
 				 
 				  </div>	
 				</li>
+				
 			 <strong>Mondat</strong>
 			 <li>
-			 <a  class="list-group-item" href="{% url 'mandat_priori' %}">{% icon 'tasks' %} Mondat_priori</a>
+			 <a  class="list-group-item" href="{% url 'mandat_priori_list' %}">{% icon 'tasks' %} Mondat_priori</a>
 			</li> 
-			 <li>
-			 <a  class="list-group-item" href="{% url 'articles_mandat_list' %}">{% icon 'tasks' %} Mondat_posteriori</a>
-			</li>
+			 <!-- <li>
+			 <a  class="list-group-item" href="{% url 'mandatlist' %}">{% icon 'tasks' %} Mondat_posteriori</a>
+			</li> --> 
 			
-			 
-			 <strong>Transfert des credit entre articles</strong>  
+			<strong>Transfert des credit entre articles</strong>    
 			<li>
 			 <a  class="list-group-item" href="{% url 'Transfert_List' %}">{% icon 'tasks' %} Transfert</a>
 			</li>  
-			<li>
-			<strong>Fournisseur et Banques</strong>
-			</li>
-			<li>
-			 <a  class="list-group-item" href="{% url 'fournisseurs_list' %}">{% icon 'tasks' %} Liste Benificiares</a>
-			</li>  
-			  <li>
-			 <a  class="list-group-item" href="{% url 'banque_list' %}">{% icon 'tasks' %} Liste Banques</a>
-			</li>    
-			<li>			 
 			
-			<strong>Repartition des credits</strong>
-			</li>
+			<strong>Fournisseurs et Banques</strong>
 			<li>
-			 <a  class="list-group-item" href="{% url 'exercice_list' %}">{% icon 'tasks' %} Liste exercices</a>
+			 <a  class="list-group-item" href="{% url 'fournisseurs_list' %}">{% icon 'tasks' %} Liste fournisseurs</a>
 			</li>  
 			<li>
+			 <a  class="list-group-item" href="{% url 'banque_list' %}">{% icon 'tasks' %} Liste banques</a>
+			</li>   
 			
 			<strong>Factures</strong>
 			</li>
@@ -210,21 +209,13 @@
 			</li>  <li>
 			 <a  class="list-group-item" href="{% url 'typesfactures_list' %}">{% icon 'tasks' %} Types facture</a>
 			</li> 
-			
 			<!-- <li>
-				<strong>Repartition des credits</strong>
-				
-					{% for exercice in user.exercice_list %}
-		 	  				<a class="dropdown-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  ">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
-				
-		        	{% endfor %}	
-				
-				  
-				</li>   -->
+			{% for exercice in user.exercice_list %}
+		 	  	<a class="list-group-item"  href="{% url 'CreditCreate_S2'  exercice.id %}"  ">{% icon 'comment-dollar' %} Exercice {{exercice.annee_budg}}</a>	
+	        {% endfor %}					  
+			</li>   -->
 			 
-			
-			
-			    </ul>
+			</ul>
 			{% endif %}
 		
 		
