@@ -1349,7 +1349,16 @@ class Type_FactureTable(tables.Table):
         template_name= "django_tables2/bootstrap4.html"
     
 class TransfertTable(tables.Table):
-
+    article_source=tables.Column(empty_values=(), orderable=False, verbose_name="Article source")
+    def render_article_source(self,value,record):
+        if record.article_source :
+            return str(record.article_source)
+        
+    article_destination=tables.Column(empty_values=(), orderable=False, verbose_name="Article destination")
+    def render_article_destination(self,value,record):
+        if record.article_destination :
+            return str(record.article_destination)    
+        
     date_transfert = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
             <a href="{% url "transfert_update" transfert_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
@@ -1363,7 +1372,7 @@ class TransfertTable(tables.Table):
 
     class Meta:
         model= Transfert
-        fields = ['annee_budgi','num_transfert','date_transfert','article_source__chapitre','article_source__article','article_destination__chapitre','article_destination__article','montant_transfert']
+        fields = ['annee_budgi','num_transfert','date_transfert','montant_transfert']
         template_name= "django_tables2/bootstrap4.html"
 
 
