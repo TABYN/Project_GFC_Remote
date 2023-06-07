@@ -2114,9 +2114,10 @@ class Exercice(models.Model):
     annee_budg=models.CharField(max_length=4, unique=True)
     debut=models.DateField()
     fin=models.DateField()
-    total=MoneyField(decimal_places=2, max_digits=9,blank=True,default='0')
-    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9,default='0')
-    
+    total=MoneyField(decimal_places=2, max_digits=9,null= True, blank=True)
+    credit_non_allouee=MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
+    exe_encours=models.BooleanField(default='False', blank=True)
+
     def __str__(self):
         return self.annee_budg
 
@@ -2297,34 +2298,32 @@ class Engagement(models.Model):
     montant_operation = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     fournisseur=models.ForeignKey(Fournisseur ,related_name='fournisseur' , null= True, blank=True, on_delete=models.SET_NULL)
     facture=models.ForeignKey(Facture ,related_name='facture' , null= True, blank=True, on_delete=models.SET_NULL )
-    mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
-    
-     
+    #mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
     
     def __str__(self):
         return "Engagement "+ str(self.num)+' '+str(self.type)
     
     def save(self, *args, **kwargs):
-      #  if not self.pk:
+        if not self.pk:
             # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
-        print("bonjour")
-        last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
-        
-        if last_object:
+           last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
+         
+           if last_object:
                 # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
-            self.num = last_object.num + 1
-        else:
+              self.num = last_object.num + 1
+           else:
                 # Si aucun objet n'existe, commencez à 1
                 self.num = 1
+         
         super(Engagement, self).save(*args, **kwargs)
         #super().save(*args, **kwargs)
 
         
-    def nouveau_solde(self): 
-        solde=0      
-        if self.montant_operation :
-            solde=solde+self.credit_alloue.credit_reste-self.montant_operation
-            return solde
+#     def nouveau_solde(self): 
+#         solde=0      
+#         if self.montant_operation :
+#             solde=solde+self.credit_alloue.credit_reste-self.montant_operation
+#             return solde
     
     def nouveau_solde_s1(self): 
         solde_s1=self.credit_alloue.credit_allouee/2
@@ -2347,7 +2346,7 @@ class Mandat(models.Model):
     date=models.DateField(null=True, blank=True)
     #article = models.ForeignKey(Article,related_name='article_mandat' , on_delete=CASCADE, null = True, blank = True)
     fournisseur=models.ForeignKey(Fournisseur, related_name='beneficiaire',on_delete= models.SET_NULL, null = True, blank = True)
-    #engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
+    engagement=models.ForeignKey(Engagement, related_name='engagement',on_delete= models.SET_NULL, null = True, blank = True)
     montant_op = MoneyField(decimal_places=2, max_digits=9, null= True, blank=True)
     observation_mandat = models.CharField(max_length=300, default='')
     annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
@@ -2355,27 +2354,31 @@ class Mandat(models.Model):
     type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture_mandat' , null= True, blank=True, on_delete=models.SET_NULL) 
 
     def __str__(self):
-        return "Mandat "+ str(self.num_mandat)+' '+str(self.fournisseur.nom_fournisseur)
+        return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
 
-    def nouveau_solde_mandat(self): 
-        solde=0      
-        if self.montant_op :
-            solde=solde+self.credit_s2.credit_reste-self.montant_op
-            return solde
-            
-
-    def nouveau_solde_s1_mandat(self): 
-        solde_s1=self.credit_s2.credit_allouee/2
-        if self.montant_op :
-            solde_s1=solde_s1-self.montant_op
-            return solde_s1
-        
-    def nouveau_solde_s2_mandat(self):  
-        solde_s2=self.credit_s2.credit_allouee/2
-        if self.nouveau_solde_s1() :
-            solde_s2=solde_s2+self.nouveau_solde_s1()
-            return solde_s2
-        else:
-            return solde_s2
+class Transfert(models.Model):
+    annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
+    num_transfert = models.IntegerField(null = True)
+    date_transfert=models.DateField(null=True, blank=True)
+    article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL)
+    article_destination=models.ForeignKey(Credit_S2 ,related_name='destination' , null= True, blank=True, on_delete=models.SET_NULL)
+    montant_transfert=MoneyField(decimal_places=2, max_digits=9)
+   
+       
+    def __str__(self):
+        return  str(self.article_source)+ ' ----> ' + str(self.article_destination)
     
- 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+           last_object = Transfert.objects.filter(annee_budgi=self.annee_budgi).order_by('-num_transfert').first()
+         
+           if last_object:
+                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+              self.num_transfert = last_object.num_transfert + 1
+           else:
+                # Si aucun objet n'existe, commencez à 1
+                self.num_transfert = 1
+            
+        super(Transfert, self).save(*args, **kwargs)
+        #super().save(*args, **kwargs)

@@ -1455,12 +1455,36 @@ class CreditForm(forms.Form):
         )
 
     )
+class Exercice_S2_CreateForm(forms.Form):
     
-class Prise_en_charge_CreateForm(forms.Form):
+    def __init__(self, request, *args, **kwargs):
+        super(Exercice_S2_CreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+
+            self.fields['annee_budg']=forms.CharField(label="Annee budgetaire")
+            
+            self.fields['debut'] = forms.DateField(label='Date debut', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            self.fields['fin'] = forms.DateField(label='Date fin', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            self.fields['total'] = forms.DecimalField(label='totale exercice', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+            self.fields['credit_non_allouee'] = forms.DecimalField(label='credit non alloue', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+            self.fields['exe_encours'] = forms.BooleanField(required=False, initial=False, help_text="Cochez pour definir l'exercice encours.",label='Encours')
+            
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'exercice. Merci de le signaler à l'administrateur")    
     
+    
+class Prise_en_charge_CreateForm(forms.Form):  
     def __init__(self, request, *args, **kwargs):
         super(Prise_en_charge_CreateForm, self).__init__(*args, **kwargs)
         self.helper=FormHelper()
+      
         try:
 
             self.fields['annee_budg']=forms.ModelChoiceField(
@@ -1469,7 +1493,7 @@ class Prise_en_charge_CreateForm(forms.Form):
             )
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -1478,13 +1502,17 @@ class Prise_en_charge_CreateForm(forms.Form):
                 help_text = "Tapez le code de l'article.",
              ) 
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Prise en charge', 'Prise en charge')],
+                initial='Prise en charge',
+                #choices=TYPE,
                 label=u"Type",
                 help_text = "Choisir le type ",
+                #widget=forms.HiddenInput(),
             )
             
+            
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
-            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
+            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement', widget=forms.HiddenInput(),)
             self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
 
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
@@ -1512,7 +1540,7 @@ class Prise_en_charge_UpdateForm(forms.Form):
             )  
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                queryset=Credit_S2.objects.all(),
+                queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                 label=u"Article",
                 widget=ModelSelect2Widget(
                         model=Credit_S2,
@@ -1522,7 +1550,8 @@ class Prise_en_charge_UpdateForm(forms.Form):
                 initial=engagement_.credit_alloue
             )  
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Prise en charge', 'Prise en charge')],
+                #choices=TYPE,
                 label=u"Type",
                 help_text = "Choisir le type ",
                 initial=engagement_.type,
@@ -1604,7 +1633,7 @@ class Depence_CreateForm(forms.Form):
             )
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.all(),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                  label=u"Article",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -1614,7 +1643,9 @@ class Depence_CreateForm(forms.Form):
                  #required = False
              ) 
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Depence', 'Depence')],
+                initial='Depence',
+                #choices=TYPE,
                 label=u"Type",
                 help_text = "Choisir le type ",
                 required = True
@@ -1639,7 +1670,7 @@ class Depence_CreateForm(forms.Form):
                 help_text = "Choisir le type .",
              )  
             self.fields['date'] = forms.DateField(label='Date engagement', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
-            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement')
+            self.fields['num'] = forms.IntegerField(initial=0, label='Numero engagement', widget=forms.HiddenInput(),)
             #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
 
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
@@ -1667,7 +1698,7 @@ class Depence_UpdateForm(forms.Form):
             )  
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                queryset=Credit_S2.objects.all(),
+                queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
                 label=u"Article",
                 widget=ModelSelect2Widget(
                         model=Credit_S2,
@@ -1677,7 +1708,8 @@ class Depence_UpdateForm(forms.Form):
                 initial=engagement_.credit_alloue
             )  
             self.fields['type'] = forms.ChoiceField(
-                choices=TYPE,
+                choices=[('Depence', 'Depence')],
+                #choices=TYPE,
                 label=u"Type",
                 initial=engagement_.type,
                 required = False
@@ -1783,7 +1815,185 @@ class Depence_DetailForm(forms.Form):
                 raise Exception
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation d'engagement")
- 
+
+class Mandat_PrioriCreateForm(forms.Form):
+    
+    def __init__(self, request, *args, **kwargs):
+        super(Mandat_PrioriCreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+            self.fields['num_mandat'] = forms.IntegerField(initial=0, label='Numero Mandat')
+
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.filter(type='Depence'),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                help_text = "Tapez le numero d'engagement.",                                                
+                #required = False,
+            )   
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                help_text = "Tapez le nom ou le code du fournisseur.",                                                
+                #required = False,
+            )     
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['code__icontains',],
+                    ),
+                help_text = "Tapez le code du type de facture.",                                                
+                #required = False,
+            )   
+            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+           # self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
+
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de Mandat. Merci de le signaler a l'administrateur")    
+
+class Mandat_Priori_UpdateForm(forms.Form):
+    
+    def __init__(self, mandat_pk, request, *args, **kwargs):
+        super(Mandat_Priori_UpdateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:  
+            mandat_= get_object_or_404(Mandat, id=mandat_pk)
+
+            self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
+
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.filter(type='Depence'),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                #help_text = "Tapez 2 lettres ou plus pour avoir la liste des types d'engagement.",                                                
+                required = False,
+                initial=mandat_.engagement
+            )    
+            
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.fournisseur                                             
+            )    
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['code__icontains',],
+                    ),
+                help_text = "Tapez le code du type de facture.",                                                
+                required = False,
+                initial=mandat_.type_facture 
+            )  
+
+            self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
+            #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
+    
+             
+            self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification d'engagement. Merci de le signaler a l'administrateur")
+  
+class Mandat_Priori_DetailForm(forms.Form):
+
+    def __init__(self, mandat_pk, *args, **kwargs):
+        super(Mandat_Priori_DetailForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try : 
+            mandat_= get_object_or_404(Mandat, id=mandat_pk)
+            
+            self.fields['num_mandat'] = forms.IntegerField(label='Numero Mandat', required = False, initial=mandat_.num_mandat)
+
+            self.fields['engagement']=forms.ModelChoiceField(
+                queryset=Engagement.objects.all(),
+                label=u"Engagement",
+                widget=ModelSelect2Widget(
+                        model=Engagement,
+                        search_fields=['num__icontains',],
+                    ),
+                                                              
+                required = False,
+                initial=mandat_.engagement
+            ) 
+            
+            self.fields['fournisseur']=forms.ModelChoiceField(
+                queryset=Fournisseur.objects.all(),
+                label=u"Fournisseur",
+                widget=ModelSelect2Widget(
+                        model=Fournisseur,
+                        search_fields=['nom_fournisseur__icontains','code_fournisseur__icontains'],
+                    ),
+                 required = False,
+                 initial=mandat_.fournisseur                                             
+            )    
+               
+            self.fields['type_facture']=forms.ModelChoiceField(
+                queryset=Type_Facture.objects.all(),
+                label=u"Type facture",
+                widget=ModelSelect2Widget(
+                        model=Type_Facture,
+                        search_fields=['code__icontains',],
+                    ),
+                help_text = "Tapez le code du type de facture.",                                                
+                required = False,
+                initial=mandat_.type_facture 
+            )  
+            
+            self.fields['credit_alloue']=forms.ModelChoiceField(
+                queryset = Credit_S2.objects.all(),
+                label=u"Article",
+                widget=ModelSelect2Widget(
+                    model=Credit_S2,
+                    search_fields=['engagement__article__code_art__icontains'],
+                ),
+                required=False,
+                initial=mandat_.engagement.credit_alloue   
+             )
+            
+            self.fields['date']=forms.DateField(label="Date", required=False, initial=mandat_.date)
+            #self.fields['observation']=forms.CharField(label="Observation", widget=forms.Textarea, required=False, initial=engagement_.observation)
+            
+            for key_ in self.fields.keys():
+                self.fields[key_].disabled=True
+        
+            self.helper.add_input(Button('cancel', 'Retour', css_class='btn-secondary', onclick="window.history.back()"))
+                    
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation de Mandat")
+                
+                 
 class Mandat_UpdateForm(forms.Form):
     
     def __init__(self, mandat_pk, request, *args, **kwargs):
@@ -1902,4 +2112,158 @@ class Mandat_DetailForm(forms.Form):
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation de Mandat")
 
-                             
+class Transfert_CreateForm(forms.Form):
+    
+    def __init__(self, request, *args, **kwargs):
+        super(Transfert_CreateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+
+            self.fields['annee_budgi']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Année budgetaire",
+                #required = False,
+                
+            )
+            
+            self.fields['num_transfert'] = forms.IntegerField(initial=0, label='Numero du transfert', widget=forms.HiddenInput(),)
+            self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
+            
+            self.fields['article_source'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                 label=u"Article_source",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                     ),
+                help_text = "Tapez le code de l'article.",
+                 #required = False
+             ) 
+            
+            self.fields['article_destination'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                 label=u"Article_destination",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                     ),
+                help_text = "Tapez le code de l'article.",
+                 #required = False
+             ) 
+            
+
+            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+
+
+            self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'engagement. Merci de le signaler à l'administrateur")    
+
+class Transfert_UpdateForm(forms.Form):
+    
+    def __init__(self, transfert_pk, request, *args, **kwargs):
+        super(Transfert_UpdateForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try:
+            transfert_= get_object_or_404(Transfert, id=transfert_pk)
+
+            self.fields['annee_budgi']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Année budgetaire",
+                required = False,
+                initial=transfert_.annee_budgi
+            )
+            
+            self.fields['num_transfert'] = forms.IntegerField(label='Numero du transfert' , required = False, initial=transfert_.num_transfert)
+            self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'),required = False, initial=transfert_.date_transfert)#    initial=datetime.date.today()
+            
+            self.fields['article_source'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                 label=u"Article_source",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                    ),
+                 required = False,
+                 initial=transfert_.article_source                                             
+            )    
+           
+            self.fields['article_destination'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                 label=u"Article_destination",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                    ),
+                 required = False,
+                 initial=transfert_.article_destination                                             
+            )    
+            
+            self.fields['montant_transfert'] = forms.DecimalField(label='montant_transfert', required = False,initial=transfert_.montant_transfert, localize=True, validators=[MinValueValidator(0)])
+            
+            self.helper.add_input(Submit('submit','Modifier',css_class='btn-primary'))
+            self.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+            self.helper.form_method='POST'
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification du Transfert. Merci de le signaler à l'administrateur")
+
+
+class Transfert_DetailForm(forms.Form):
+
+    def __init__(self, transfert_pk, *args, **kwargs):
+        super(Transfert_DetailForm, self).__init__(*args, **kwargs)
+        self.helper=FormHelper()
+        try : 
+            transfert_= get_object_or_404(Transfert, id=transfert_pk)
+            self.fields['annee_budgi']=forms.ModelChoiceField(
+                queryset=AnneeUniv.objects.all().order_by('-annee_univ'),
+                label=u"Annee budgetaire",
+                required = False,
+                initial=transfert_.annee_budgi
+            )   
+            self.fields['num_transfert'] = forms.IntegerField(label='Numero du transfert' , required = False, initial=transfert_.num_transfert)
+            self.fields['date_transfert'] = forms.DateField(label='Date du transfert', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'),required = False, initial=transfert_.date_transfert)#    initial=datetime.date.today()
+            
+            self.fields['article_source'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.all(),
+                 label=u"Article_source",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                    ),
+                 required = False,
+                 initial=transfert_.article_source                                             
+            )    
+           
+            self.fields['article_destination'] = forms.ModelChoiceField(
+                 queryset=Credit_S2.objects.all(),
+                 label=u"Article_destination",
+                 widget=ModelSelect2Widget(
+                         model=Credit_S2,
+                         search_fields=['article__code_art__icontains'],
+                    ),
+                 required = False,
+                 initial=transfert_.article_destination                                             
+            )    
+            
+            self.fields['montant_transfert'] = forms.DecimalField(label='Montant_transfert', required = False, localize=True, initial=transfert_.montant_transfert)
+            
+            for key_ in self.fields.keys():
+                self.fields[key_].disabled=True
+        
+            self.helper.add_input(Button('cancel', 'Retour', css_class='btn-secondary', onclick="window.history.back()"))
+                    
+        except Exception:
+            if settings.DEBUG:
+                raise Exception
+            else:
+                messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation du transfert")
+                              
