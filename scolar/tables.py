@@ -1221,12 +1221,21 @@ class DepenceTable(tables.Table):
 
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
+            {% if not record.credit_alloue.article.posteriori %}\
             <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "depence_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "depence_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
+            {% else %}\
+            <a href="{% url "Fiches_regularisation_provision_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "Fiches_regularisation_provision_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
+            {% endif %}'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
-            <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> '
+             {% if not record.credit_alloue.article.posteriori %}\
+            <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> \
+            {% else %}\
+            <a href="{% url "detail_fiches_regularisation_provision" pk=record.id %} " > {% icon "eye" %}</a> \
+            {% endif %}'
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
@@ -1247,7 +1256,11 @@ class ExerciceTable(tables.Table):
     action='{% load icons %}\
             <a href="{% url "CreditCreate_S2"  exe=record.id %}" class="btn btn-link"> Exercices </a>'
     detail=tables.TemplateColumn(action, orderable=False)
-    
+    action='{% load icons %}\
+            <a href="{% url "exercice_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+        
+            
     class Meta:
         model = Exercice
         fields=['annee_budg', 'exe_encours']
