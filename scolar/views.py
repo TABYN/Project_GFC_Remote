@@ -13357,10 +13357,10 @@ class Depence_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Depences  '
+        context['titre'] = 'Liste des Depenses  '
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
-            'Ajouter nouvelle dépence': reverse('depence_create'),
+            'Ajouter nouvelle dépense': reverse('depence_create'),
                   
             }
         return context
@@ -13413,7 +13413,7 @@ def depence_create_view(request):
                 elif settings.DEBUG:
                     raise exception
                 else:
-                    messages.error(request, "ERREUR: lors de la création de la dépence. Veuillez le signaler.")
+                    messages.error(request, "ERREUR: lors de la création de la dépense. Veuillez le signaler.")
                     return render(request, 'scolar/create.html', {'form': form })
 
             return HttpResponseRedirect(reverse('Depence_List'))
@@ -13421,7 +13421,7 @@ def depence_create_view(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Depence_CreateForm(request)
-        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle dépence")
+        messages.info(request, "Utilisez ce formulaire pour ajouter une nouvelle dépense")
     
     context={}  
     context['form']=form
@@ -13481,7 +13481,7 @@ def depence_update_view(request, engagement_pk):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = Depence_UpdateForm(engagement_pk, request)
-        messages.info(request, "Utilisez ce formulaire pour modifier la dépence")
+        messages.info(request, "Utilisez ce formulaire pour modifier la dépense")
 
         
     context['form']=form
@@ -13503,7 +13503,7 @@ def depence_delete(request, engagement_pk):
         assert credit_S2_.credit_reste.amount >= 0 
         credit_S2_.save(update_fields=['credit_reste'])
         
-        messages.success(request, 'Dépence supprimée.')
+        messages.success(request, 'Dépense supprimée.')
         return redirect('Depence_List')
     return render(request, 'scolar/delete_item.html', {'delete': delete})
 
@@ -13517,7 +13517,7 @@ class Depence_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         
     def get_context_data(self, **kwargs):
         context = super(Depence_DetailView, self).get_context_data(**kwargs)
-        titre='Engagement Depence '#+ self.kwargs.get("pk")
+        titre='Engagement Depense '#+ self.kwargs.get("pk")
         context['titre'] = titre
 
         engagement_=get_object_or_404(Engagement, id=self.kwargs.get("pk"))
@@ -13949,7 +13949,7 @@ def mandat_priori_create_view(request):
                     date=data['date'],
                     fournisseur=data['fournisseur'],
                     engagement=data['engagement'], 
-                    type_facture=data['type_facture']
+                    facture_mandat=data['facture_mandat']
                     
                     )                         
                 
@@ -14005,7 +14005,7 @@ def mandat_priori_update_view(request, mandat_pk):
                 mandat_.num_mandat=data['num_mandat']
                 mandat_.engagement=data['engagement']
                 mandat_.fournisseur=data['fournisseur']
-                mandat_.type_facture=data['type_facture']
+                mandat_.facture_mandat=data['facture_mandat']
                 
                 mandat_.save()
                          

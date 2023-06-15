@@ -92,7 +92,7 @@ table {
 						
 						<tr style="height:20px;">
 						<td style="border-right: none;text-align:center;">
-                          <p style="text-align:left;">Service Emetteur: </p><p style="text-align:LEFT;">N° au registre des O.P: </p>
+                          <p style="text-align:left;">Service Emetteur: </p><p style="text-align:LEFT;">N° au registre des O.P:{{mandat_.num_mandat}} </p>
                         </td>
                          
                         <td colspan="2" style="border-left: none;text-align:center;">
@@ -133,10 +133,13 @@ table {
                           
                           </td>
                            <td  style="border-bottom: none;vertical-align: top;">
-                            <p style="text-align:right;">{{mandat_.montant_op}} </p>
+                            <p style="text-align:left;">{{mandat_.engagement.credit_alloue.article.chapitre.code_chap}}{{mandat_.engagement.credit_alloue.article.code_art}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{mandat_.engagement.montant_operation.amount}} </p>
+                          <hr>
+                            <p style="text-align:left;">{{mandat_.engagement.credit_alloue.article.libelle_art_FR}}</p>
+                          
                           </td>
                            <td style="vertical-align: top;border-bottom: none;">
-                            <p style="text-align:left;">{{mandat_.observation_mandat}} </p>
+                            <p style="text-align:left;">{{mandat_.fournisseur.nom_fournisseur}} : facture N°{{mandat_.facture_mandat.num_fact}} Du {{mandat_.date}}  </p>
                           </td>
 						</tr>
 						

@@ -53,7 +53,7 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee.amount}}</p>
                           </td>
                           
                           </tr>
@@ -66,7 +66,7 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee.amount}}</p>
                           </td>
                           
                           </tr>
@@ -95,7 +95,7 @@ table {
 						</tr>
 					  <tr style="height:80px;"> 
 							<td style=" width: 30%;height:25;"><p>N°</p><br><p>DU</p></td>
-				        	<td style=" width: 40%;height:25;border-top: none;border-bottom: none;vertical-align: bottom;"><br><p>Ordonnateur</p></td>
+				        	<td style=" width: 40%;height:25;border-top: none;border-bottom: none;vertical-align: bottom;"><br></td>
 						<td style=" width: 30%;height:25;"><p style="text-align:center;">FICHE N°</p><br><p style="text-align:center;">0001</p></td>
 						</tr>
 				
@@ -127,13 +127,22 @@ table {
 				        	<td style=" width: 10%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
 						    <td style=" width: 10%;height:25;vertical-align: top;text-align:right;"><p></p></td>
 						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>0.00</p></td>
-				        	<td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
-						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
+				        	<td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+						    <td style=" width: 25%;height:25;vertical-align: top;text-align:right;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
 
 						</table>  
+						<div style="text-align:left;">
+						<p>L'intitule: </p>
+						<p>Chapitre:&nbsp;&nbsp;{{engagement_.credit_alloue.chapitre.libelle_chap_FR}} </p>
+						<p>Article: &nbsp;&nbsp;{{engagement_.credit_alloue.article.libelle_art_FR}}</p>
+						</div>
 						
-						<div style="text-align:center;text-decoration: underline;">
+						<div style="text-align:left;text-decoration: underline;">
+						<br>
+						<p>ORDONNATEUR</p>
+						</div>
+						<div style="text-align:right;text-decoration: underline;">
 						<p>OPSERVATION DU SERVICE</p>
 						</div>
 						<br><br><br><br><br><br>

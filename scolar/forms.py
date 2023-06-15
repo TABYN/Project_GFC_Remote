@@ -2043,16 +2043,25 @@ class Mandat_PrioriCreateForm(forms.Form):
                 help_text = "Tapez le nom ou le code du fournisseur.",                                                
                 #required = False,
             )     
-            self.fields['type_facture']=forms.ModelChoiceField(
-                queryset=Type_Facture.objects.all(),
-                label=u"Type facture",
-                widget=ModelSelect2Widget(
-                        model=Type_Facture,
-                        search_fields=['type__icontains',],
+#             self.fields['type_facture']=forms.ModelChoiceField(
+#                 queryset=Type_Facture.objects.all(),
+#                 label=u"Type facture",
+#                 widget=ModelSelect2Widget(
+#                         model=Type_Facture,
+#                         search_fields=['type__icontains',],
+#                     ),
+#                 help_text = "Tapez le code du type de facture.",                                                
+#                 #required = False,
+#             )   
+            self.fields['facture_mandat'] = forms.ModelChoiceField(
+                queryset=Facture.objects.all(),
+                label=u"facture",
+                widget = ModelSelect2Widget(
+                    model=Facture,
+                    search_fields=['type_facture__type__icontains'],
                     ),
-                help_text = "Tapez le code du type de facture.",                                                
-                #required = False,
-            )   
+                help_text = "Choisir le type .",
+             )  
             self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
            # self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea)
 
@@ -2097,17 +2106,28 @@ class Mandat_Priori_UpdateForm(forms.Form):
                  required = False,
                  initial=mandat_.fournisseur                                             
             )    
-            self.fields['type_facture']=forms.ModelChoiceField(
-                queryset=Type_Facture.objects.all(),
-                label=u"Type facture",
-                widget=ModelSelect2Widget(
-                        model=Type_Facture,
-                        search_fields=['type__icontains',],
+#             self.fields['type_facture']=forms.ModelChoiceField(
+#                 queryset=Type_Facture.objects.all(),
+#                 label=u"Type facture",
+#                 widget=ModelSelect2Widget(
+#                         model=Type_Facture,
+#                         search_fields=['type__icontains',],
+#                     ),
+#                 help_text = "Tapez le code du type de facture.",                                                
+#                 required = False,
+#                 initial=mandat_.type_facture 
+#             )  
+            self.fields['facture_mandat'] = forms.ModelChoiceField(
+                queryset=Facture.objects.all(),
+                label=u"facture",
+                widget = ModelSelect2Widget(
+                    model=Facture,
+                    search_fields=['type_facture__type__icontains'],
                     ),
-                help_text = "Tapez le code du type de facture.",                                                
+                help_text = "Choisir le type .",
                 required = False,
-                initial=mandat_.type_facture 
-            )  
+                initial=mandat_.facture_mandat
+             )  
 
             self.fields['date'] = forms.DateField(label='Date Mandat', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), required = False, initial=mandat_.date)
             #self.fields['observation']=forms.CharField(label="Observation",  widget=forms.Textarea, required = False, initial=engagement_.observation)
@@ -2155,16 +2175,27 @@ class Mandat_Priori_DetailForm(forms.Form):
                  initial=mandat_.fournisseur                                             
             )    
                
-            self.fields['type_facture']=forms.ModelChoiceField(
-                queryset=Type_Facture.objects.all(),
-                label=u"Type facture",
-                widget=ModelSelect2Widget(
-                        model=Type_Facture,
-                        search_fields=['code__icontains',],
+#             self.fields['type_facture']=forms.ModelChoiceField(
+#                 queryset=Type_Facture.objects.all(),
+#                 label=u"Type facture",
+#                 widget=ModelSelect2Widget(
+#                         model=Type_Facture,
+#                         search_fields=['code__icontains',],
+#                     ),
+#                 help_text = "Tapez le code du type de facture.",                                                
+#                 required = False,
+#                 initial=mandat_.type_facture 
+#             )  
+            self.fields['facture_mandat'] = forms.ModelChoiceField(
+                queryset=Facture.objects.all(),
+                label=u"facture",
+                widget = ModelSelect2Widget(
+                    model=Facture,
+                    search_fields=['type_facture__type__icontains'],
                     ),
-                help_text = "Tapez le code du type de facture.",                                                
+                help_text = "Choisir le type .",
                 required = False,
-                initial=mandat_.type_facture 
+                initial=mandat_.facture_mandat
             )  
             
             self.fields['credit_alloue']=forms.ModelChoiceField(

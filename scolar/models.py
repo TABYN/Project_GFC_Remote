@@ -2255,9 +2255,9 @@ class Credit_S2(models.Model):
     
     def credit_article_posteriori(self):       
         if self.article.posteriori==True :
-            return self.credit_allouee/2
+            return self.credit_allouee.amount/2
         else : 
-            return self.credit_allouee
+            return self.credit_allouee.amount
     
     def __str__(self):
         return str(self.article.code_art) + ' ' + str(self.article.libelle_art_FR)
@@ -2275,7 +2275,7 @@ class Type_Facture(models.Model):
         return  self.code + ' : ' + self.type
     
 class Facture(models.Model):
-    num_fact = models.IntegerField(null=True)
+    num_fact = models.CharField(max_length=50, null=True)
     date_fact=models.DateField(null=True, blank=True)
     #type_fact = models.CharField(max_length = 100, null=True, blank=True) 
     type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture' , null= True, blank=True, on_delete=models.SET_NULL) 
@@ -2352,6 +2352,7 @@ class Mandat(models.Model):
     annee_budge=models.ForeignKey(AnneeUniv ,related_name='annee_budge' , null= True, blank=True, on_delete=models.SET_NULL)
     credit_s2=models.ForeignKey(Credit_S2 ,related_name='credit_s2_mandat' , null= True, blank=True, on_delete=models.SET_NULL)
     type_facture=models.ForeignKey(Type_Facture ,related_name='Type_Facture_mandat' , null= True, blank=True, on_delete=models.SET_NULL) 
+    facture_mandat=models.ForeignKey(Facture ,related_name='facture_mandat' , null= True, blank=True, on_delete=models.SET_NULL )
 
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
