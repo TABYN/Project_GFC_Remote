@@ -1467,7 +1467,7 @@ class Exercice_S2_CreateForm(forms.Form):
             self.fields['debut'] = forms.DateField(label='Date debut', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['fin'] = forms.DateField(label='Date fin', input_formats = settings.DATE_INPUT_FORMATS, widget=DatePickerInput(format='%d/%m/%Y'), initial=datetime.date.today())
             self.fields['total'] = forms.DecimalField(label='totale exercice', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
-            self.fields['credit_non_allouee'] = forms.DecimalField(label='credit non alloue', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+            #self.fields['credit_non_allouee'] = forms.DecimalField(label='credit non alloue', required = False, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
             self.fields['exe_encours'] = forms.BooleanField(required=False, initial=False, help_text="Cochez pour definir l'exercice encours.",label='Encours')
             
             self.helper.add_input(Submit('submit','Ajouter',css_class='btn-primary'))
@@ -1478,7 +1478,7 @@ class Exercice_S2_CreateForm(forms.Form):
                 raise Exception
             else:
                 messages.error(self.request, "ERREUR: lors de la construction du formulaire d'ajout de l'exercice. Merci de le signaler à l'administrateur")    
-    
+ 
     
 class Prise_en_charge_CreateForm(forms.Form):  
     def __init__(self, request, *args, **kwargs):
@@ -1633,7 +1633,7 @@ class Depence_CreateForm(forms.Form):
             )
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True).filter(article__posteriori=False),
                  label=u"Article",
                  widget=ModelSelect2Widget(
                          model=Credit_S2,
@@ -1698,7 +1698,7 @@ class Depence_UpdateForm(forms.Form):
             )  
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
-                queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
+                queryset=Credit_S2.objects.filter(exercice__exe_encours=True).filter(article__posteriori=False),
                 label=u"Article",
                 widget=ModelSelect2Widget(
                         model=Credit_S2,
@@ -1749,6 +1749,7 @@ class Depence_UpdateForm(forms.Form):
             else:
                 messages.error(self.request, "ERREUR: lors de la construction du formulaire de modification d'engagement. Merci de le signaler à l'administrateur")
  
+
 class Depence_DetailForm(forms.Form):
 
     def __init__(self, engagement_pk, *args, **kwargs):

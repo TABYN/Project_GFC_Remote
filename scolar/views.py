@@ -11990,6 +11990,22 @@ def ExerciceCreate(request):
 def ExerciceShow(request):
     exercices = Exercice.objects.all()
     return render(request, 'scolar/show_exercices.html', {'exercices': exercices})
+
+
+class ExerciceUpdateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'scolar.change_exercice'
+    model = Exercice
+    fields = ['annee_budg', 'debut', 'fin', 'total', 'credit_non_allouee', 'exe_encours']
+    template_name = 'scolar/update.html'
+    success_message = "L'exercice a ete modifie avec succes!"
+ 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper = FormHelper()
+        form.helper.add_input(Submit('submit', 'Modifier', css_class='btn-warning'))
+        form.helper.add_input(Button('cancel', 'Annuler', css_class='btn-secondary', onclick="window.history.back()"))
+        self.success_url = reverse('exercice_list')
+        return form
                            
 @login_required
 def AvanceCreate(request, exe):
@@ -12971,7 +12987,7 @@ def exercice_s2_create_view(request):
                     debut=data['debut'],
                     fin=data['fin'],
                     total=data['total'],
-                    credit_non_allouee=data['credit_non_allouee'],
+                    credit_non_allouee=data['total'],
                     exe_encours=data['exe_encours']
                     )  
                 
@@ -12994,7 +13010,6 @@ def exercice_s2_create_view(request):
     context={}  
     context['form']=form
     return render(request, 'scolar/create.html', context)
-   
           
 @login_required
 def CreditCreate_S2(request,exe):
@@ -13041,9 +13056,7 @@ def CreditAssociate_S2(request,exe,art):
                             messages.success(request, 'credit enregistree.')
                             messages.success(request, 'Il reste comme credit Non alloue : ' + str(
                                 pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)) + "DZD")
-                            return render(request,'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe}) 
-                            return redirect(request.path_info)
-                             
+                            
                             pexe.credit_non_allouee.amount = pexe.credit_non_allouee.amount - (credit_S2.credit_allouee.amount)
                             pexe.save(update_fields=['credit_non_allouee'])
                             return render(request, 'scolar/add_credit_S2.html', {'article': article, 'pi': pi,'crdt': crdt,'pexe':pexe})
@@ -13566,6 +13579,8 @@ class Prise_en_chargeS2_PDFView(PDFTemplateView):
         context['engagement_letter'] = engagement_letter
   
         self.filename ='engagement_prise_en_charge'+str(engagement_.id) + '.pdf'
+        self.filename ='Eng_PEC_N_' +str(engagement_.num)+'___'+str(engagement_.credit_alloue.article.chapitre.code_chap)+'-' +str(engagement_.credit_alloue.article.code_art)  +'.pdf'
+
         return context
     
        
@@ -13585,7 +13600,9 @@ class Engagement_de_la_provision_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_de_la_provision'+str(engagement_.id) + '.pdf'
+        
+        self.filename ='Eng_PRVS_N_' +str(engagement_.num)+'___'+str(engagement_.credit_alloue.article.chapitre.code_chap)+'-' +str(engagement_.credit_alloue.article.code_art)  +'.pdf'
+
         return context
 
 class Depence_PDFView(PDFTemplateView):
@@ -13604,7 +13621,7 @@ class Depence_PDFView(PDFTemplateView):
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
-        self.filename ='engagement_depence'+str(engagement_.id) + '.pdf'
+        self.filename ='Eng_DPS_N_' +str(engagement_.num)+'___'+str(engagement_.credit_alloue.article.chapitre.code_chap)+'-' +str(engagement_.credit_alloue.article.code_art)  +'.pdf'
         return context
     
 
@@ -13760,6 +13777,7 @@ class Mandat_PDFView(PDFTemplateView):
         context['mandat_letter'] = mandat_letter
   
         self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
+
         return context
 
 ###################################################   Mandat a priori   #############################
@@ -13930,7 +13948,9 @@ class Mandat_Priori_PDFView(PDFTemplateView):
         context['mandat_letter'] = mandat_letter
   
 #         self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
-        self.filename ='mandat_' '.pdf'
+
+        self.filename ='Mandat_N_' +str(mandat_.num_mandat)+'___'+str(mandat_.engagement.credit_alloue.article.chapitre.code_chap)+'-' +str(mandat_.engagement.credit_alloue.article.code_art)  +'.pdf'
+
 
         return context
 
@@ -14047,11 +14067,9 @@ class Type_FactureListView(TemplateView):
         context['filter'] = filter_
         context['table'] = table
         context['titre'] = 'Liste des types des factures '
-        if self.request.user.is_staff_only():
-            context['btn_list'] = {
-            'Ajouter type facture': reverse('typesfactures_create'),
-                 
-            }
+  
+        context['btn_list'] = {
+            'Ajouter type facture': reverse('typesfactures_create'),}
         return context    
 
 class Type_FactureCreateView(LoginRequiredMixin, SuccessMessageMixin, PermissionRequiredMixin, CreateView):

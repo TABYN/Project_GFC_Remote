@@ -354,6 +354,7 @@ urlpatterns = [
     
     path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'),   
     path('exercice_s2_create', views.exercice_s2_create_view, name='exercice_s2_create'),
+    re_path(r'^exercice_update/(?P<pk>\d+)/$',views.ExerciceUpdateView.as_view(), name='exercice_update'),
 
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),

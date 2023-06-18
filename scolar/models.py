@@ -2150,7 +2150,7 @@ class Bordereau(models.Model):
     regisseur = models.CharField(max_length=50, null=True, blank=True)
     cloture = models.BooleanField(default=False)
     date_borderau = models.DateField(null=True, blank=True)
-    etat_borderau = models.BooleanField(default=True, null=True, blank=True)  #Rejeté ou accepté
+    etat_borderau = models.BooleanField(default=True, null=True, blank=True)  #Rejetï¿½ ou acceptï¿½
 
 class Piece(models.Model):
     credit = models.ForeignKey(Credit, on_delete=CASCADE, default='')
@@ -2251,7 +2251,7 @@ class Credit_S2(models.Model):
     chapitre = models.ForeignKey(Chapitre, on_delete=CASCADE ,default='' )
     credit_allouee = MoneyField(decimal_places=2, max_digits=9)
     credit_reste = MoneyField(decimal_places=2, max_digits=9)
-    epc = models.BooleanField(default=False, null=True, blank=True)  #Engagé prise en compte ou non
+    epc = models.BooleanField(default=False, null=True, blank=True)  #Engagï¿½ prise en compte ou non
     
     def credit_article_posteriori(self):       
         if self.article.posteriori==True :
@@ -2301,18 +2301,18 @@ class Engagement(models.Model):
     #mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
     
     def __str__(self):
-        return "Engagement "+ str(self.num)+' '+str(self.type)
+        return "Engagement :"+ str(self.num)+' '+str(self.type)+' '+str(self.credit_alloue.article.libelle_art_FR)
     
     def save(self, *args, **kwargs):
         if not self.pk:
-            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+            # Si l'objet n'a pas encore de clï¿½ primaire, c'est qu'il s'agit d'une crï¿½ation
            last_object = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article).order_by('-num').first()
          
            if last_object:
-                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+                # Si des objets existent dï¿½jï¿½, rï¿½cupï¿½rez le plus grand nombre et incrï¿½mentez-le de 1
               self.num = last_object.num + 1
            else:
-                # Si aucun objet n'existe, commencez à 1
+                # Si aucun objet n'existe, commencez ï¿½ 1
                 self.num = 1
          
         super(Engagement, self).save(*args, **kwargs)
@@ -2370,14 +2370,14 @@ class Transfert(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.pk:
-            # Si l'objet n'a pas encore de clé primaire, c'est qu'il s'agit d'une création
+            # Si l'objet n'a pas encore de clï¿½ primaire, c'est qu'il s'agit d'une crï¿½ation
            last_object = Transfert.objects.filter(annee_budgi=self.annee_budgi).order_by('-num_transfert').first()
          
            if last_object:
-                # Si des objets existent déjà, récupérez le plus grand nombre et incrémentez-le de 1
+                # Si des objets existent dï¿½jï¿½, rï¿½cupï¿½rez le plus grand nombre et incrï¿½mentez-le de 1
               self.num_transfert = last_object.num_transfert + 1
            else:
-                # Si aucun objet n'existe, commencez à 1
+                # Si aucun objet n'existe, commencez ï¿½ 1
                 self.num_transfert = 1
             
         super(Transfert, self).save(*args, **kwargs)

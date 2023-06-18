@@ -8,7 +8,7 @@ import djmoney.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scolar', '0207_auto_20221114_1127'),
+        ('scolar', '0207_auto_20221005_1459'),
     ]
 
     operations = [

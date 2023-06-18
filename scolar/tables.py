@@ -1247,11 +1247,14 @@ class ExerciceTable(tables.Table):
     action='{% load icons %}\
             <a href="{% url "CreditCreate_S2"  exe=record.id %}" class="btn btn-link"> Exercices </a>'
     detail=tables.TemplateColumn(action, orderable=False)
-    
+    action='{% load icons %}\
+            <a href="{% url "exercice_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+            
     class Meta:
         model = Exercice
         fields=['annee_budg', 'exe_encours']
-        template_name= "django_tables2/bootstrap4.html"   
+        template_name= "django_tables2/bootstrap4.html"  
         
 class Mandat_1_Table(tables.Table):
     chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
