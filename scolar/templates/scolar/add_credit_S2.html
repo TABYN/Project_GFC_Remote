@@ -42,7 +42,7 @@ table {
 							<tbody>
 												<tr style="border: 1px solid black; padding: 0px; border-radius: 0px;">
 								
-								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{pexe.total}} DA</td>
+								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{pexe.total.amount}} DA</td>
 								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">{{pexe.credit_non_allouee.amount}} DA</td>
                                
 							  </tr>
@@ -75,7 +75,7 @@ table {
 								<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
 									{% for crd in crdt %}
 									{% if crd.article == art  and crd.exercice_id == pexe.id %}
-									{{crd.credit_allouee}} 
+									{{crd.credit_allouee.amount}} DA
 									{% else %}
 									{% endif %}
 									{% endfor %}
@@ -85,7 +85,7 @@ table {
 									<td style="border: 1px solid black; padding: 0px; border-radius: 0px;">
 									{% for crd in crdt %}
 									{% if crd.article == art  and crd.exercice_id == pexe.id %}
-									{{crd.credit_reste}}
+									{{crd.credit_reste.amount}} DA
 									{% else %}
 									{% endif %}
 									{% endfor %}

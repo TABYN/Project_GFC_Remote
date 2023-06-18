@@ -354,6 +354,7 @@ urlpatterns = [
     
     path('exercice_list', views.ExerciceListView.as_view(), name='exercice_list'),   
     path('exercice_s2_create', views.exercice_s2_create_view, name='exercice_s2_create'),
+    re_path(r'^exercice_update/(?P<pk>\d+)/$',views.ExerciceUpdateView.as_view(), name='exercice_update'),
 
     path('CreditCreate_S2/<int:exe>/',views.CreditCreate_S2, name="CreditCreate_S2"),
     path('CreditAssociate_S2/<int:exe>/<int:art>/', views.CreditAssociate_S2, name="CreditAssociate_S2"),
@@ -376,6 +377,10 @@ urlpatterns = [
     re_path(r'^detail_depence/(?P<pk>\d+)/$', views.Depence_DetailView.as_view(), name='detail_depence'),
     
     path('Fiches_regularisation_provision_List', views.Fiche_regularisation_provision_ListView.as_view(), name='Fiches_regularisation_provision_List'),
+    path('Fiches_regularisation_provision_create', views.fiche_regularisation_provision_create_view, name='Fiches_regularisation_provision_create'),
+    re_path(r'^Fiches_regularisation_provision_update/(?P<engagement_pk>\d+)/$', views.fiche_regularisation_provision_update_view, name='Fiches_regularisation_provision_update'),
+    re_path(r'^Fiches_regularisation_provision_delete/(?P<engagement_pk>\d+)/$', views.Fiche_regularisation_provisionDeleteView.as_view(), name='Fiches_regularisation_provision_delete'),
+    re_path(r'^detail_fiches_regularisation_provision/(?P<pk>\d+)/$', views.Fiche_regularisation_provision_DetailView.as_view(), name='detail_fiches_regularisation_provision'),
 
 
     path('mandatlist', views.MandatListView.as_view(), name='mandatlist'),

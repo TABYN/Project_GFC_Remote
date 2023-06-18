@@ -50,7 +50,7 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee.amount}}</p>
                           </td>
                           
                           </tr>
@@ -63,7 +63,7 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p>
+                            <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee.amount}}</p>
                           </td>
                           
                           </tr>
@@ -121,8 +121,8 @@ table {
 						  
 						
 						<pre>
-						Objet : Depence
-						      : Economie
+						Objet : <label for="caseDepense">Depense</label> <input type="checkbox" id="caseDepense" name="caseDepense">
+						      : <label for="caseEconomie">Economie</label> <input type="checkbox" id="caseEconomie" name="caseEconomie">
 						</pre>
 						
 						
@@ -142,10 +142,10 @@ table {
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>*Dotation budgetaire initiale{{engagement_.credit_alloue.credit_allouee}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>*Dotation budgetaire initiale{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						
 						</tr>
 						
@@ -164,7 +164,7 @@ table {
 						
 						<div style="text-align:left;">
 						<p>L'intitule: </p>
-						<p>Chapitre:&nbsp;&nbsp;{{engagement_.credit_alloue.chapitre.code_chap}} </p>
+						<p>Chapitre:&nbsp;&nbsp;{{engagement_.credit_alloue.chapitre.libelle_chap_FR}} </p>
 						<p>Article: &nbsp;&nbsp;{{engagement_.credit_alloue.article.libelle_art_FR}}</p>
 						<p><b>NB:*Dotation budgetaire initiale</b></p>
 						</div>
@@ -172,6 +172,7 @@ table {
 						<table style="margin-top: 50px; width: 50%;">
 						<tr style="height:150px;"> 
 							<td style=" width: 30%;height:25;"><p style="text-align:center;">VISA DU CONTROLEUR FINANCIER</p></td>
+						    
 						</tr>
 						</table>  
 						

@@ -1221,19 +1221,28 @@ class DepenceTable(tables.Table):
 
     date = tables.DateTimeColumn(format ='d/m/Y')
     action='{% load icons %}\
+            {% if not record.credit_alloue.article.posteriori %}\
             <a href="{% url "depence_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "depence_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>'      
+            <a href="{% url "depence_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
+            {% else %}\
+            <a href="{% url "Fiches_regularisation_provision_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
+            <a href="{% url "Fiches_regularisation_provision_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
+            {% endif %}'      
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
-            <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> '
+             {% if not record.credit_alloue.article.posteriori %}\
+            <a href=" {% url "detail_depence" pk=record.id %}" > {% icon "eye" %}</a> \
+            {% else %}\
+            <a href="{% url "detail_fiches_regularisation_provision" pk=record.id %} " > {% icon "eye" %}</a> \
+            {% endif %}'
                
     detail   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% if  record.credit_alloue.article.posteriori %}\
             <a href="{% url "Regularisation_provision_PDFView" engagement_pk=record.id  %}" > Imprimer fiche de regularisation de la provision</a>\
             {% else %}\
-            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depence</a>\
+            <a href="{% url "Depence_PDFView" engagement_pk=record.id %}" > Imprimer depense</a>\
             {% endif %}'
 
     Imprimer=tables.TemplateColumn(action, orderable=False)          
@@ -1247,7 +1256,10 @@ class ExerciceTable(tables.Table):
     action='{% load icons %}\
             <a href="{% url "CreditCreate_S2"  exe=record.id %}" class="btn btn-link"> Exercices </a>'
     detail=tables.TemplateColumn(action, orderable=False)
-    
+    action='{% load icons %}\
+            <a href="{% url "exercice_update" pk=record.id %}" > {% icon "pencil-alt" %}</a>'
+    edit= tables.TemplateColumn(action, orderable=False)
+            
     class Meta:
         model = Exercice
         fields=['annee_budg', 'exe_encours']
@@ -1305,7 +1317,7 @@ class MandatTable(tables.Table):
     class Meta:
         model= Mandat
 
-        fields =['num_mandat', 'date', 'fournisseur__nom_fournisseur', 'engagement__num', 'type_facture']
+        fields =['num_mandat', 'date', 'fournisseur__nom_fournisseur', 'engagement__num', 'facture_mandat__type_facture__type']
         template_name= "django_tables2/bootstrap4.html"
         
 
@@ -1369,6 +1381,16 @@ class TransfertTable(tables.Table):
             <a href=" {% url "detail_transfert" pk=record.id %}" > {% icon "eye" %}</a> '
                 
     detail   = tables.TemplateColumn(action, orderable=False)
+    
+    action= '{% if  record.credit_alloue.article.posteriori %}\
+            <a href="" > Imprimer transfert + </a>\
+            <a href="" > Imprimer transfert - </a>\
+            {% else %}\
+            <a href="" > Imprimer transfert + </a>\
+            <a href="" > Imprimer transfert - </a>\
+            {% endif %}'
+
+    Imprimer=tables.TemplateColumn(action, orderable=False)          
 
     class Meta:
         model= Transfert
