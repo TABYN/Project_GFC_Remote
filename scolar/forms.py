@@ -1817,7 +1817,7 @@ class Depence_DetailForm(forms.Form):
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation d'engagement")
 
 class Fiche_regularisation_provision_CreateForm(forms.Form):
-    
+  
     def __init__(self, request, *args, **kwargs):
         super(Fiche_regularisation_provision_CreateForm, self).__init__(*args, **kwargs)
         self.helper=FormHelper()
@@ -1895,6 +1895,7 @@ class Fiche_regularisation_provision_UpdateForm(forms.Form):
                 required = False,
                 initial=engagement_.annee_budg
             )  
+            
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
                 queryset=Credit_S2.objects.filter(exercice__exe_encours=True),
@@ -2032,7 +2033,9 @@ class Mandat_PrioriCreateForm(forms.Form):
                     ),
                 help_text = "Tapez le numero d'engagement.",                                                
                 #required = False,
-            )   
+            )  
+            self.fields['montant_op'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+ 
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",
@@ -2095,7 +2098,8 @@ class Mandat_Priori_UpdateForm(forms.Form):
                 required = False,
                 initial=mandat_.engagement
             )    
-            
+            self.fields['montant_op'] = forms.DecimalField(label='Montant operation', required = False, initial=mandat_.montant_op,  localize=True, validators=[MinValueValidator(0)])
+
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",
@@ -2163,7 +2167,8 @@ class Mandat_Priori_DetailForm(forms.Form):
                 required = False,
                 initial=mandat_.engagement
             ) 
-            
+            self.fields['montant_op'] = forms.DecimalField(label='Montant operation', required = False,  localize=True, initial=mandat_.montant_op)
+
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",
