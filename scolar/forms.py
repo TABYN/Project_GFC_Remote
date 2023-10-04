@@ -2032,6 +2032,11 @@ class Mandat_PrioriCreateForm(forms.Form):
                     ),
                 help_text = "Tapez le numero d'engagement.",                                                
                 #required = False,
+            )
+            self.fields['montant_op'] = forms.DecimalField(
+                label='Montant operation',
+                required = True, max_digits=9, decimal_places=2,
+                validators=[MinValueValidator(0)]
             )   
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
@@ -2095,7 +2100,13 @@ class Mandat_Priori_UpdateForm(forms.Form):
                 required = False,
                 initial=mandat_.engagement
             )    
-            
+            self.fields['montant_op'] = forms.DecimalField(
+                label='Montant operation',
+                required = False,
+                initial=mandat_.montant_op,
+                localize=True,
+                validators=[MinValueValidator(0)]
+            )
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",
@@ -2163,7 +2174,12 @@ class Mandat_Priori_DetailForm(forms.Form):
                 required = False,
                 initial=mandat_.engagement
             ) 
-            
+            self.fields['montant_op'] = forms.DecimalField(
+                label='Montant operation',
+                required = False,
+                localize=True,
+                initial=mandat_.montant_op
+            )
             self.fields['fournisseur']=forms.ModelChoiceField(
                 queryset=Fournisseur.objects.all(),
                 label=u"Fournisseur",

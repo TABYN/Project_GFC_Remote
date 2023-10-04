@@ -13787,7 +13787,7 @@ class MandatListView(TemplateView):
         
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Mandats '
+        context['titre'] = 'Liste des Mandats a posteriori '
 
         return context   
     
@@ -13923,7 +13923,7 @@ class Mandat_PrioriListView(TemplateView):
   
         context['filter'] = filter_
         context['table'] = table
-        context['titre'] = 'Liste des Mandats '
+        context['titre'] = 'Liste des Mandats a priori'
         #if self.request.user.is_staff_only():
         context['btn_list'] = {
             'Ajouter nouvelle Mandat': reverse('mandat_priori_create'),
@@ -13948,7 +13948,8 @@ def mandat_priori_create_view(request):
                     num_mandat=data['num_mandat'],
                     date=data['date'],
                     fournisseur=data['fournisseur'],
-                    engagement=data['engagement'], 
+                    engagement=data['engagement'],
+                    montant_op= data['montant_op'], #####################
                     facture_mandat=data['facture_mandat']
                     
                     )                         
@@ -14004,6 +14005,7 @@ def mandat_priori_update_view(request, mandat_pk):
                 mandat_.date=data['date']
                 mandat_.num_mandat=data['num_mandat']
                 mandat_.engagement=data['engagement']
+                mandat_.montant_op= data['montant_op']###############
                 mandat_.fournisseur=data['fournisseur']
                 mandat_.facture_mandat=data['facture_mandat']
                 
@@ -14066,7 +14068,8 @@ class Mandat_Priori_PDFView(PDFTemplateView):
 
     def get_context_data(self,  **kwargs):
         mandat_ = Mandat.objects.get(id=self.kwargs.get('mandat_pk'))
-        mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
+        #mandat_letter = num2words(mandat_.engagement.montant_operation.amount, lang='fr')
+        mandat_letter = num2words(mandat_.montant_op.amount, lang='fr')#######################
  
         pieces = {}
         context = {}
