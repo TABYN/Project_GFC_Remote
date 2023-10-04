@@ -1226,7 +1226,7 @@ class DepenceTable(tables.Table):
             <a href="{% url "depence_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
             {% else %}\
             <a href="{% url "Fiches_regularisation_provision_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "Fiches_regularisation_provision_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
+            <a href="{% url "Fiches_regularisation_provision_delete" pk=record.id %}" > {% icon "trash" %}</a>\
             {% endif %}'      
     edit   = tables.TemplateColumn(action, orderable=False)
     

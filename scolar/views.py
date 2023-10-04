@@ -13582,6 +13582,7 @@ def fiche_regularisation_provision_create_view(request):
                     date=data['date'],
                     annee_budg=data['annee_budg'],
                     credit_alloue=data['credit_alloue'],
+                    montant_operation=data['montant_operation'],
                     fournisseur=data['fournisseur'],
                     facture=data['facture']
                     ) 
@@ -13628,6 +13629,7 @@ def fiche_regularisation_provision_update_view(request, engagement_pk):
                 engagement_.date=data['date']
                 engagement_.num=data['num']
                 engagement_.credit_alloue=data['credit_alloue']
+                engagement_.montant_operation=data['montant_operation']
                 engagement_.fournisseur=data['fournisseur']
                 engagement_.facture=data['facture']
                 
@@ -13661,6 +13663,7 @@ class Fiche_regularisation_provisionDeleteView(LoginRequiredMixin, SuccessMessag
 
     def get_success_url(self):
         return reverse('Fiches_regularisation_provision_List')
+
 
 class Fiche_regularisation_provision_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'scolar/engagement_detail.html'
@@ -13769,6 +13772,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
 
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
+                         
  
 ####################  Mandat a posteriori  ######################
 
@@ -13905,6 +13909,7 @@ class Mandat_PDFView(PDFTemplateView):
   
         self.filename ='mandat_'+str(mandat_.credit_s2.article.code_art) + '.pdf'
         return context
+    
 
 ###################################################   Mandat a priori   #############################
 
