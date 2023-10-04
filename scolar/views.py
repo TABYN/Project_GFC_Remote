@@ -13764,12 +13764,21 @@ class Regularisation_provision_PDFView(PDFTemplateView):
     def get_context_data(self,  **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
         engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
- 
+        article = engagement_.credit_alloue.article
+        all_mandats = Mandat.objects.all().exclude(credit_s2__isnull=True)
+        mandats=[]
+        total=0
+        for mandat in all_mandats:
+            if mandat.credit_s2.article.posteriori == True and mandat.credit_s2.article == article:
+                mandats.append(mandat)
+                total+= mandat.montant_op.amount
+        
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
-
+        context['mandats'] = mandats
+        context['total'] = total
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
                          
