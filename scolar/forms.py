@@ -1850,6 +1850,7 @@ class Fiche_regularisation_provision_CreateForm(forms.Form):
             ) 
           
             #self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
             self.fields['fournisseur'] = forms.ModelChoiceField(
                  queryset=Fournisseur.objects.all(),
                  label=u"Fournisseur",
@@ -1914,6 +1915,7 @@ class Fiche_regularisation_provision_UpdateForm(forms.Form):
                 initial=engagement_.type,
                 required = False
             ) 
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False, initial=engagement_.montant_operation,  localize=True, validators=[MinValueValidator(0)])
             self.fields['fournisseur'] = forms.ModelChoiceField(
                  queryset=Fournisseur.objects.all(),
                  label=u"Fournisseur",
@@ -1979,7 +1981,8 @@ class Fiche_regularisation_provision_DetailForm(forms.Form):
                 label=u"Type",
                 initial=engagement_.type,
                 required = False
-            ) 
+            )
+            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = False,  localize=True, initial=engagement_.montant_operation) 
             self.fields['fournisseur'] = forms.ModelChoiceField(
                  queryset=Fournisseur.objects.all(),
                  label=u"Fournisseur",

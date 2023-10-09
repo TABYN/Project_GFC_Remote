@@ -13582,6 +13582,7 @@ def fiche_regularisation_provision_create_view(request):
                     date=data['date'],
                     annee_budg=data['annee_budg'],
                     credit_alloue=data['credit_alloue'],
+                    montant_operation=data['montant_operation'],
                     fournisseur=data['fournisseur'],
                     facture=data['facture']
                     ) 
@@ -13628,6 +13629,7 @@ def fiche_regularisation_provision_update_view(request, engagement_pk):
                 engagement_.date=data['date']
                 engagement_.num=data['num']
                 engagement_.credit_alloue=data['credit_alloue']
+                engagement_.montant_operation=data['montant_operation']
                 engagement_.fournisseur=data['fournisseur']
                 engagement_.facture=data['facture']
                 
@@ -13761,11 +13763,28 @@ class Regularisation_provision_PDFView(PDFTemplateView):
     def get_context_data(self,  **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
         engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
- 
+        
+        article = engagement_.credit_alloue.article
+        all_mandats = Mandat.objects.all().exclude(credit_s2__isnull=True)
+        mandats=[]
+        total=0
+        for mandat in all_mandats:
+            if mandat.credit_s2.article.posteriori == True and mandat.credit_s2.article == article:
+                mandats.append(mandat)
+                #total+= mandat.montant_op.amount
+                if mandat.date.month >= 1 and mandat.date.month <= 6 and engagement_.date.month >= 1 and engagement_.date.month <= 6:
+                   total+= mandat.montant_op.amount
+                elif mandat.date.month >= 7 and mandat.date.month <= 12 and engagement_.date.month >= 7 and engagement_.date.month <= 12:
+                   total+= mandat.montant_op.amount
+
+
+        
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
+        context['mandats'] = mandats
+        context['total'] = total
 
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
@@ -14481,4 +14500,23 @@ class Transfert_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 exclude_columns_.append('expert')
                   
         return context     
+
+class Transfert_plus_PDFView(PDFTemplateView):
+    template_name= 'scolar/transfert+.html'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
+        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+ 
+        pieces = {}
+        context = {}
+        context['engagement_'] = engagement_
+        context['engagement_letter'] = engagement_letter
+
+        self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
+        return context
               

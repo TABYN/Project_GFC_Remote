@@ -1226,8 +1226,9 @@ class DepenceTable(tables.Table):
             <a href="{% url "depence_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
             {% else %}\
             <a href="{% url "Fiches_regularisation_provision_update" engagement_pk=record.id %}" > {% icon "pencil-alt" %}</a>\
-            <a href="{% url "Fiches_regularisation_provision_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\
-            {% endif %}'      
+            <a href="{% url "Fiches_regularisation_provision_delete" pk=record.id %}" > {% icon "trash" %}</a>\
+            {% endif %}'  
+            #<a href="{% url "Fiches_regularisation_provision_delete" engagement_pk=record.id %}" > {% icon "trash" %}</a>\    
     edit   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% load icons %}\
@@ -1383,7 +1384,7 @@ class TransfertTable(tables.Table):
     detail   = tables.TemplateColumn(action, orderable=False)
     
     action= '{% if  record.credit_alloue.article.posteriori %}\
-            <a href="" > Imprimer transfert + </a>\
+            <a href="{% url "Transfert+_PDFView" transfert_pk=record.id %}" > Imprimer transfert + </a>\
             <a href="" > Imprimer transfert - </a>\
             {% else %}\
             <a href="" > Imprimer transfert + </a>\

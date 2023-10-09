@@ -379,7 +379,8 @@ urlpatterns = [
     path('Fiches_regularisation_provision_List', views.Fiche_regularisation_provision_ListView.as_view(), name='Fiches_regularisation_provision_List'),
     path('Fiches_regularisation_provision_create', views.fiche_regularisation_provision_create_view, name='Fiches_regularisation_provision_create'),
     re_path(r'^Fiches_regularisation_provision_update/(?P<engagement_pk>\d+)/$', views.fiche_regularisation_provision_update_view, name='Fiches_regularisation_provision_update'),
-    re_path(r'^Fiches_regularisation_provision_delete/(?P<engagement_pk>\d+)/$', views.Fiche_regularisation_provisionDeleteView.as_view(), name='Fiches_regularisation_provision_delete'),
+    re_path(r'^Fiches_regularisation_provision_delete/(?P<pk>\d+)/$', views.Fiche_regularisation_provisionDeleteView.as_view(), name='Fiches_regularisation_provision_delete'),
+    #re_path(r'^Fiches_regularisation_provision_delete/(?P<engagement_pk>\d+)/$', views.Fiche_regularisation_provisionDeleteView.as_view(), name='Fiches_regularisation_provision_delete'),
     re_path(r'^detail_fiches_regularisation_provision/(?P<pk>\d+)/$', views.Fiche_regularisation_provision_DetailView.as_view(), name='detail_fiches_regularisation_provision'),
 
 
@@ -416,6 +417,8 @@ urlpatterns = [
     re_path(r'^transfert_update/(?P<transfert_pk>\d+)/$', views.transfert_update_view, name='transfert_update'),
     re_path(r'^transfert_delete/(?P<transfert_pk>\d+)/$', views.transfert_delete, name='transfert_delete'),
     re_path(r'^detail_transfert/(?P<pk>\d+)/$', views.Transfert_DetailView.as_view(), name='detail_transfert'),
+   # path('Transfert_plus_PDFView/<engagement_pk>/', views.Transfert_plus_PDFView.as_view(), name='Transfert_plus_PDFView'),
+    
 
 
     ]
