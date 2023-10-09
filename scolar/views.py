@@ -13771,7 +13771,12 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         for mandat in all_mandats:
             if mandat.credit_s2.article.posteriori == True and mandat.credit_s2.article == article:
                 mandats.append(mandat)
-                total+= mandat.montant_op.amount
+                if mandat.date.month >= 1 and mandat.date.month <= 6 and engagement_.date.month >= 1 and engagement_.date.month <= 6:
+                   total+= mandat.montant_op.amount
+                elif mandat.date.month >= 7 and mandat.date.month <= 12 and engagement_.date.month >= 7 and engagement_.date.month <= 12:
+                   total+= mandat.montant_op.amount
+                       
+                
         
         pieces = {}
         context = {}
@@ -13779,10 +13784,10 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         context['engagement_letter'] = engagement_letter
         context['mandats'] = mandats
         context['total'] = total
+        
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
-                         
- 
+
 ####################  Mandat a posteriori  ######################
 
 class MandatListView(TemplateView):

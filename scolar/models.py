@@ -2351,6 +2351,8 @@ class Engagement(models.Model):
         if self.montant_operation :
             s_s2=s_s2-self.montant_operation
             return s_s2
+    
+  
         
 class Mandat(models.Model):
     num_mandat = models.IntegerField(null = True)
@@ -2367,7 +2369,8 @@ class Mandat(models.Model):
 
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
-
+    
+        
 class Transfert(models.Model):
     annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
     num_transfert = models.IntegerField(null = True)

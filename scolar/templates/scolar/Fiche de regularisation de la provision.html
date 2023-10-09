@@ -45,8 +45,13 @@ table {
                           
                              <tr >
                           <td style="border-bottom: none;">
-                          {% for mandat in mandats %}
+                          {% for mandat in mandats %}  
+                          {% if mandat.date.month >= 1 and mandat.date.month <= 6 and engagement_.date.month >= 1 and engagement_.date.month <= 6 %}                        
                           <p>Bordereau N°:{{mandat.num_mandat}} Le {{mandat.date}}</p>
+                          {% elif mandat.date.month >= 7 and mandat.date.month <= 12 and engagement_.date.month >= 7 and engagement_.date.month <= 12 %}
+                          
+                          <p>Bordereau N°:{{mandat.num_mandat}} Le {{mandat.date}}</p>
+                          {% endif %}
                           {% endfor %}
 					
                           <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -55,7 +60,11 @@ table {
                           </td>
                            <td style="vertical-align: top;">
                            {% for mandat in mandats %}
+                           {% if mandat.date.month >= 1 and mandat.date.month <= 6 and engagement_.date.month >= 1 and engagement_.date.month <= 6 %}                        
                             <p style="text-align:right;">{{mandat.montant_op.amount}}</p>
+                           {% elif mandat.date.month >= 7 and mandat.date.month <= 12 and engagement_.date.month >= 7 and engagement_.date.month <= 12 %}
+                            <p style="text-align:right;">{{mandat.montant_op.amount}}</p>
+                            {% endif %}
                             {% endfor %}
                           </td>
                           
@@ -69,7 +78,7 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{total}}</p>
+                              <p style="text-align:right;">{{total}}</p>
                           </td>
                           
                           </tr>
@@ -182,9 +191,9 @@ table {
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{00}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{00}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{00}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						
 						</tr>
