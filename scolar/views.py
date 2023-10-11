@@ -14502,21 +14502,21 @@ class Transfert_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         return context     
 
 class Transfert_plus_PDFView(PDFTemplateView):
-    template_name= 'scolar/transfert+.html'
+    template_name= 'scolar/transfert_plus.html'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
     }
 
     def get_context_data(self,  **kwargs):
-        engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+        transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
+        transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
  
         pieces = {}
         context = {}
-        context['engagement_'] = engagement_
-        context['engagement_letter'] = engagement_letter
+        context['transfert_'] = transfert_
+        context['transfert_letter'] = transfert_letter
 
-        self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
+        self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
         return context
               

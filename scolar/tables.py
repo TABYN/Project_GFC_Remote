@@ -1382,14 +1382,19 @@ class TransfertTable(tables.Table):
             <a href=" {% url "detail_transfert" pk=record.id %}" > {% icon "eye" %}</a> '
                 
     detail   = tables.TemplateColumn(action, orderable=False)
-    
-    action= '{% if  record.credit_alloue.article.posteriori %}\
-            <a href="{% url "Transfert+_PDFView" transfert_pk=record.id %}" > Imprimer transfert + </a>\
-            <a href="" > Imprimer transfert - </a>\
-            {% else %}\
-            <a href="" > Imprimer transfert + </a>\
-            <a href="" > Imprimer transfert - </a>\
-            {% endif %}'
+ 
+    action= '{% load icons %}\
+            <a href="{% url "Transfert_plus_PDFView" transfert_pk=record.id %}" > Imprimer transfert + </a> \
+            <a href="" > Imprimer transfert - </a> '
+            
+
+#     action= '{% if  record.credit_alloue.article.posteriori %}\
+#             <a href="{% url "Transfert_plus_PDFView" transfert_pk=record.id %}" > Imprimer transfert + </a>\
+#             <a href="" > Imprimer transfert - </a>\
+#             {% else %}\
+#             <a href="" > Imprimer transfert + </a>\
+#             <a href="" > Imprimer transfert - </a>\
+#             {% endif %}'
 
     Imprimer=tables.TemplateColumn(action, orderable=False)          
 
