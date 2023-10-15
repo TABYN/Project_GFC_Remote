@@ -42,17 +42,23 @@ table {
                           
                           </tr>
                           
-                             <tr >
+                          <tr >
                           <td style="border-bottom: none;">
-                          <p>{{transfert_.article_destination.article}}</p>
                           
+                          
+                           {% for transfert in transferts %}
+                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+                          {% endfor %}
                           
                           <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                         
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{transfert_.article_destination.credit_reste}}</p>
+                            
+                            {% for transfert in transferts %}
+                            <p style="text-align:right;">{{transfert_.montant_transfert.amount}}</p>
+                            {% endfor %}
                           </td>
                           
                           </tr>
@@ -65,7 +71,7 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{transfert_.article_destination.credit_reste}}</p>
+                            <p style="text-align:right;">{{total}}</p>
                           </td>
                           
                           </tr>

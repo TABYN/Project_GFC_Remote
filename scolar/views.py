@@ -13762,7 +13762,7 @@ class Regularisation_provision_PDFView(PDFTemplateView):
 
     def get_context_data(self,  **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
-        engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
+        
         
         article = engagement_.credit_alloue.article
         all_mandats = Mandat.objects.all().exclude(credit_s2__isnull=True)
@@ -13777,14 +13777,15 @@ class Regularisation_provision_PDFView(PDFTemplateView):
                 elif mandat.date.month >= 7 and mandat.date.month <= 12 and engagement_.date.month >= 7 and engagement_.date.month <= 12:
                    total+= mandat.montant_op.amount
 
-
+        engagement_letter = num2words(total, lang='fr')
         
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
-        context['engagement_letter'] = engagement_letter
+        
         context['mandats'] = mandats
         context['total'] = total
+        context['engagement_letter'] = engagement_letter
 
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
         return context
@@ -14510,11 +14511,26 @@ class Transfert_plus_PDFView(PDFTemplateView):
 
     def get_context_data(self,  **kwargs):
         transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
-        transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
- 
+        #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
+        
+
+        all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
+        transferts=[]
+        total=0
+        for transfert in all_transferts:
+            
+                transferts.append(transfert)
+                total+= transfert.montant_transfert.amount
+                
+
+        transfert_letter = num2words(total, lang='fr')
+         
         pieces = {}
         context = {}
         context['transfert_'] = transfert_
+        
+        context['transferts'] = transferts
+        context['total'] = total
         context['transfert_letter'] = transfert_letter
 
         self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
