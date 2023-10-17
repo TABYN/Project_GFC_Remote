@@ -14518,10 +14518,16 @@ class Transfert_plus_PDFView(PDFTemplateView):
         transferts=[]
         total=0
         for transfert in all_transferts:
+            transferts.append(transfert)
+            total+= transfert.montant_transfert.amount
             
-                transferts.append(transfert)
-                total+= transfert.montant_transfert.amount
-                
+#             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
+#                 transferts.append(transfert)
+#                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
+#                     total+= transfert.montant_transfert.amount
+#                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
+#                     total+= transfert.montant_transfert.amount
+              
 
         transfert_letter = num2words(total, lang='fr')
          

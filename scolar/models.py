@@ -2341,19 +2341,37 @@ class Engagement(models.Model):
              
  ############################################################################  
  
- #methode pour calculer le nouveau montant du premier semestere
+ 
+#methode pour calculer le totale des montatnts des mandats
+    def total_montant(self):
+        total=0
+        mandats = Mandat.objects.filter(engagement=self.pk)
+        for mandat in mandats:
+            if self.total_montant() :
+                solde_s1=solde_s1-self.total_montant()
+
+#             if mandat.montant_op:
+#                 total+= mandat.montant_op.amount
+                return total 
+
+#methode pour calculer le nouveau montant du premier semestere
     def nouveau_solde_s1(self): 
         solde_s1=self.credit_alloue.credit_allouee/2
         if 1 <= self.date.month <= 6:
-            if self.montant_operation :
-                solde_s1=solde_s1-self.montant_operation
+            if self.total_montant() :
+                solde_s1=solde_s1-self.total_montant()
+            
+#             if self.montant_operation :
+#                 solde_s1=solde_s1-self.montant_operation
                 return solde_s1
         else:
             solde_s1=0
-            return solde_s1   
+            return solde_s1 
+
+  
     #methode pour ajouter le reste du s1 au montant du s2    
     def nouveau_solde_s2(self):  
-        solde_s2=self.credit_alloue.credit_allouee/2
+        solde_s2=self.credit_alloue.credit_allouee/2        
         if self.nouveau_solde_s1() :
             solde_s2=solde_s2+self.nouveau_solde_s1()
             return solde_s2
@@ -2365,8 +2383,11 @@ class Engagement(models.Model):
     def n_solde_s2(self):
         if self.nouveau_solde_s2() : 
             s_s2=self.nouveau_solde_s2()
-        if self.montant_operation :
-            s_s2=s_s2-self.montant_operation
+        if self.total_montant() :
+            s_s2=s_s2-self.total_montant()
+            
+#         if self.montant_operation :
+#             s_s2=s_s2-self.montant_operation
             return s_s2    
                          
     

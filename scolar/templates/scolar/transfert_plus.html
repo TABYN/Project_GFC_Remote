@@ -47,7 +47,11 @@ table {
                           
                           
                            {% for transfert in transferts %}
+                           <!-- {% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
                            <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+                           {% elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 %}
+ -->                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+                          <!--  {% endif %} -->
                           {% endfor %}
                           
                           <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -154,7 +158,7 @@ table {
 						    <td style=" width: 40%;height:25;text-align:center;"><p>Observation des services</p></td>
 						    
 						</tr>
-						
+						{% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
@@ -176,7 +180,34 @@ table {
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_reste}}</p></td>
 						
 						</tr>
+                           {% else %}
+                        <tr style="height:100px;"> 
 
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+							<!-- <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td> -->
+                            <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+						</tr>
+
+						<tr style="height:100px;"> 
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
+				        	<!-- <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.montant_operation}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
+ -->                        <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2.amount}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2.amount}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+						</tr>
+						{% endif %}
+                          
 						</table>  
 						
 						<div style="text-align:left;">
