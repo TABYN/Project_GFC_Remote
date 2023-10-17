@@ -2318,19 +2318,21 @@ class Engagement(models.Model):
         super(Engagement, self).save(*args, **kwargs)
         #super().save(*args, **kwargs)
 
-        
-#     def nouveau_solde(self): 
-#         solde=0      
-#         if self.montant_operation :
-#             solde=solde+self.credit_alloue.credit_reste-self.montant_operation
-#             return solde
-    
+    #methode pour calculer le totale des montatnts des mandats
+    def total_montant(self):
+        total=0
+        mandats = Mandat.objects.filter(engagement=self.pk)
+        for mandat in mandats:
+            if mandat.montant_op:
+                total+= mandat.montant_op.amount
+                return total 
+         
     #methode pour calculer le nouveau montant du premier semestere
     def nouveau_solde_s1(self): 
         solde_s1=self.credit_alloue.credit_allouee/2
         if 1 <= self.date.month <= 6:
-            if self.montant_operation :
-                solde_s1=solde_s1-self.montant_operation
+            if self.total_montant() :
+                solde_s1=solde_s1-self.total_montant()
                 return solde_s1
         else:
             solde_s1=0
@@ -2348,8 +2350,8 @@ class Engagement(models.Model):
     def n_solde_s2(self):
         if self.nouveau_solde_s2() : 
             s_s2=self.nouveau_solde_s2()
-        if self.montant_operation :
-            s_s2=s_s2-self.montant_operation
+        if self.total_montant() :
+            s_s2=s_s2-self.total_montant()
             return s_s2
     
   
