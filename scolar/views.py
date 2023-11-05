@@ -13767,24 +13767,25 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         article = engagement_.credit_alloue.article
         all_mandats = Mandat.objects.all().exclude(credit_s2__isnull=True)
         mandats=[]
-        total=0
+        total_regularisation_provision=0
         for mandat in all_mandats:
             if mandat.credit_s2.article.posteriori == True and mandat.credit_s2.article == article:
                 mandats.append(mandat)
-                #total+= mandat.montant_op.amount
+                #total_regularisation_provision+= mandat.montant_op.amount
                 if mandat.date.month >= 1 and mandat.date.month <= 6 and engagement_.date.month >= 1 and engagement_.date.month <= 6:
-                   total+= mandat.montant_op.amount
+                   total_regularisation_provision+= mandat.montant_op.amount
+                  # print(engagement_.date.month)
                 elif mandat.date.month >= 7 and mandat.date.month <= 12 and engagement_.date.month >= 7 and engagement_.date.month <= 12:
-                   total+= mandat.montant_op.amount
+                   total_regularisation_provision+= mandat.montant_op.amount
 
-        engagement_letter = num2words(total, lang='fr')
+        engagement_letter = num2words(total_regularisation_provision, lang='fr')
         
         pieces = {}
         context = {}
         context['engagement_'] = engagement_
         
         context['mandats'] = mandats
-        context['total'] = total
+        context['total_regularisation_provision'] = total_regularisation_provision
         context['engagement_letter'] = engagement_letter
 
         self.filename ='engagement_fiche_regularisation_de_la_provision'+str(engagement_.id) + '.pdf'
@@ -14516,27 +14517,27 @@ class Transfert_plus_PDFView(PDFTemplateView):
 
         all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
         transferts=[]
-        total=0
+        total_transfert=0
         for transfert in all_transferts:
             transferts.append(transfert)
-            total+= transfert.montant_transfert.amount
+            total_transfert+= transfert.montant_transfert.amount
             
 #             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
 #                 transferts.append(transfert)
 #                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
-#                     total+= transfert.montant_transfert.amount
+#                     total_transfert+= transfert.montant_transfert.amount
 #                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
-#                     total+= transfert.montant_transfert.amount
+#                     total_transfert+= transfert.montant_transfert.amount
               
 
-        transfert_letter = num2words(total, lang='fr')
+        transfert_letter = num2words(total_transfert, lang='fr')
          
         pieces = {}
         context = {}
         context['transfert_'] = transfert_
         
         context['transferts'] = transferts
-        context['total'] = total
+        context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
 
         self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'

@@ -2343,16 +2343,35 @@ class Engagement(models.Model):
  
  
 #methode pour calculer le totale des montatnts des mandats
-    def total_montant(self):
-        total=0
-        mandats = Mandat.objects.filter(engagement=self.pk)
-        for mandat in mandats:
-            if self.total_montant() :
-                solde_s1=solde_s1-self.total_montant()
 
+    def total_montant(self):
+        total = 0
+        print(self)
+        # Vous pouvez obtenir les mandats liés à cet engagement directement
+       # mandats = self.mandat_set.all()
+        mandats = Mandat.objects.filter(engagement=self.pk)
+        print(mandats)
+        print(self.pk)
+        
+      
+#         for mandat in mandats:
+#             if mandat.montant_op:
+#                 print(montant_op)
+#                 total += mandat.montant_op.amount
+#                 print(total)
+#             
+
+        return total
+#######################
+#    #methode pour calculer le totale des montatnts des mandats
+#     def total_montant(self):
+#         total=0
+#         mandats = Mandat.objects.filter(engagement=self.pk)
+#         for mandat in mandats:
 #             if mandat.montant_op:
 #                 total+= mandat.montant_op.amount
-                return total 
+#                 return total 
+##################################            
 
 #methode pour calculer le nouveau montant du premier semestere
     def nouveau_solde_s1(self): 
