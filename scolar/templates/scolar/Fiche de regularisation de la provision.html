@@ -81,7 +81,7 @@ table {
                           </td>
                            <td style="vertical-align: top;">
                             <!-- <p style="text-align:right;">{{engagement_.credit_alloue.credit_allouee}}</p> -->
-                            <p style="text-align:right;">{{total}}</p>
+                            <p style="text-align:right;">{{total_regularisation_provision}}</p>
                           </td>
                           
                           </tr>
@@ -173,7 +173,7 @@ table {
 						    <!-- <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.montant_operation}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s1}}</p></td>
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
- -->						<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total}}</p></td>
+ -->						<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_regularisation_provision}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s1.amount}}</p></td>
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
@@ -191,7 +191,7 @@ table {
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
                         
-                        {% else %}
+                        {% elif engagement_.date.month >= 7 and engagement_.date.month <= 12%}
                         <tr style="height:100px;"> 
 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
@@ -213,7 +213,7 @@ table {
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2}}</p></td>
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
  -->                        <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2.amount}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_regularisation_provision}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2.amount}}</p></td>
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
