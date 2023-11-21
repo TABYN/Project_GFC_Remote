@@ -2345,21 +2345,30 @@ class Engagement(models.Model):
 #methode pour calculer le totale des montatnts des mandats
 
     def total_montant(self):
+        #return sum(order_item.get_total_item_price() for order_item in self.items.all())
         total = 0
         print(self)
         # Vous pouvez obtenir les mandats liés à cet engagement directement
-       # mandats = self.mandat_set.all()
+       #mandats = self.mandat_set.all()
+#         
+#             Mandat.objects.filter(engagement=self.pk).aggregate(total=Sum('montant_op'))
+#             print(Mandat.objects.filter(engagement=self.pk).aggregate(total=Sum('montant_op')))
+#        
+        
+        total= Mandat.objects.filter(engagement=self.pk)#.aggregate(Sum('montant_op.amount'))
+        print(total)
         mandats = Mandat.objects.filter(engagement=self.pk)
         print(mandats)
         print(self.pk)
-        
-      
-#         for mandat in mandats:
-#             if mandat.montant_op:
-#                 print(montant_op)
-#                 total += mandat.montant_op.amount
-#                 print(total)
-#             
+         
+       
+        for mandat in mandats:
+            if mandat.montant_op:
+                print(montant_op)
+                total += mandat.montant_op.amount
+                print('total')
+                print(total)
+              
 
         return total
 #######################
