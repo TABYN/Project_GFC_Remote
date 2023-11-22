@@ -2301,7 +2301,7 @@ class Engagement(models.Model):
     #mandat= models.ForeignKey('Mandat' ,related_name='mandat_engagement' , null= True, blank=True, on_delete=models.SET_NULL) 
     
     def __str__(self):
-        return "Engagement :"+ str(self.num)+' '+str(self.type)+' '+str(self.credit_alloue.article.libelle_art_FR)
+        return "Engagement :id"+str(self.id)+':num'+ str(self.num)+' '+str(self.type)+' '+str(self.credit_alloue.article.libelle_art_FR)
     
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -2347,6 +2347,8 @@ class Engagement(models.Model):
     def total_montant(self):
         #return sum(order_item.get_total_item_price() for order_item in self.items.all())
         total = 0
+        print(total)
+        print('atika')
         print(self)
         # Vous pouvez obtenir les mandats liés à cet engagement directement
        #mandats = self.mandat_set.all()
@@ -2355,10 +2357,14 @@ class Engagement(models.Model):
 #             print(Mandat.objects.filter(engagement=self.pk).aggregate(total=Sum('montant_op')))
 #        
         
-        total= Mandat.objects.filter(engagement=self.pk)#.aggregate(Sum('montant_op.amount'))
+       # total= Mandat.objects.filter(engagement=self.pk)#.aggregate(Sum('montant_op.amount'))
+        #engagement_ = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article)
+        print('atika2')
         print(total)
         mandats = Mandat.objects.filter(engagement=self.pk)
+        print('atika3')
         print(mandats)
+        print('atika4')
         print(self.pk)
          
        
