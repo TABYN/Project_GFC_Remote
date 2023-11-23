@@ -2344,7 +2344,7 @@ class Engagement(models.Model):
  
 #methode pour calculer le totale des montatnts des mandats
 
-    def total_montant(self):
+    def total_montant(self, *args, **kwargs):
         #return sum(order_item.get_total_item_price() for order_item in self.items.all())
         total = 0
         print(total)
@@ -2361,8 +2361,10 @@ class Engagement(models.Model):
         #engagement_ = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article)
         print('atika2')
         print(total)
-        mandats = Mandat.objects.filter(engagement=self.pk)
-        print('atika3')
+        engagement_ = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article)
+        print(engagement_)
+        mandats = Mandat.objects.filter(pk__in=engagement_)       #engagement=self.engagement_.pk)
+        print('atika3')                # credit_alloue__article=self.credit_alloue.article
         print(mandats)
         print('atika4')
         print(self.pk)
