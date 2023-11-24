@@ -1816,11 +1816,14 @@ class Depence_DetailForm(forms.Form):
             else:
                 messages.error(self.request, "ERREUR: lors de la construction de la page de visualisation d'engagement")
 
+
+
 class Fiche_regularisation_provision_CreateForm(forms.Form):
     
     def __init__(self, request, *args, **kwargs):
         super(Fiche_regularisation_provision_CreateForm, self).__init__(*args, **kwargs)
         self.helper=FormHelper()
+        #engagement_=Engagement.objects.get(id=engagement_pk)
         try:
 
             self.fields['annee_budg']=forms.ModelChoiceField(
@@ -1829,6 +1832,7 @@ class Fiche_regularisation_provision_CreateForm(forms.Form):
                 #required = False,
                 
             )
+            #self.fields['engagement']=engagement_
             
             self.fields['credit_alloue'] = forms.ModelChoiceField(
                  queryset=Credit_S2.objects.filter(exercice__exe_encours=True).filter(article__posteriori=True),
