@@ -2363,7 +2363,9 @@ class Engagement(models.Model):
         print(total)
         engagement_ = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article)
         print(engagement_)
-        mandats = Mandat.objects.filter(pk__in=engagement_)       #engagement=self.engagement_.pk)
+        article_=Article.objects.filter(id=self.credit_alloue.article.id)
+        print(article_)
+        mandats = Mandat.objects.filter(pk__in=article_)       #engagement=self.engagement_.pk)
         print('atika3')                # credit_alloue__article=self.credit_alloue.article
         print(mandats)
         print('atika4')
@@ -2371,6 +2373,7 @@ class Engagement(models.Model):
          
        
         for mandat in mandats:
+            
             if mandat.montant_op:
                 print(montant_op)
                 total += mandat.montant_op.amount
