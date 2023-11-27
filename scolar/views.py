@@ -13780,9 +13780,14 @@ class Regularisation_provision_PDFView(PDFTemplateView):
                    total_regularisation_provision+= mandat.montant_op.amount
 
         engagement_letter = num2words(total_regularisation_provision, lang='fr')
+        nouveau_solde_s1 = engagement_.credit_alloue.credit_allouee.amount/2 - total_regularisation_provision 
+        nouveau_s1_s2 = nouveau_solde_s1 + engagement_.credit_alloue.credit_allouee.amount/2
+        context = {}
+        context['nouveau_solde_s1'] = nouveau_solde_s1 
+        context['nouveau_s1_s2'] = nouveau_s1_s2
         
         pieces = {}
-        context = {}
+        
         context['engagement_'] = engagement_
         
         context['mandats'] = mandats

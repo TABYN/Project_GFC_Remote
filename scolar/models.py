@@ -2344,8 +2344,9 @@ class Engagement(models.Model):
  
 #methode pour calculer le totale des montatnts des mandats
 
-    def total_montant(self, *args, **kwargs):
+    def total_montant(self):
         #return sum(order_item.get_total_item_price() for order_item in self.items.all())
+        #print(total_montant_for_engagement)
         total = 0
         print(total)
         print('atika')
@@ -2365,6 +2366,8 @@ class Engagement(models.Model):
         print(engagement_)
         article_=Article.objects.filter(id=self.credit_alloue.article.id)
         print(article_)
+        
+        #mandats=Mandat.objects.filter(credit_alloue__article=article_)
         mandats = Mandat.objects.filter(pk__in=article_)       #engagement=self.engagement_.pk)
         print('atika3')                # credit_alloue__article=self.credit_alloue.article
         print(mandats)
@@ -2445,7 +2448,19 @@ class Mandat(models.Model):
 
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
+ ###########################################  
+    def total_montant_for_engagement(self):
+        # Obtenez l'engagement lié à ce mandat
+        engagement = self.credit_s2.article
 
+        # Obtenez tous les mandats liés à l'engagement et à l'article
+        mandats = Mandat.objects.filter(credit_s2__article=engagement)
+
+        # Calculez la somme des montants des mandats
+        total = mandats.aggregate(models.Sum('montant_op'))['montant_op__sum']
+
+        return total or 0 
+#################################################
 class Transfert(models.Model):
     annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
     num_transfert = models.IntegerField(null = True)
