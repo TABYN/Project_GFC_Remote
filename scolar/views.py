@@ -13583,7 +13583,7 @@ def fiche_regularisation_provision_create_view(request):
                     date=data['date'],
                     annee_budg=data['annee_budg'],
                     credit_alloue=data['credit_alloue'],
-                    montant_operation=data['montant_operation'],
+                    #montant_operation=data['montant_operation'],
                     fournisseur=data['fournisseur'],
                     facture=data['facture']
                     ) 
@@ -13782,9 +13782,14 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         engagement_letter = num2words(total_regularisation_provision, lang='fr')
         nouveau_solde_s1 = engagement_.credit_alloue.credit_allouee.amount/2 - total_regularisation_provision 
         nouveau_s1_s2 = nouveau_solde_s1 + engagement_.credit_alloue.credit_allouee.amount/2
+        nouveau_solde_s2 = nouveau_s1_s2 - total_regularisation_provision
+        print(nouveau_solde_s2)
+        print(nouveau_s1_s2)
+        print(total_regularisation_provision)
         context = {}
         context['nouveau_solde_s1'] = nouveau_solde_s1 
         context['nouveau_s1_s2'] = nouveau_s1_s2
+        context['nouveau_solde_s2'] = nouveau_solde_s2
         
         pieces = {}
         

@@ -170,12 +170,9 @@ table {
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
 				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
-						    <!-- <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.montant_operation}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s1}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
- -->						<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_regularisation_provision}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_regularisation_provision}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde_s1}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}x</p></td>
 						</tr>
 						
 						<tr style="height:100px;"> 
@@ -183,12 +180,9 @@ table {
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
 				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_article_posteriori}}</p></td>
-						    <!-- <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s1}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
-					 -->	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_regularisation_provision}}</p></td>
+						   	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde_s1}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_s1_s2}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}y</p></td>
 						</tr>
                         
                         {% elif engagement_.date.month >= 7 and engagement_.date.month <= 12%}
@@ -200,21 +194,16 @@ table {
 				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
-							<!-- <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td> -->
-                            <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
 
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.article.code_art}}</p></td>
-				        	<!-- <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.montant_operation}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
- -->                        <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2.amount}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_s1_s2}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_regularisation_provision}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2.amount}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde_s2}}</p></td>
 							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
 						{% endif %}

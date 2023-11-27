@@ -1854,7 +1854,7 @@ class Fiche_regularisation_provision_CreateForm(forms.Form):
             ) 
           
             #self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
-            self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
+            #self.fields['montant_operation'] = forms.DecimalField(label='Montant operation', required = True, max_digits=9, decimal_places=2, validators=[MinValueValidator(0)] )
             self.fields['fournisseur'] = forms.ModelChoiceField(
                  queryset=Fournisseur.objects.all(),
                  label=u"Fournisseur",

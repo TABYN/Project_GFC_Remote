@@ -2342,49 +2342,6 @@ class Engagement(models.Model):
  ############################################################################  
  
  
-#methode pour calculer le totale des montatnts des mandats
-
-    def total_montant(self):
-        #return sum(order_item.get_total_item_price() for order_item in self.items.all())
-        #print(total_montant_for_engagement)
-        total = 0
-        print(total)
-        print('atika')
-        print(self)
-        # Vous pouvez obtenir les mandats liés à cet engagement directement
-       #mandats = self.mandat_set.all()
-#         
-#             Mandat.objects.filter(engagement=self.pk).aggregate(total=Sum('montant_op'))
-#             print(Mandat.objects.filter(engagement=self.pk).aggregate(total=Sum('montant_op')))
-#        
-        
-       # total= Mandat.objects.filter(engagement=self.pk)#.aggregate(Sum('montant_op.amount'))
-        #engagement_ = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article)
-        print('atika2')
-        print(total)
-        engagement_ = Engagement.objects.filter(credit_alloue__article=self.credit_alloue.article)
-        print(engagement_)
-        article_=Article.objects.filter(id=self.credit_alloue.article.id)
-        print(article_)
-        
-        #mandats=Mandat.objects.filter(credit_alloue__article=article_)
-        mandats = Mandat.objects.filter(pk__in=article_)       #engagement=self.engagement_.pk)
-        print('atika3')                # credit_alloue__article=self.credit_alloue.article
-        print(mandats)
-        print('atika4')
-        print(self.pk)
-         
-       
-        for mandat in mandats:
-            
-            if mandat.montant_op:
-                print(montant_op)
-                total += mandat.montant_op.amount
-                print('total')
-                print(total)
-              
-
-        return total
 #######################
 #    #methode pour calculer le totale des montatnts des mandats
 #     def total_montant(self):
