@@ -13783,9 +13783,6 @@ class Regularisation_provision_PDFView(PDFTemplateView):
         nouveau_solde_s1 = engagement_.credit_alloue.credit_allouee.amount/2 - total_regularisation_provision 
         nouveau_s1_s2 = nouveau_solde_s1 + engagement_.credit_alloue.credit_allouee.amount/2
         nouveau_solde_s2 = nouveau_s1_s2 - total_regularisation_provision
-        print(nouveau_solde_s2)
-        print(nouveau_s1_s2)
-        print(total_regularisation_provision)
         context = {}
         context['nouveau_solde_s1'] = nouveau_solde_s1 
         context['nouveau_s1_s2'] = nouveau_s1_s2
@@ -13832,10 +13829,10 @@ def MandatCreate(request, crd):
     annee_bdg = AnneeUniv.objects.all().order_by('-annee_univ')
     annee_budge_id=request.POST.get('annee_budge')
     
-    engage=Engagement.objects.all()
-    print(engage)
-    engagement_id=request.POST.get('engagement')
-    print(engagement_id)
+#     engage=Engagement.objects.all()
+#     print(engage)
+#     engagement_id=request.POST.get('engagement')
+#     print(engagement_id)
     
     frn = Fournisseur.objects.all()
     fournisseur_id=request.POST.get('fournisseur')
@@ -13853,7 +13850,7 @@ def MandatCreate(request, crd):
             observation_mandat=request.POST['observation_mandat'],
             annee_budge=AnneeUniv.objects.get(annee_univ=annee_budge_id),
             fournisseur=Fournisseur.objects.get(id=fournisseur_id),
-            engagement=Engagement.objects.get(id=engagement_id),
+            #engagement=Engagement.objects.get(id=engagement_id),
             type_facture=Type_Facture.objects.get(id=type_facture_id),
             
         )
@@ -13864,7 +13861,7 @@ def MandatCreate(request, crd):
     else:
         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
         mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
-        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt,'engage':engage, 'frn':frn, 'annee_bdg':annee_bdg, 'type_fact':type_fact})
+        return render(request, 'scolar/add_mandat.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg, 'type_fact':type_fact})#'engage':engage,
 
 @login_required
 def MandatDelete(request, mandat):
