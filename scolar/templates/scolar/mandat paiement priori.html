@@ -45,15 +45,16 @@ table {
                           
                              <tr >
                           <td style="border-bottom: none;">
-                         <!--  <p>{{mandat_.engagement.montant_operation}}</p> -->
+                          <p>Bordereau N°:{{mandat_.num_mandat}} Date le: {{mandat_.date}}</p> 
                           <br>
-                          <p>{{mandat_.engagement.observation}}</p>
-                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<!--                           <p>{{mandat_.engagement.observation}}</p>
+ -->                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
                      
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{mandat_.engagement.montant_operation}}</p>
+                            <!-- <p style="text-align:right;">{{mandat_.engagement.montant_operation.amount}} DA</p> -->
+                            <p style="text-align:right;">{{mandat_.montant_op.amount}} DA</p>
                           </td>
                           
                           </tr>
@@ -66,7 +67,8 @@ table {
                           
                           </td>
                            <td style="vertical-align: top;">
-                            <p style="text-align:right;">{{mandat_.engagement.montant_operation}}</p>
+                            <!-- <p style="text-align:right;">{{mandat_.engagement.montant_operation.amount}} DA </p> -->
+                            <p style="text-align:right;">{{mandat_.montant_op.amount}} DA</p>
                           </td>
                           
                           </tr>
@@ -87,7 +89,7 @@ table {
 						
 					  <tr style="height:40px;"> 
 							
-				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année  {{mandat.engagement.annee_budg}}</p></td>
+				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année  {{mandat_.engagement.annee_budg}}</p></td>
 						    <td style="text-align:center;">{{mandat_.num_mandat}}</td>
 					  </tr>
 						
@@ -97,7 +99,7 @@ table {
                         </td>
                          
                         <td colspan="2" style="border-left: none;text-align:center;">
-                            <p style="text-align:LEFT;">Compte Bénéficiaire: {{mandat_.fournisseur.code_fournisseur}}??????</p><p style="text-align:LEFT;">Libellé du Compte :{{mandat_.fournisseur.nom_fournisseur}} ???????</p>
+                            <p style="text-align:LEFT;">Compte Bénéficiaire: {{mandat_.fournisseur.num_cmpt_fournisseur}}</p><p style="text-align:LEFT;">Libellé du Compte : {{mandat_.fournisseur.cle_cmpt_fournisseur}}</p>
                         </td>
 						</tr>
 						
@@ -108,7 +110,8 @@ table {
                         </td>
                          
                         <td colspan="2" style="text-align:center;">
-                            <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.engagement.montant_operation}}</p>
+                            <!-- <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.engagement.montant_operation.amount}} DA</p> -->
+                            <p style="text-align:LEFT;">Date: {{mandat_.date}}</p><p style="text-align:LEFT;">Montant en chiffre : {{mandat_.montant_op.amount}} DA</p>
                         </td>
 						</tr>
 						
@@ -134,10 +137,13 @@ table {
                           
                           </td>
                            <td  style="border-bottom: none;vertical-align: top;">
-                            <p style="text-align:right;">{{mandat_.engagement.montant_operation}}</p>
+                            <p style="text-align:left;">{{mandat_.engagement.credit_alloue.article.chapitre.code_chap}}{{mandat_.engagement.credit_alloue.article.code_art}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;engagement:{{mandat_.engagement.montant_operation.amount}} </p>
+                          <hr>
+                            <p style="text-align:left;">{{mandat_.engagement.credit_alloue.article.libelle_art_FR}}</p>
+                          
                           </td>
                            <td style="vertical-align: top;border-bottom: none;">
-                            <p style="text-align:left;">{{mandat_.engagement.observation}}</p>
+                            <p style="text-align:left;">{{mandat_.fournisseur.nom_fournisseur}} : facture N°{{mandat_.facture_mandat.num_fact}} Du {{mandat_.date}}  </p>
                           </td>
 						</tr>
 						
@@ -153,7 +159,7 @@ table {
                           <p style="text-align:left;">CREDITS ALLOUES: {{mandat_.engagement.credit_alloue.credit_allouee}}</p>
                           </td>
                            <td>
-                            <p style="text-align:left;">CREDITS DISPONIBLES: </p>  <!-- {{mandat_.credit_s2.credit_reste}} -->
+                            <p style="text-align:left;">CREDITS DISPONIBLES: {{mandat_.engagement.credit_alloue.credit_reste}}</p>  <!-- {{mandat_.credit_s2.credit_reste}} -->
                           </td>
                          
                         </tr>

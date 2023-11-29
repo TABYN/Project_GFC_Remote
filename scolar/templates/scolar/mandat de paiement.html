@@ -88,17 +88,17 @@ table {
 						
 					  <tr style="height:40px;"> 
 							
-				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année  <!-- {{mandat.engagement.annee_budg}} --></p></td>
+				        	<td colspan="2" style=" width: 40%;height:15;border-top: none;border-left: none;vertical-align: bottom;border-bottom: none;border-right: none;text-align:center;"><br><p>BUDGET-Année {{mandat_.annee_budge}} <!-- {{mandat.engagement.annee_budg}} --></p></td>
 						    <td style="text-align:center;">{{mandat_.num_mandat}}</td>
 					  </tr>
 						
 						<tr style="height:20px;">
 						<td style="border-right: none;text-align:center;">
-                          <p style="text-align:left;">Service Emetteur: </p><p style="text-align:LEFT;">N° au registre des O.P:{{mandat_.num_mandat}} </p>
+                          <p style="text-align:left;">Service Emetteur: </p><p style="text-align:LEFT;">N° au registre des O.P: </p>
                         </td>
                          
                         <td colspan="2" style="border-left: none;text-align:center;">
-                            <p style="text-align:LEFT;">Compte Bénéficiaire: </p><p style="text-align:LEFT;">Libellé du Compte </p>
+                            <p style="text-align:LEFT;">Compte Bénéficiaire: {{mandat_.fournisseur.num_cmpt_fournisseur}}</p><p style="text-align:LEFT;">Libellé du Compte: {{mandat_.fournisseur.cle_cmpt_fournisseur}} </p>
                         </td>
 						</tr>
 						
@@ -136,9 +136,9 @@ table {
                           
                           </td>
                            <td  style="border-bottom: none;vertical-align: top;">
-                            <p style="text-align:left;">{{mandat_.engagement.credit_alloue.article.chapitre.code_chap}}{{mandat_.engagement.credit_alloue.article.code_art}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{mandat_.engagement.montant_operation.amount}} </p>
+                            <p style="text-align:left;">{{mandat_.credit_s2.article.chapitre.code_chap}}{{mandat_.credit_s2.article.code_art}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{mandat_.montant_op.amount}} </p>
                           <hr>
-                            <p style="text-align:left;">{{mandat_.engagement.credit_alloue.article.libelle_art_FR}}</p>
+                            <p style="text-align:left;">{{mandat_.credit_s2.article.libelle_art_FR}}</p>
                           
                           </td>
                            <td style="vertical-align: top;border-bottom: none;">
@@ -158,7 +158,7 @@ table {
                           <p style="text-align:left;">CREDITS ALLOUES: {{mandat_.credit_s2.credit_allouee}} </p>
                           </td>
                            <td>
-                            <p style="text-align:left;">CREDITS DISPONIBLES: {{mandat_.nouveau_solde_mandat}}</p>
+                            <p style="text-align:left;">CREDITS DISPONIBLES: {{mandat_.credit_s2.credit_reste}}</p> <!-- {{mandat_.nouveau_solde_mandat}} -->
                           </td>
                          
                         </tr>

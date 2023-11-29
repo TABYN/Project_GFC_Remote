@@ -2405,19 +2405,7 @@ class Mandat(models.Model):
 
     def __str__(self):
         return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
- ###########################################  
-    def total_montant_for_engagement(self):
-        # Obtenez l'engagement lié à ce mandat
-        engagement = self.credit_s2.article
-
-        # Obtenez tous les mandats liés à l'engagement et à l'article
-        mandats = Mandat.objects.filter(credit_s2__article=engagement)
-
-        # Calculez la somme des montants des mandats
-        total = mandats.aggregate(models.Sum('montant_op'))['montant_op__sum']
-
-        return total or 0 
-#################################################
+ 
 class Transfert(models.Model):
     annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
     num_transfert = models.IntegerField(null = True)

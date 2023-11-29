@@ -14097,9 +14097,9 @@ class MandatPrioriDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
         return context    
 
 class Mandat_Priori_PDFView(PDFTemplateView):
-    template_name= 'scolar/mandat de paiement.html'
+    template_name=  'scolar/Mandat paiement priori.html'
     cmd_options = {
-        'orientation': 'Landscape',
+        'orientation': 'Landscape',#'Landscape',
         'page-size': 'A3',
     }
 
