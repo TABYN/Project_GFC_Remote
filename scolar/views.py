@@ -13744,9 +13744,10 @@ class Depence_PDFView(PDFTemplateView):
     def get_context_data(self,  **kwargs):
         engagement_ = Engagement.objects.get(id=self.kwargs.get('engagement_pk'))
         engagement_letter = num2words(engagement_.credit_alloue.credit_allouee.amount, lang='fr')
- 
+        ancien_solde = engagement_.credit_alloue.credit_reste.amount + engagement_.montant_operation.amount
         pieces = {}
         context = {}
+        context['ancien_solde'] = ancien_solde
         context['engagement_'] = engagement_
         context['engagement_letter'] = engagement_letter
   
@@ -13990,6 +13991,25 @@ def mandat_priori_create_view(request):
                     facture_mandat=data['facture_mandat']
                     
                     )                         
+                #######################    calculer le nouveau credit_reste dans le cas ou le montant du mandat est inferieur au montant de l'engagement
+                print(mandat_.montant_op-mandat_.engagement.montant_operation)
+                if mandat_.montant_op-mandat_.engagement.montant_operation!=0:
+                    if mandat_.engagement.credit_alloue:
+                        credit_reste_s2 = mandat_.engagement.credit_alloue.credit_reste
+                        print(credit_reste_s2)
+                        credit_S2 = Credit_S2.objects.get(pk=mandat_.engagement.credit_alloue.id)
+                        credit_S2.credit_reste.amount = credit_reste_s2.amount + (mandat_.engagement.montant_operation.amount - mandat_.montant_op.amount)
+                        print(credit_S2.credit_reste.amount)
+                     
+ 
+                  
+                assert credit_S2.credit_reste.amount >= 0
+                 
+                credit_S2.save(update_fields=['credit_reste'])  
+                                
+                
+ ##################################################################
+
                 
             except Exception:
                 if settings.DEBUG:
@@ -14035,6 +14055,7 @@ def mandat_priori_update_view(request, mandat_pk):
         form = Mandat_Priori_UpdateForm(mandat_pk, request, request.POST)
         # check whether it's valid:
         if form.is_valid():
+            #credit_S2 = None
             try:
                 # process the data in form.cleaned_data as required
                 data=form.cleaned_data
@@ -14045,6 +14066,26 @@ def mandat_priori_update_view(request, mandat_pk):
                 mandat_.montant_op= data['montant_op']###############
                 mandat_.fournisseur=data['fournisseur']
                 mandat_.facture_mandat=data['facture_mandat']
+
+#######################    calculer le nouveau credit_reste dans le cas ou le montant du mandat est inferieur au montant de l'engagement
+                print(mandat_.montant_op-mandat_.engagement.montant_operation)
+                if mandat_.montant_op-mandat_.engagement.montant_operation!=0:
+                    if mandat_.engagement.credit_alloue:
+                        credit_reste_s2 = mandat_.engagement.credit_alloue.credit_reste
+                        print(credit_reste_s2)
+                        credit_S2 = Credit_S2.objects.get(pk=mandat_.engagement.credit_alloue.id)
+                        credit_S2.credit_reste.amount = credit_reste_s2.amount + (mandat_.engagement.montant_operation.amount - mandat_.montant_op.amount)
+                        print(credit_S2.credit_reste.amount)
+                     
+ 
+                  
+                assert credit_S2.credit_reste.amount >= 0
+                 
+                credit_S2.save(update_fields=['credit_reste'])  
+                                
+                
+ ##################################################################
+
                 
                 mandat_.save()
                          
@@ -14099,7 +14140,7 @@ class MandatPrioriDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
 class Mandat_Priori_PDFView(PDFTemplateView):
     template_name=  'scolar/Mandat paiement priori.html'
     cmd_options = {
-        'orientation': 'Landscape',#'Landscape',
+        'orientation': 'Landscape',
         'page-size': 'A3',
     }
 
