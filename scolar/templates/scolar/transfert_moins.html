@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	  {% load static %}
+	  {% load djmoney %}
+	  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+	   <style>
+table {
+  		page-break-inside:auto;
+ 		font-family: Arial, Helvetica, sans-serif;
+	}
+	th, td {
+	  border: 1px solid black;
+	  border-collapse: collapse;
+	}
+	td {
+		page-break-before:avoid;
+	}
+	tr {
+         page-break-inside:avoid;
+    }
+
+    </style>
+  </head>
+          
+		  <table style="margin-top: 0; width: 100%;">
+				  <tr>
+				        <td style="margin-top: 0; width: 45%;border:none;" >
+                          <img src ="{% static 'entete provision_2.PNG' %}" alt="entete" width= "700" height="150">					
+                          <br><br>
+                          <table width="100%">
+                          <tr >
+                          <td>
+                          <p style="text-align:center;">Identification des Pièces</p>
+                          </td>
+                           <td>
+                            <p style="text-align:center;">Montant</p>
+                          </td>
+                          
+                          </tr>
+                          
+                          <tr >
+                          <td style="border-bottom: none;">
+                          
+                          
+                           {% for transfert in transferts %}
+                           <!-- {% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
+                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+                           {% elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 %}
+ -->                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+                          <!--  {% endif %} -->
+                          {% endfor %}
+                          
+                          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                        
+                          
+                          </td>
+                           <td style="vertical-align: top;">
+                            
+                            {% for transfert in transferts %}
+                            <p style="text-align:right;">{{transfert_.montant_transfert.amount}}</p>
+                            {% endfor %}
+                          </td>
+                          
+                          </tr>
+                          
+                           <tr >
+                          <td   style="border-top: none;">
+                        
+                        
+                          <p style="text-align: right;">TOTAL......... </p>
+                          
+                          </td>
+                           <td style="vertical-align: top;">
+                            <p style="text-align:right;">{{total_transfert}}</p>
+                          </td>
+                          
+                          </tr>
+                          
+                                <tr >
+                          <td   style="border: none;">
+                        
+                        
+                          <p style="text-align: left;">Total en lettres:<br> {{transfert_letter}}  Dinars Algeriens</p>
+     
+                          </td>
+                       
+                          
+                          </tr>
+                          
+                          </table>
+					  </td>
+			  <td style="margin-top: 0; width: 5%;vertical-align: top;border:none;" >  </td>
+					  <td style="margin-top: 0; width: 45%;vertical-align: top;border:none;" >
+						  <img src ="{% static 'entete doc budget.png' %}" alt="entete" width= "700" height="50" >
+                       <p>Section 02</p>
+ 					   <p>DESIGNATION DE L'ORDONNATEUR</p>	  
+				       <p><b>Directeur de l'école</b></p>
+				       <table   style=" width: 60%; ">
+						<tr style="height:25px;"> 
+							<td style=" width: 30%;height:25;"><p style="text-align:LEFT;"><b>CODE ORDONNATEUR</b></p></td>
+							<td style="width: 30%;height:25;" >  </td>
+						</tr>
+						</table>  
+						<br>
+				       <table  style="margin-left: auto; margin-right: auto; width: 60%; ">
+						<tr style="height:50px;"> 
+							<td style=" width: 50%;height:25;"><p style="text-align:center;"><b>BUDGET DE FONCTIONNEMENT</b></p></td>
+						</tr>
+						</table>  
+						<br>	  
+						<table style="width: 100%;">
+						<thead>
+						<tr style="height:50px;"> 
+							<td colspan="2" style=" width: 30%;height:25;"><p style="text-align:left;">Semestre:<br>Fiche de provision N°</p></td>	
+				        	<td style=" width: 40%;height:25;border-top: none;border-bottom: none;"></td>
+							<td colspan="2" style=" width: 30%;height:25;text-align:center;"><p>Visa du controleur financier</p></td>
+						</tr>
+						</thead>
+						<tbody>
+					  <tr style="height:50px;"> 
+					  
+							<td style=" width: 15%;height:25;"><p>Année&nbsp;&nbsp;&nbsp;&nbsp;{{transfert_.annee_budgi}}</p></td>
+							<td style=" width: 15%;height:25;"><p>N° &nbsp;&nbsp;&nbsp;&nbsp;003</p></td>
+							<td style=" width: 40%;height:25;border-top: none;border-bottom: none;vertical-align: bottom;"><br></td>
+                           <td style=" width: 15%;height:25;"><p>N° </p></td>	
+                           <td style=" width: 15%;height:25;"><p>DU</p></td>					
+                      </tr>
+                      </tbody>
+						</table>  
+						<br>
+						
+						<table  style="margin-left: auto; margin-right: auto; width: 60%; ">
+						<tr style="height:50px;"> 
+							<td style=" width: 50%;height:25;"><p style="text-align:center;"><b>FICHE MODIFICATION D'ENGAGEMENT DE LA PROVISION(CREDITS/PROVISION)</b></p></td>
+						</tr>
+						</table>  
+					
+						  
+						
+						<pre>
+						Objet : <label for="caseDepense">Dépense</label> <input type="checkbox" id="caseDepense" name="caseDepense">
+						      : <label for="caseEconomie">Economie</label> <input type="checkbox" id="caseEconomie" name="caseEconomie">
+						</pre>
+						
+						
+					<table style="margin-top: 20px; width: 100%;">	
+					  <tr style="height:40px;">
+					        <td style=" width: 15%;height:25;text-align:center;"><p>Comptabilite</p></td> 
+							<td style=" width: 10%;height:25;text-align:center;"><p>Chapitre</p></td>
+				        	<td style=" width: 10%;height:25;text-align:center;"><p>Article</p></td>
+						    <td style=" width: 15%;height:25;text-align:center;"><p>Ancien solde</p></td>
+				        	<td style=" width: 15%;height:25;text-align:center;"><p>Montant de l'opération</p></td>
+						    <td style=" width: 15%;height:25;text-align:center;"><p>Nouveau solde</p></td>
+						    <td style=" width: 40%;height:25;text-align:center;"><p>Observation des services</p></td>
+						    
+						</tr>
+						{% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
+						<tr style="height:100px;"> 
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td> 
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_article_posteriori}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.montant_transfert}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.nouveau_solde_s1_transfert}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_reste}}</p></td>
+						
+						</tr>
+						
+						<tr style="height:100px;"> 
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_article_posteriori}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.nouveau_solde_s1_transfert}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.nouveau_solde_s2_transfert}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_reste}}</p></td>
+						
+						</tr>
+                           {% else %}
+                        <tr style="height:100px;"> 
+
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+							<!-- <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td> -->
+                            <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+						</tr>
+
+						<tr style="height:100px;"> 
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
+				        	<!-- <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.montant_operation}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
+ -->                        <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2.amount}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2.amount}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+						</tr>
+						{% endif %}
+                          
+						</table>  
+						
+						<div style="text-align:left;">
+						<p>L'intitule: </p>
+						<p>Chapitre:&nbsp;&nbsp;{{transfert_.article_destination.chapitre.libelle_chap_FR}} </p>
+						<p>Article: &nbsp;&nbsp;{{transfert_.article_destination.article.libelle_art_FR}}</p>
+						<p>Observation du service</p>
+						<!-- <p>Regularisation d'engagement de depence pris en charge dans sa forme a posteriori.......................<br>
+						      .............................................................................................................................</p>
+ -->						</div>
+						
+						<table style="margin-top: 50px; width: 100%;">
+						<tr style="height:150px;"> 
+							<td style=" width: 50%;height:25;"><p style="text-align:center;">VISA DU CONTROLEUR FINANCIER</p></td>
+							<td style=" width: 50%;height:25;border-top: none;border-bottom: none;border-right: none;">&nbsp;&nbsp;&nbsp;&nbsp;A................     Le...............<br>&nbsp;&nbsp;&nbsp;&nbsp;L'ordonateur</td>
+						</tr>
+						</table>  
+						
+						
+						
+						
+						  
+						  
+						  
+						  
+					  </td>
+				  </tr>
+			
+		
+				  
+		  </table>
+				 
+
+</html>

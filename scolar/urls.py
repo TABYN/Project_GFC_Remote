@@ -418,6 +418,7 @@ urlpatterns = [
     re_path(r'^transfert_delete/(?P<transfert_pk>\d+)/$', views.transfert_delete, name='transfert_delete'),
     re_path(r'^detail_transfert/(?P<pk>\d+)/$', views.Transfert_DetailView.as_view(), name='detail_transfert'),
     path('Transfert_plus_PDFView/<transfert_pk>/', views.Transfert_plus_PDFView.as_view(), name='Transfert_plus_PDFView'),
+    path('Transfert_moins_PDFView/<transfert_pk>/', views.Transfert_moins_PDFView.as_view(), name='Transfert_moins_PDFView'),
     
 
 

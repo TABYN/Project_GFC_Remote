@@ -1385,7 +1385,7 @@ class TransfertTable(tables.Table):
  
     action= '{% load icons %}\
             <a href="{% url "Transfert_plus_PDFView" transfert_pk=record.id %}" > Imprimer transfert + </a> \
-            <a href="" > Imprimer transfert - </a> '
+            <a href="{% url "Transfert_moins_PDFView" transfert_pk=record.id %}" > Imprimer transfert - </a> '
             
 
 #     action= '{% if  record.credit_alloue.article.posteriori %}\
