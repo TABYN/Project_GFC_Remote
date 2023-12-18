@@ -14562,6 +14562,7 @@ class Transfert_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 
 class Transfert_plus_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_plus.html'
+    titre = 'Transfert de credit (+)'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
@@ -14602,6 +14603,7 @@ class Transfert_plus_PDFView(PDFTemplateView):
  
 class Transfert_moins_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_moins.html'
+    titre = 'Transfert de credit (-)'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
