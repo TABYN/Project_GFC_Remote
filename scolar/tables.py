@@ -1387,12 +1387,12 @@ class TransfertTable(tables.Table):
 ###################
  
     action = '{% if record.article_source.article.posteriori == False %}'\
-         '<a href="{% url "Transfert_plus_PDFView" transfert_pk=record.id %}" > Imprimer transfert - </a>'\
+         '<a href="{% url "Transfert_moins_PDFView" transfert_pk=record.id %}" > Imprimer transfert - </a>'\
          '{% endif %}'\
          '{% if record.article_source.article.posteriori != False %}'\
          ' Article_Source_Posteriori' \
          '{% endif %}'
-    Imprim_Source=tables.TemplateColumn(action, orderable=False)         
+    Imprim_Art_Source=tables.TemplateColumn(action, orderable=False)         
 
 
     action = '{% if record.article_destination.article.posteriori != True %}'\
@@ -1401,7 +1401,7 @@ class TransfertTable(tables.Table):
          '{% if record.article_destination.article.posteriori == True%}'\
          ' Article_Destination_Posteriori '\
          '{% endif %}'
-    Imprim_Destination=tables.TemplateColumn(action, orderable=False)
+    Imprim_Art_Destination=tables.TemplateColumn(action, orderable=False)
 
 #########################
 #     action= '{% if  record.credit_alloue.article.posteriori %}\

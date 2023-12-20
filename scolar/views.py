@@ -14560,7 +14560,7 @@ class Transfert_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                   
         return context     
 
-class Transfert_plus_PDFView(PDFTemplateView):
+class Transfert_plus_posteriori_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_plus.html'
     titre = 'Transfert de credit (+)'
     cmd_options = {
@@ -14601,7 +14601,7 @@ class Transfert_plus_PDFView(PDFTemplateView):
         self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
         return context
  
-class Transfert_moins_PDFView(PDFTemplateView):
+class Transfert_moins_posteriori_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_moins.html'
     titre = 'Transfert de credit (-)'
     cmd_options = {
@@ -14641,4 +14641,50 @@ class Transfert_moins_PDFView(PDFTemplateView):
 
         self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
         return context
-              
+ 
+class Transfert_moins_PDFView(PDFTemplateView):
+    template_name= 'scolar/transfert_moins.html'
+    #titre = 'Transfert de credit (-)'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
+        montant_operation= transfert_.montant_transfert.amount
+        transfert_letter = num2words(montant_operation, lang='fr')
+        ancien_solde = transfert_.article_source.credit_reste.amount - montant_operation
+        pieces = {}
+        context = {}
+        context['montant_operation'] = montant_operation
+        context['ancien_solde'] = ancien_solde
+        context['transfert_'] = transfert_
+        context['transfert_letter'] = transfert_letter
+  
+        self.filename ='Transfert de Credit (-)'+str(transfert_.num_transfert) + '.pdf'
+        return context
+    
+class Transfert_plus_PDFView(PDFTemplateView):  
+    template_name= 'scolar/transfert_plus.html'
+    #titre = 'Transfert de credit (-)'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
+        montant_operation= transfert_.montant_transfert.amount
+        transfert_letter = num2words(montant_operation, lang='fr')
+        ancien_solde = transfert_.article_destination.credit_reste.amount - montant_operation
+        pieces = {}
+        context = {}
+        context['montant_operation'] = montant_operation
+        context['ancien_solde'] = ancien_solde
+        context['transfert_'] = transfert_
+        context['transfert_letter'] = transfert_letter
+  
+        self.filename ='Transfert de Credit (-)'+str(transfert_.num_transfert) + '.pdf'
+        return context
+                
