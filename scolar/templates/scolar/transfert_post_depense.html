@@ -1,0 +1,142 @@
+{% extends 'scolar/index.html' %}
+{% load django_tables2 crispy_forms_tags icons bootstrap4 %}
+{% bootstrap_css %}         {# Embed Bootstrap CSS #}
+{% bootstrap_javascript jquery='full' %}  {# Embed Bootstrap JS+jQuery #}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+ <!-- Required meta tags -->
+ <meta charset="utf-8">
+ {% block content %}
+ <form id="demoForm" method="post"  action = "" class="post-form" enctype="multipart/form-data">
+ {% csrf_token %}
+   	   <style>
+ 	   body {
+  font: normal medium/1.4 serif;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+    </style>
+	<div class="content-wrapper">
+		<div class="row">
+			<div class="col-md-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+					<h2>Fiche modification d'engagement de la provision (credit/provision)</h2>
+					<h4> {{article_source}}</h4>
+						
+						<br><br>
+				<form class="forms-sample">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										
+										<div class="col-sm-9">
+											<!-- <input type="text" class="form-control" name="num_mandat" id="number1"  /> -->
+										</div>
+									</div>
+								</div>
+							
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Annee budgetaire</label>
+										<div class="col-sm-9">
+											<select class="form-control"  name="annee_budge" >
+											   {% for annee_bdg in annee_bdg %}
+											   <option value="{{ annee_bdg.annee_univ }}">{{ annee_bdg.annee_univ }}</option>
+											   {% endfor %}
+											</select>
+											
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Date Debut</label>
+										<div class="col-sm-9">
+											<input type="date" class="form-control" name="date_debut" />
+										</div>
+									</div>
+								</div>
+								
+								<div class="col-md-6">
+								  <div class=class="form-group row">
+									<div class="form-group row">
+										<label class="col-sm-3 col-form-label">Date Fin</label>
+										<div class="col-sm-9">
+											<input type="date" class="form-control" name="date_fin" />
+										</div>
+									</div>
+								  </div>
+							    </div>
+							</div>
+							<br><br>
+							
+							<div class="row">
+								
+								<div class="col-md-4">
+									<button type="submit" class="btn btn-primary btn-block" >
+										<i class="fa fa-database"></i> Afficher</button>
+								</div>
+							</div>
+				</form>
+						<div class="content-wrapper">
+							<div class="row">
+								<div class="col-md-12 grid-margin stretch-card">
+									<div class="card">
+										<div class="card-body">
+											<p class="lead font-italic">Listes des depense </p>
+											<hr class="my-4">
+											<table class="table table-borderless">
+												<thead class="border-bottom font-weight-bold">
+												<tr>
+													<th>Num_Transfert</th>
+													<th>Date_Transfert</th>
+													<th>Montant_Transfert</th>
+													<th>Article_Destination</th>
+												</tr>
+												</thead>
+												<tbody>
+												{% for transfert in transferts %}
+												
+												<tr>
+													<td>{{transfert.num_transfert}}</td>
+													<td>{{transfert.date_transfert}}</td>
+													<td>{{transfert.montant_transfert}}</td>
+													<td>{{transfert.article_destination_id}}</td>
+													
+												{% endfor %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+ </form>
+ <br><br><br>
+ 							<div class="row">
+								<div class="col-md-4">
+									<a href="{% url 'Transfert_post_list' %}" class="btn btn-secondary btn-block">
+										<i class="fa fa-list"></i> Retour
+									</a>
+								</div>
+								<div class="col-md-4">
+									<button type="submit" class="btn btn-primary btn-block" >
+										<i class="fa fa-database"></i>Imprimer</button>
+								</div>
+							</div>
+ 							
+ 
+</html>
+
+{% endblock %}

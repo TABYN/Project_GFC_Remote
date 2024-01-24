@@ -37,8 +37,8 @@ from scolar.tables import OrganismeTable, OrganismeFilter, PFETable, PFEFilter, 
     ActiviteEtudiantTable, ActiviteTable, ActiviteFilter, \
     PreinscriptionTable, ResidenceUnivTable, PreinscriptionFilter, ExamenTable, ExamenFilter, \
     FournisseurFilter, FournisseurTable, ChapitreFilter, ChapitreTable , BanqueTable, BanqueFilter, Type_Engagement_S2Filter ,Type_Engagement_S2Table, Prise_en_chargeTable, EngagementFilter, \
-    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, MandatFilter,MandatTable, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable, TransfertTable, TransfertFilter
-
+    DepenceTable, ArticleFilter, ArticleTable, ExerciceTable,  Mandat_1_Table, Mandat_1_Filter, MandatFilter,MandatTable, FactureTable, FactureFilter, Type_FactureFilter, Type_FactureTable, TransfertTable, TransfertFilter, \
+    Transfert_post_Table, Transfert_post_Filter
 from functools import reduce
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import EmailMessage, send_mass_mail
@@ -14687,4 +14687,92 @@ class Transfert_plus_PDFView(PDFTemplateView):
   
         self.filename ='Transfert de Credit (-)'+str(transfert_.num_transfert) + '.pdf'
         return context
-                
+ 
+ 
+ ####################### transfert_article_posteriori  #####################
+ 
+class Transfert_post_ListView(TemplateView):
+    template_name = 'scolar/filter_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super(Transfert_post_ListView, self).get_context_data(**kwargs)
+
+        filter_ = Transfert_post_Filter(self.request.GET, queryset=Credit_S2.objects.filter(exercice__exe_encours=True).filter(article__posteriori=True))
+
+        filter_.form.helper = FormHelper()
+        exclude_columns_ = exclude_columns(self.request.user)
+        table = Transfert_post_Table(filter_.qs)
+        RequestConfig(self.request).configure(table)
+        
+        context['filter'] = filter_
+        context['table'] = table
+        context['titre'] = 'Liste des Transfert a posteriori '
+
+        return context   
+
+
+
+
+###############################################    essai
+
+@login_required
+def Transfert_depense(request, crd):
+    article_source= Transfert.objects.get(article_source_id=crd)
+    annee_bdg = AnneeUniv.objects.all().order_by('-annee_univ')
+    transferts= Transfert.objects.all()
+#     annee_budge_id=request.POST.get('annee_budge')
+    
+    #crdt= Credit_S2.objects.get(pk=crd)
+    print(crd)
+    print(article_source)
+    #arti=Article.objects.get(pk=art)
+    
+#     engage=Engagement.objects.all()
+#     print(engage)
+#     engagement_id=request.POST.get('engagement')
+#     print(engagement_id)
+    
+    #frn = Fournisseur.objects.all()
+    #fournisseur_id=request.POST.get('fournisseur')
+    
+    #type_fact=Type_Facture.objects.all()
+    #type_facture_id=request.POST.get('type_facture')
+    
+    
+    if request.method == 'POST':
+        date_debut=request.POST['date_debut']
+        date_fin=request.POST['date_fin']
+    
+#         date_debut.save()
+#         date_fin.save()     
+        return redirect(request.path_info)
+        print(date_debut)
+        print(date_fin)
+    
+    
+#     if request.method == 'POST':
+#         mandat = Mandat(
+#             credit_s2 =Credit_S2.objects.get(pk=crd),
+#             #article=Article.objects.get(pk=art),
+#             num_mandat=request.POST['num_mandat'],
+#             date=request.POST['date'],
+#             montant_op=request.POST['montant_op'],
+#             observation_mandat=request.POST['observation_mandat'],
+#             annee_budge=AnneeUniv.objects.get(annee_univ=annee_budge_id),
+#             fournisseur=Fournisseur.objects.get(id=fournisseur_id),
+#             #engagement=Engagement.objects.get(id=engagement_id),
+#             type_facture=Type_Facture.objects.get(id=type_facture_id),
+#             
+#         )
+#         
+#         mandat.save()
+#         messages.success(request, 'Mandat enregistré.')
+#         return redirect(request.path_info)
+#     else:
+#         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
+#         mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
+#         return render(request, 'scolar/transfert_post_depense.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg, 'type_fact':type_fact})#'engage':engage,
+    
+    
+    return render(request, 'scolar/transfert_post_depense.html',{'article_source': article_source , 'annee_bdg':annee_bdg, 'transferts':transferts})#, 'date_debut':date_debut, 'date_fin':date_fin
+               

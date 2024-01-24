@@ -1426,4 +1426,34 @@ class TransfertFilter(django_filters.FilterSet):
     class Meta:
         model = Transfert
         fields = ['annee_budgi','date_transfert', 'num_transfert'] 
+
+
+####################### transfert_article_posteriori  #####################
+
+class Transfert_post_Table(tables.Table):
+    chapitre=tables.Column(empty_values=(), orderable=False, verbose_name="Chapitre")
+    def render_chapitre(self,value,record):
+        if record.article.chapitre :
+            return str(record.article.chapitre)
+        
+    edit= '<a href="{% url "Transfert_depense" crd=record.id %}" class="btn btn-info" role="button"> Liste_Depense</a>'
+    Depense=tables.TemplateColumn(edit, orderable=False)
+    action= '<a href="{% url "mandatCreate" crd=record.id %}" class="btn btn-info" role="button"> Liste_Economie</a>'
+    Economie=tables.TemplateColumn(action, orderable=False)
+    
+    class Meta:
+        model = Credit_S2
+        fields=('chapitre','article__code_art','article__libelle_art_FR')
+        template_name= "django_tables2/bootstrap4.html"    
+        row_attrs = { "style": lambda record: "background-color: #e6e6e6;" if record.article.posteriori==False 
+                                        else "background-color: #66ff33;"}  
+        
+
+class Transfert_post_Filter(django_filters.FilterSet):
+    code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
+                                      
+    class Meta:
+        model = Credit_S2
+        fields = ['code_art']
+
   
