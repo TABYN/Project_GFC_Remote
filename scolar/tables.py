@@ -1284,11 +1284,12 @@ class Mandat_1_Table(tables.Table):
         
 
 class Mandat_1_Filter(django_filters.FilterSet):
-    code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
+    #code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
                                       
     class Meta:
         model = Credit_S2
-        fields = ['code_art']
+        fields=('article__code_art',)
+        #fields = ['code_art']
         
 class MandatFilter(django_filters.FilterSet):
     num_mandat = django_filters.CharFilter(field_name='num_mandat', lookup_expr='icontains', label="numero Mandat")
@@ -1450,10 +1451,11 @@ class Transfert_post_Table(tables.Table):
         
 
 class Transfert_post_Filter(django_filters.FilterSet):
-    code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
+    #code_art= django_filters.ModelChoiceFilter(field_name='code_art', queryset = Article.objects.all(), empty_label ='Code article', label ='Code article')
                                       
     class Meta:
         model = Credit_S2
-        fields = ['code_art']
+        fields=('article__code_art',)
+        #fields = ['article__code_art']
 
   
