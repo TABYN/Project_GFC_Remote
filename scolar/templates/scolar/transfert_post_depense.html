@@ -25,6 +25,7 @@ table {
 					<div class="card-body">
 					<h2>Fiche modification d'engagement de la provision (credit/provision)</h2>
 					<h4> {{article_source}}</h4>
+					<!-- <h4>xxxx{{annee_bdg.annee_univ}}</h4> -->
 						
 						<br><br>
 				<form class="forms-sample">
@@ -40,15 +41,8 @@ table {
 							
 								<div class="col-md-6">
 									<div class="form-group row">
-										<label class="col-sm-3 col-form-label">Annee budgetaire</label>
-										<div class="col-sm-9">
-											<select class="form-control"  name="annee_budge" >
-											   {% for annee_bdg in annee_bdg %}
-											   <option value="{{ annee_bdg.annee_univ }}">{{ annee_bdg.annee_univ }}</option>
-											   {% endfor %}
-											</select>
-											
-										</div>
+										<label class="col-sm-9 col-form-label">Annee_budgetaire: {{annee_bdg}}</label>
+										
 									</div>
 								</div>
 							</div>
@@ -56,9 +50,9 @@ table {
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group row">
-										<label class="col-sm-3 col-form-label">Date Debut</label>
+										<label class="col-sm-3 col-form-label" for="date_debut">Date Debut</label>
 										<div class="col-sm-9">
-											<input type="date" class="form-control" name="date_debut" />
+											<input type="date" class="form-control" name="date_debut" required />
 										</div>
 									</div>
 								</div>
@@ -66,9 +60,9 @@ table {
 								<div class="col-md-6">
 								  <div class=class="form-group row">
 									<div class="form-group row">
-										<label class="col-sm-3 col-form-label">Date Fin</label>
+										<label class="col-sm-3 col-form-label" for="date_fin">Date Fin</label>
 										<div class="col-sm-9">
-											<input type="date" class="form-control" name="date_fin" />
+											<input type="date" class="form-control" name="date_fin" required/>
 										</div>
 									</div>
 								  </div>
@@ -128,11 +122,12 @@ table {
 								<div class="col-md-4">
 									<a href="{% url 'Transfert_post_list' %}" class="btn btn-secondary btn-block">
 										<i class="fa fa-list"></i> Retour
-									</a>
+									</a>    
 								</div>
 								<div class="col-md-4">
-									<button type="submit" class="btn btn-primary btn-block" >
-										<i class="fa fa-database"></i>Imprimer</button>
+									<a href="{% url 'Transfert_moins_posteriori_PDFView' article_source.id  %}" class="btn btn-primary btn-block">
+										<i class="fa fa-print fa-lg"></i> Imprimer
+									</a>
 								</div>
 							</div>
  							

@@ -14718,61 +14718,53 @@ class Transfert_post_ListView(TemplateView):
 @login_required
 def Transfert_depense(request, crd):
     article_source= Transfert.objects.get(article_source_id=crd)
-    annee_bdg = AnneeUniv.objects.all().order_by('-annee_univ')
-    transferts= Transfert.objects.all()
+    annee_bdg = AnneeUniv.objects.get(encours=True)#.all().order_by('-annee_univ')
+#     an_budg=Transfert.objects.filter(annee_budgi=annee_bdg)
+#     print(an_budg)
+    #transferts= Transfert.objects.all()
 #     annee_budge_id=request.POST.get('annee_budge')
-    
+    print(annee_bdg)
+   
     #crdt= Credit_S2.objects.get(pk=crd)
     print(crd)
     print(article_source)
-    #arti=Article.objects.get(pk=art)
-    
-#     engage=Engagement.objects.all()
-#     print(engage)
-#     engagement_id=request.POST.get('engagement')
-#     print(engagement_id)
-    
-    #frn = Fournisseur.objects.all()
-    #fournisseur_id=request.POST.get('fournisseur')
-    
-    #type_fact=Type_Facture.objects.all()
-    #type_facture_id=request.POST.get('type_facture')
-    
+
+
     
     if request.method == 'POST':
         date_debut=request.POST['date_debut']
         date_fin=request.POST['date_fin']
+        #annee_budgef=request.POST['annee_budgef']
+        transferts= Transfert.objects.filter(date_transfert__range=[date_debut, date_fin]).filter(article_source_id=crd).filter(annee_budgi=annee_bdg)
+        return render(request, 'scolar/transfert_post_depense.html', {'transferts': transferts, 'article_source': article_source, 'annee_bdg':annee_bdg})
+
     
-#         date_debut.save()
-#         date_fin.save()     
-        return redirect(request.path_info)
-        print(date_debut)
-        print(date_fin)
-    
-    
-#     if request.method == 'POST':
-#         mandat = Mandat(
-#             credit_s2 =Credit_S2.objects.get(pk=crd),
-#             #article=Article.objects.get(pk=art),
-#             num_mandat=request.POST['num_mandat'],
-#             date=request.POST['date'],
-#             montant_op=request.POST['montant_op'],
-#             observation_mandat=request.POST['observation_mandat'],
-#             annee_budge=AnneeUniv.objects.get(annee_univ=annee_budge_id),
-#             fournisseur=Fournisseur.objects.get(id=fournisseur_id),
-#             #engagement=Engagement.objects.get(id=engagement_id),
-#             type_facture=Type_Facture.objects.get(id=type_facture_id),
-#             
-#         )
-#         
-#         mandat.save()
-#         messages.success(request, 'Mandat enregistré.')
-#         return redirect(request.path_info)
-#     else:
-#         #mandats = Mandat.objects.filter(article=Article.objects.get(pk=art))
-#         mandats = Mandat.objects.filter(credit_s2 =Credit_S2.objects.get(pk=crd))
-#         return render(request, 'scolar/transfert_post_depense.html', {'mandats': mandats, 'crdt': crdt, 'frn':frn, 'annee_bdg':annee_bdg, 'type_fact':type_fact})#'engage':engage,
-    
-    
-    return render(request, 'scolar/transfert_post_depense.html',{'article_source': article_source , 'annee_bdg':annee_bdg, 'transferts':transferts})#, 'date_debut':date_debut, 'date_fin':date_fin
-               
+    return render(request, 'scolar/transfert_post_depense.html',{'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
+  
+  
+  ######################   Imprimer la somme des transfert_moin_posteriori ##############  
+
+class Transfert_moins_posteriori_PDFView(PDFTemplateView):
+    template_name= 'scolar/transfert_moins_posteriori.html'
+    #titre = 'Transfert de credit (-)'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+#         transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
+#         montant_operation= transfert_.montant_transfert.amount
+#         transfert_letter = num2words(montant_operation, lang='fr')
+#         ancien_solde = transfert_.article_source.credit_reste.amount - montant_operation
+#         pieces = {}
+        context = {}
+#         context['montant_operation'] = montant_operation
+#         context['ancien_solde'] = ancien_solde
+#         context['transfert_'] = transfert_
+#         context['transfert_letter'] = transfert_letter
+  
+       # self.filename ='Imprimer la somme des transfert de Credit (-)'+str(transfert_.num_transfert) + '.pdf'
+        return context
+  
+            
