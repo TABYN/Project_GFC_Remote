@@ -14477,7 +14477,6 @@ def transfert_update_view(request, transfert_pk):
                 
                 credit_S2_source.save(update_fields=['credit_reste'])  
                 credit_S2_destination.save(update_fields=['credit_reste'])
-                   
                 
                 ##########################
                 
@@ -14560,87 +14559,6 @@ class Transfert_DetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                   
         return context     
 
-class Transfert_plus_posteriori_PDFView(PDFTemplateView):
-    template_name= 'scolar/transfert_plus.html'
-    titre = 'Transfert de credit (+)'
-    cmd_options = {
-        'orientation': 'Landscape',
-        'page-size': 'A3',
-    }
-
-    def get_context_data(self,  **kwargs):
-        transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
-        #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
-        
-
-        all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
-        transferts=[]
-        total_transfert=0
-        for transfert in all_transferts:
-            transferts.append(transfert)
-            total_transfert+= transfert.montant_transfert.amount
-            
-#             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
-#                 transferts.append(transfert)
-#                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
-#                     total_transfert+= transfert.montant_transfert.amount
-#                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
-#                     total_transfert+= transfert.montant_transfert.amount
-              
-
-        transfert_letter = num2words(total_transfert, lang='fr')
-         
-        pieces = {}
-        context = {}
-        context['transfert_'] = transfert_
-        
-        context['transferts'] = transferts
-        context['total_transfert'] = total_transfert
-        context['transfert_letter'] = transfert_letter
-
-        self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
-        return context
- 
-class Transfert_moins_posteriori_PDFView(PDFTemplateView):
-    template_name= 'scolar/transfert_moins.html'
-    titre = 'Transfert de credit (-)'
-    cmd_options = {
-        'orientation': 'Landscape',
-        'page-size': 'A3',
-    }
-
-    def get_context_data(self,  **kwargs):
-        transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
-        #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
-        
-
-        all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
-        transferts=[]
-        total_transfert=0
-        for transfert in all_transferts:
-            transferts.append(transfert)
-            total_transfert+= transfert.montant_transfert.amount
-            
-#             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
-#                 transferts.append(transfert)
-#                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
-#                     total_transfert+= transfert.montant_transfert.amount
-#                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
-#                     total_transfert+= transfert.montant_transfert.amount
-              
-
-        transfert_letter = num2words(total_transfert, lang='fr')
-         
-        pieces = {}
-        context = {}
-        context['transfert_'] = transfert_
-        
-        context['transferts'] = transferts
-        context['total_transfert'] = total_transfert
-        context['transfert_letter'] = transfert_letter
-
-        self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
-        return context
  
 class Transfert_moins_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_moins.html'
@@ -14710,35 +14628,28 @@ class Transfert_post_ListView(TemplateView):
 
         return context   
 
-
-
-
-###############################################    essai
+###############################################    essai posteriori
 
 @login_required
 def Transfert_depense(request, crd):
     article_source= Transfert.objects.get(article_source_id=crd)
     annee_bdg = AnneeUniv.objects.get(encours=True)#.all().order_by('-annee_univ')
 #     an_budg=Transfert.objects.filter(annee_budgi=annee_bdg)
-#     print(an_budg)
     #transferts= Transfert.objects.all()
 #     annee_budge_id=request.POST.get('annee_budge')
-    print(annee_bdg)
-   
     #crdt= Credit_S2.objects.get(pk=crd)
     print(crd)
     print(article_source)
-
-
     
     if request.method == 'POST':
         date_debut=request.POST['date_debut']
         date_fin=request.POST['date_fin']
-        #annee_budgef=request.POST['annee_budgef']
         transferts= Transfert.objects.filter(date_transfert__range=[date_debut, date_fin]).filter(article_source_id=crd).filter(annee_budgi=annee_bdg)
-        return render(request, 'scolar/transfert_post_depense.html', {'transferts': transferts, 'article_source': article_source, 'annee_bdg':annee_bdg})
-
-    
+        somme_montant_transfert_post=0
+        for transfert in transferts:
+            somme_montant_transfert_post+=transfert.montant_transfert.amount 
+         
+        return render(request, 'scolar/transfert_post_depense.html', {'transferts': transferts, 'article_source': article_source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})
     return render(request, 'scolar/transfert_post_depense.html',{'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
   
   
@@ -14746,13 +14657,57 @@ def Transfert_depense(request, crd):
 
 class Transfert_moins_posteriori_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_moins_posteriori.html'
-    #titre = 'Transfert de credit (-)'
+    titre = 'Les depense d un article a posteriori'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
     }
 
+#     def get_context_data(self,  **kwargs):
+#         article_source= Transfert.objects.get(article_source_id=kwargs)
+#         annee_bdg = AnneeUniv.objects.get(encours=True)#.all().order_by('-annee_univ')
+#         transferts= Transfert.objects.filter(date_transfert__range=[date_debut, date_fin]).filter(article_source_id=crd).filter(annee_budgi=annee_bdg)
+#         
+#         transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
+#         #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
+#         
+# 
+#         all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
+#         transferts=[]
+#         total_transfert=0
+#         for transfert in all_transferts:
+#             transferts.append(transfert)
+#             total_transfert+= transfert.montant_transfert.amount
+#             
+# #             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
+# #                 transferts.append(transfert)
+# #                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
+# #                     total_transfert+= transfert.montant_transfert.amount
+# #                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
+# #                     total_transfert+= transfert.montant_transfert.amount
+#               
+# 
+#         transfert_letter = num2words(total_transfert, lang='fr')
+#          
+#         pieces = {}
+#         context = {}
+#         context['transfert_'] = transfert_
+#         
+#         context['transferts'] = transferts
+#         context['total_transfert'] = total_transfert
+#         context['transfert_letter'] = transfert_letter
+# 
+#         self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
+#         return context
+    
     def get_context_data(self,  **kwargs):
+        #transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
+        article_source_= Transfert.objects.get(id=self.kwargs.get('article_source_pk'))
+        
+        annee_bdg = AnneeUniv.objects.get(encours=True)#.all().order_by('-annee_univ')
+        print(article_source_)
+        print(annee_bdg)
+        
 #         transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
 #         montant_operation= transfert_.montant_transfert.amount
 #         transfert_letter = num2words(montant_operation, lang='fr')
@@ -14763,8 +14718,50 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
 #         context['ancien_solde'] = ancien_solde
 #         context['transfert_'] = transfert_
 #         context['transfert_letter'] = transfert_letter
-  
+   
        # self.filename ='Imprimer la somme des transfert de Credit (-)'+str(transfert_.num_transfert) + '.pdf'
         return context
   
+###############################
+class Transfert_plus_posteriori_PDFView(PDFTemplateView):
+    template_name= 'scolar/transfert_plus.html'
+    titre = 'Transfert de credit (+)'
+    cmd_options = {
+        'orientation': 'Landscape',
+        'page-size': 'A3',
+    }
+
+    def get_context_data(self,  **kwargs):
+        transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
+        #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
+        
+
+        all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
+        transferts=[]
+        total_transfert=0
+        for transfert in all_transferts:
+            transferts.append(transfert)
+            total_transfert+= transfert.montant_transfert.amount
+            
+#             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
+#                 transferts.append(transfert)
+#                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
+#                     total_transfert+= transfert.montant_transfert.amount
+#                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
+#                     total_transfert+= transfert.montant_transfert.amount
+              
+
+        transfert_letter = num2words(total_transfert, lang='fr')
+         
+        pieces = {}
+        context = {}
+        context['transfert_'] = transfert_
+        
+        context['transferts'] = transferts
+        context['total_transfert'] = total_transfert
+        context['transfert_letter'] = transfert_letter
+
+        self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
+        return context
+ 
             
