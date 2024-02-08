@@ -50,7 +50,7 @@ table {
                            <!-- {% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
                            <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
                            {% elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 %}
- -->                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+ -->                           <p>Transfert du {{article_source_.article.chapitre.code_chap}}{{article_source_.article.code_art}} vers {{transfert.article_destination.article.chapitre.code_chap}}{{transfert.article_destination.article.code_art}}</p>
                           <!--  {% endif %} -->
                           {% endfor %}
                           
@@ -61,7 +61,7 @@ table {
                            <td style="vertical-align: top;">
                             
                             {% for transfert in transferts %}
-                            <p style="text-align:right;">{{transfert_.montant_transfert.amount}}</p>
+                            <p style="text-align:right;">{{transfert.montant_transfert.amount}}</p>
                             {% endfor %}
                           </td>
                           
@@ -124,7 +124,7 @@ table {
 					  <tr style="height:50px;"> 
 					  
 							<td style=" width: 15%;height:25;"><p>Année&nbsp;&nbsp;&nbsp;&nbsp;{{transfert_.annee_budgi}}</p></td>
-							<td style=" width: 15%;height:25;"><p>N° &nbsp;&nbsp;&nbsp;&nbsp;003</p></td>
+							<td style=" width: 15%;height:25;"><p>N° &nbsp;&nbsp;&nbsp;&nbsp;0063</p></td>
 							<td style=" width: 40%;height:25;border-top: none;border-bottom: none;vertical-align: bottom;"><br></td>
                            <td style=" width: 15%;height:25;"><p>N° </p></td>	
                            <td style=" width: 15%;height:25;"><p>DU</p></td>					
