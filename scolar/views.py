@@ -12033,15 +12033,15 @@ def AvanceCreate(request, exe):
     
 class AvanceChartView(TemplateView):
      template_name='scolar/chart.html'
-     
+      
      def get_context_data(self, **kwargs) :
         context = super(AvanceChartView, self).get_context_data(**kwargs) 
         avances = Avance.objects.filter(encours='True')
-    
+     
         vect=[]
         for avane in avances :
             vect.append(avane.id)
-        
+         
         Credits = Credit.objects.filter(avance_id=vect[0])
         exercice = Exercice.objects.get(id=Avance.objects.get(id=vect[0]).exercice_id)
         avance= Avance.objects.get(id=vect[0])
@@ -12049,15 +12049,16 @@ class AvanceChartView(TemplateView):
         nb_brds=0
         sum_credit=0
         sum_reste=0
+         
         for credit in Credits : 
             Ratio_reste.append( "{:.2f}".format(((credit.credit_allouee.amount - credit.credit_reste.amount)*100)/credit.credit_allouee.amount))
             sum_credit=sum_credit+ credit.credit_allouee.amount
             sum_reste=sum_reste+credit.credit_reste.amount
             nb_brds=nb_brds+ Bordereau.objects.filter(credit=credit).count()
-       
-        
+         
+          
         print (nb_brds)
-        
+         
         context['pourcent_reste'] = "{:.2f}".format((sum_reste*100)/sum_credit)
         context['exercice'] = exercice.annee_budg
         context['sum_credit'] = sum_credit
@@ -12066,8 +12067,10 @@ class AvanceChartView(TemplateView):
         context['Credits'] = Credits
         context['nb_brds'] = nb_brds
         return context        
-    
-  
+     
+   
+
+
 
 @login_required
 def ChapitreCreate(request):
@@ -14632,14 +14635,17 @@ class Transfert_post_ListView(TemplateView):
 
 @login_required
 def Transfert_depense(request, crd):
-    article_source= Transfert.objects.get(article_source_id=crd)
-    annee_bdg = AnneeUniv.objects.get(encours=True)#.all().order_by('-annee_univ')
-#     an_budg=Transfert.objects.filter(annee_budgi=annee_bdg)
-    #transferts= Transfert.objects.all()
-#     annee_budge_id=request.POST.get('annee_budge')
-    #crdt= Credit_S2.objects.get(pk=crd)
     print(crd)
+    credit_s2_= Credit_S2.objects.get(id=crd)
+    print(credit_s2_)
+    #article_source_= Article.objects.get(id=crd)
+    article_source= credit_s2_.article
+    
     print(article_source)
+    transfert_=Transfert.objects.filter(article_source_id=crd)
+    print(transfert_)
+    annee_bdg = AnneeUniv.objects.get(encours=True)
+    
     
     if request.method == 'POST':
         date_debut=request.POST['date_debut']
@@ -14647,10 +14653,11 @@ def Transfert_depense(request, crd):
         transferts= Transfert.objects.filter(date_transfert__range=[date_debut, date_fin]).filter(article_source_id=crd).filter(annee_budgi=annee_bdg)
         somme_montant_transfert_post=0
         for transfert in transferts:
-            somme_montant_transfert_post+=transfert.montant_transfert.amount 
+            somme_montant_transfert_post+=transfert.montant_transfert.amount
+            destination= transfert.article_destination  
          
-        return render(request, 'scolar/transfert_post_depense.html', {'transferts': transferts, 'article_source': article_source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})
-    return render(request, 'scolar/transfert_post_depense.html',{'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
+        return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})
+    return render(request, 'scolar/transfert_post_depense.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
   
   
   ######################   Imprimer la somme des transfert_moin_posteriori ##############  
@@ -14664,14 +14671,30 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
     }
 
     def get_context_data(self,  **kwargs):
-        article_source_= Transfert.objects.get(id=self.kwargs.get('article_source_pk'))
+        print(self.kwargs.get('credit_s2__pk'))
+        #######################
+#         transfert_=Transfert.objects.filter(article_source=self.kwargs.get('credit_s2__pk'))#get('crd'))
+#         print(transfert_)
+#         article_source = transfert_.article_source
+#         print(article_source)
+        ######################
+        #article_source_= Transfert.objects.get(id=self.kwargs.get('article_source_pk'))
+        #article_source_p = self.kwargs.get('article_source_pk')
+        #print(article_source_p)# id du transfert 12
+        #source=transfert.objects.filter(article_source=article_source_p.)
+        #article_source_ = Transfert.objects.get(id=article_source_p)
         annee_bdg = AnneeUniv.objects.get(encours=True)#.all().order_by('-annee_univ')
- 
+       # print(article_source_)
+        print(annee_bdg)
         #date_transfert_range_ = Transfert.objects.filter(date_debut=self.kwargs.get('date_debut'), date_fin=self.kwargs.get('date_fin'))
                 
         #transferts = Transfert.objects.filter(date_transfert=date_transfert__range).filter(article_source_id=article_source_).filter(annee_budgi=annee_bdg)
-        all_transferts = Transfert.objects.filter(article_source_id=article_source_.id, annee_budgi=annee_bdg)
-
+        #all_transferts = Transfert.objects.filter(article_source__id=article_source_.id, annee_budgi=annee_bdg)
+        #all_transferts = Transfert.objects.filter(article_source_id = article_source_.pk)
+        all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))
+        print(all_transferts)
+        article_source = self.kwargs.get('credit_s2__pk')
+        print(article_source)
         #transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
         #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
          
@@ -14692,19 +14715,21 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
                
  
         transfert_letter = num2words(total_transfert, lang='fr')
+        print(transfert_letter)
           
         pieces = {}
         context = {}
-        context['article_source_'] = article_source_
-         
+        context['article_source'] = article_source
+        context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
  
-        self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source_.id) + '.pdf'
+        #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source.id) + '.pdf'
+        self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source) + '.pdf'
         return context
     
-#     def get_context_data(self,  **kwargs):
+#     def get_context_data(self,  **kwargs):                            
 #         #transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
 #         article_source_= Transfert.objects.get(id=self.kwargs.get('article_source_pk'))
 #         

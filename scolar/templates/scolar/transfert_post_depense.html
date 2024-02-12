@@ -24,7 +24,7 @@ table {
 				<div class="card">
 					<div class="card-body">
 					<h2>Fiche modification d'engagement de la provision (credit/provision)</h2>
-					<h4> {{article_source}}</h4>
+					<h4>Article_Source:  {{article_source}}</h4>
 					<!-- <h4>xxxx{{annee_bdg.annee_univ}}</h4> -->
 						
 						<br><br>
@@ -41,7 +41,7 @@ table {
 							
 								<div class="col-md-6">
 									<div class="form-group row">
-										<label class="col-sm-9 col-form-label">Annee_budgetaire: {{annee_bdg}}</label>
+										<label class="col-md-6 col-form-label">Annee_budgetaire: {{annee_bdg}}</label>
 										
 									</div>
 								</div>
@@ -101,7 +101,7 @@ table {
 													<td>{{transfert.num_transfert}}</td>
 													<td>{{transfert.date_transfert}}</td>
 													<td>{{transfert.montant_transfert}}</td>
-													<td>{{transfert.article_destination_id}}</td>
+													<td>{{destination}}</td> <!-- {{transfert.article_destination.id}} : -->
 													
 												{% endfor %}
 												</tbody>
@@ -136,7 +136,7 @@ table {
 									</a>    
 								</div>
 								<div class="col-md-4">
-									<a href="{% url 'Transfert_moins_posteriori_PDFView' article_source.id  %}" class="btn btn-primary btn-block">
+									<a href="{% url 'Transfert_moins_posteriori_PDFView' credit_s2_.id  %}" class="btn btn-primary btn-block">
 										<i class="fa fa-print fa-lg"></i> Imprimer
 									</a>
 								</div>

@@ -423,6 +423,6 @@ urlpatterns = [
     path('Transfert_depense/<int:crd>/', views.Transfert_depense, name="Transfert_depense"),
     #path('Transfert_plus_PDFView/<transfert_pk>/', views.Transfert_plus_PDFView.as_view(), name='Transfert_plus_PDFView'),
     #path('Transfert_moins_posteriori_PDFView/(?P<date_debut>\d{4}-\d{2}-\d{2})/(?P<date_fin>\d{4}-\d{2}-\d{2})/<article_source_pk>/ ', views.Transfert_moins_posteriori_PDFView.as_view(), name='Transfert_moins_posteriori_PDFView'),
-    path('Transfert_moins_posteriori_PDFView/<article_source_pk>/ ', views.Transfert_moins_posteriori_PDFView.as_view(), name='Transfert_moins_posteriori_PDFView'),
-
+    path('Transfert_moins_posteriori_PDFView/<credit_s2__pk>/ ', views.Transfert_moins_posteriori_PDFView.as_view(), name='Transfert_moins_posteriori_PDFView'),
+                                               #<int:crd> transfert_posterio_pk
     ]

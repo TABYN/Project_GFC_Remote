@@ -1437,7 +1437,7 @@ class Transfert_post_Table(tables.Table):
         if record.article.chapitre :
             return str(record.article.chapitre)
         
-    edit= '<a href="{% url "Transfert_depense" crd=record.id %}" class="btn btn-info" role="button"> Liste_Depense</a>'
+    edit= '<a href="{% url "Transfert_depense" crd=record.id %}" class="btn btn-info" role="button"> Liste_Depense</a>' #a href="{% url "Transfert_depense" crd=record.id %}
     Depense=tables.TemplateColumn(edit, orderable=False)
     action= '<a href="{% url "mandatCreate" crd=record.id %}" class="btn btn-info" role="button"> Liste_Economie</a>'
     Economie=tables.TemplateColumn(action, orderable=False)
