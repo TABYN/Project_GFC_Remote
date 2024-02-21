@@ -14642,8 +14642,9 @@ def Transfert_depense(request, crd):
     print(credit_s2_)
     #article_source_= Article.objects.get(id=crd)
     article_source= credit_s2_.article
-    
     print(article_source)
+    art_source_id =credit_s2_.article.id
+    print(art_source_id) 
     transfert_=Transfert.objects.filter(article_source_id=crd)
     print(transfert_)
     annee_bdg = AnneeUniv.objects.get(encours=True)
@@ -14653,6 +14654,7 @@ def Transfert_depense(request, crd):
         date_debut=request.POST['date_debut']
         date_fin=request.POST['date_fin']
         transferts= Transfert.objects.filter(date_transfert__range=[date_debut, date_fin]).filter(article_source_id=crd).filter(annee_budgi=annee_bdg)
+        # confusion--->ici article_source_id c'est le ID de credit_s2_  pas le Id de l'Article
         somme_montant_transfert_post=0
         for transfert in transferts:
             somme_montant_transfert_post+=transfert.montant_transfert.amount
@@ -14695,16 +14697,25 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         #all_transferts = Transfert.objects.filter(article_source__id=article_source_.id, annee_budgi=annee_bdg)
         #all_transferts = Transfert.objects.filter(article_source_id = article_source_.pk)
         all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))
-        print(all_transferts)
-        art_source = self.kwargs.get('credit_s2__pk')
-        print('art_source = self.kwargs.get(credit_s2__pk)')
-        print(art_source)
-        essai= Article.objects.get(id=self.kwargs.get('credit_s2__pk'))
-        print('essai= Article.objects.get(id=self.kwargs.get(credit_s2__pk))')
-        print(essai)
+        print(all_transferts)###########################
+#         art_source = self.kwargs.get('credit_s2__pk')
+#         print('art_source = self.kwargs.get(credit_s2__pk)')
+#         print(art_source)
+#         essai= Article.objects.get(id=self.kwargs.get('credit_s2__pk'))
+#         print('essai= Article.objects.get(id=self.kwargs.get(credit_s2__pk))')
+#         print(essai)
+################################################
         #transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
         #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
-         
+        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))
+        print('credit_s2_')
+        print(credit_s2_)
+        #article_source_= Article.objects.get(id=crd)
+        article_source= credit_s2_.article
+        print(article_source)
+        essai =credit_s2_.article#.id
+        print('essai')
+        print(essai)  
  
         #all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
         transferts=[]
@@ -14726,15 +14737,16 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
           
         pieces = {}
         context = {}
-        context['art_source'] = art_source
+        context['article_source'] =article_source
         context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
         context['essai'] =essai
+        context['credit_s2_']=credit_s2_
  
         #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source.id) + '.pdf'
-        self.filename ='transfert_fiche_modification_de_la_provision'+str(art_source) + '.pdf'
+        self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source) + '.pdf'
         return context
     
 #     def get_context_data(self,  **kwargs):                            
