@@ -14635,8 +14635,10 @@ class Transfert_post_ListView(TemplateView):
 
 @login_required
 def Transfert_depense(request, crd):
+    print('crd')
     print(crd)
     credit_s2_= Credit_S2.objects.get(id=crd)
+    print('credit_s2_')
     print(credit_s2_)
     #article_source_= Article.objects.get(id=crd)
     article_source= credit_s2_.article
@@ -14671,6 +14673,7 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
     }
 
     def get_context_data(self,  **kwargs):
+        print('self.kwargs.get(credit_s2__pk)')
         print(self.kwargs.get('credit_s2__pk'))
         #######################
 #         transfert_=Transfert.objects.filter(article_source=self.kwargs.get('credit_s2__pk'))#get('crd'))
@@ -14693,8 +14696,12 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         #all_transferts = Transfert.objects.filter(article_source_id = article_source_.pk)
         all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))
         print(all_transferts)
-        article_source = self.kwargs.get('credit_s2__pk')
-        print(article_source)
+        art_source = self.kwargs.get('credit_s2__pk')
+        print('art_source = self.kwargs.get(credit_s2__pk)')
+        print(art_source)
+        essai= Article.objects.get(id=self.kwargs.get('credit_s2__pk'))
+        print('essai= Article.objects.get(id=self.kwargs.get(credit_s2__pk))')
+        print(essai)
         #transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
         #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
          
@@ -14719,14 +14726,15 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
           
         pieces = {}
         context = {}
-        context['article_source'] = article_source
+        context['art_source'] = art_source
         context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
+        context['essai'] =essai
  
         #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source.id) + '.pdf'
-        self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source) + '.pdf'
+        self.filename ='transfert_fiche_modification_de_la_provision'+str(art_source) + '.pdf'
         return context
     
 #     def get_context_data(self,  **kwargs):                            
