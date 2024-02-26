@@ -14338,9 +14338,10 @@ class Transfert_ListView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         return self.request.user.is_budget()
        
     def get_context_data(self, **kwargs):
+        annee_bdg = AnneeUniv.objects.get(encours=True)
         context = super(Transfert_ListView, self).get_context_data(**kwargs)
  
-        filter_ = TransfertFilter(self.request.GET, queryset=Transfert.objects.order_by('num_transfert'))
+        filter_ = TransfertFilter(self.request.GET, queryset=Transfert.objects.filter(annee_budgi=annee_bdg).order_by('num_transfert'))
  
         filter_.form.helper = FormHelper()
         exclude_columns_ = exclude_columns(self.request.user)
@@ -14680,9 +14681,13 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         #  requete recupere tous les transferts de la base de donnees qui ont une annee budgetaire specifique
         # et qui ont pour source l'article associe a la cle 'credit_s2__pk'
         all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))
-        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))# recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
+        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))
+        credit_s2_alloue= credit_s2_.credit_allouee.amount/2
+        print('credit_s2_alloue')
+        print(credit_s2_alloue)
+        # recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
         article_source= credit_s2_.article # recuperer l'objet article_source
-        ancien_solde = credit_s2_.credit_reste.amount
+        #ancien_solde = credit_s2_.credit_reste.amount
 
         transferts=[]
         total_transfert=0
@@ -14697,7 +14702,13 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
 #                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
 #                     total_transfert+= transfert.montant_transfert.amount
                
-        nouveau_solde =  credit_s2_.credit_reste.amount-total_transfert
+        #nouveau_solde =  credit_s2_.credit_reste.amount-total_transfert
+        ancien_solde = (credit_s2_.credit_reste.amount) + total_transfert
+        print('ancien_solde')
+        print(ancien_solde)
+        nouveau_solde = credit_s2_.credit_reste.amount
+        print('nouveau_solde')
+        print(nouveau_solde)
         transfert_letter = num2words(total_transfert, lang='fr')
         print(transfert_letter)
           
