@@ -14575,7 +14575,7 @@ class Transfert_moins_PDFView(PDFTemplateView):
         transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
         montant_operation= transfert_.montant_transfert.amount
         transfert_letter = num2words(montant_operation, lang='fr')
-        ancien_solde = transfert_.article_source.credit_reste.amount - montant_operation
+        ancien_solde = transfert_.article_source.credit_reste.amount + montant_operation
         pieces = {}
         context = {}
         context['montant_operation'] = montant_operation
@@ -14718,7 +14718,34 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
     
 
   
-###############################
+###############################  Economie
+@login_required
+def Transfert_economie(request, crd):
+    credit_s2_= Credit_S2.objects.get(id=crd)
+    article_destination= credit_s2_.article
+#    art_destination_id =credit_s2_.article.id
+ #   print(art_destination_id) 
+    transfert_=Transfert.objects.filter(article_destination_id=crd)
+    print(transfert_)
+    annee_bdg = AnneeUniv.objects.get(encours=True)
+    
+    
+    if request.method == 'POST':
+        date_debut=request.POST['date_debut']
+        date_fin=request.POST['date_fin']
+        transferts= Transfert.objects.filter(date_transfert__range=[date_debut, date_fin]).filter(article_destination_id=crd).filter(annee_budgi=annee_bdg)
+        # confusion--->ici article_destination_id c'est le ID de credit_s2_  pas le Id de l'Article
+        # models.py---->  class Transfert :article_destination=models.ForeignKey(Credit_S2 ,related_name='destination' , null= True, blank=True, on_delete=models.SET_NULL) 
+        somme_montant_transfert_post=0
+        for transfert in transferts:
+            somme_montant_transfert_post+=transfert.montant_transfert.amount
+            #destination= transfert.article_destination 
+            source = transfert.article_source 
+         
+        return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination,'source':source , 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})# 'destination':destination
+    return render(request, 'scolar/transfert_post_economie.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_destination': article_destination, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
+ 
+
 class Transfert_plus_posteriori_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_plus.html'
     titre = 'Transfert de credit (+)'
@@ -14728,36 +14755,49 @@ class Transfert_plus_posteriori_PDFView(PDFTemplateView):
     }
 
     def get_context_data(self,  **kwargs):
-        transfert_ = Transfert.objects.get(id=self.kwargs.get('transfert_pk'))
-        #transfert_letter = num2words(transfert_.article_destination.credit_reste.amount, lang='fr')
-        
+        print('self.kwargs.get(credit_s2__pk)')
+        print(self.kwargs.get('credit_s2__pk'))
+        #######################
+        annee_bdg = AnneeUniv.objects.get(encours=True)
+        #date_transfert_range_ = Transfert.objects.filter(date_debut=self.kwargs.get('date_debut'), date_fin=self.kwargs.get('date_fin'))
+        #transferts = Transfert.objects.filter(date_transfert=date_transfert__range).filter(article_destination_id=article_destination_).filter(annee_budgi=annee_bdg)
 
-        all_transferts = Transfert.objects.all().exclude(article_destination__isnull=True)
+        #  requete recupere tous les transferts de la base de donnees qui ont une annee budgetaire specifique
+        # et qui ont pour destination l'article associe a la cle 'credit_s2__pk'
+        all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_destination=self.kwargs.get('credit_s2__pk'))
+        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))# recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
+        article_destination= credit_s2_.article # recuperer l'objet article_destination
+        ancien_solde = credit_s2_.credit_reste.amount
+
         transferts=[]
         total_transfert=0
         for transfert in all_transferts:
             transferts.append(transfert)
             total_transfert+= transfert.montant_transfert.amount
-            
+            print(total_transfert) 
 #             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
 #                 transferts.append(transfert)
 #                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
 #                     total_transfert+= transfert.montant_transfert.amount
 #                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
 #                     total_transfert+= transfert.montant_transfert.amount
-              
-
+               
+        nouveau_solde =  credit_s2_.credit_reste.amount+total_transfert
         transfert_letter = num2words(total_transfert, lang='fr')
-         
+        print(transfert_letter)
+          
         pieces = {}
         context = {}
-        context['transfert_'] = transfert_
-        
+        context['article_destination'] =article_destination
+        context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
-
-        self.filename ='transfert_fiche_modification_de_la_provision'+str(transfert_.id) + '.pdf'
-        return context
+        #context['credit_s2_'] = credit_s2_
+        context['ancien_solde']=ancien_solde
+        context['nouveau_solde']=nouveau_solde
  
+        #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_destination.id) + '.pdf'
+        self.filename ='transfert_fiche_modification_de_la_provision'+str(article_destination) + '.pdf'
+        return context
             

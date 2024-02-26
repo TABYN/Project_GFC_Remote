@@ -48,9 +48,9 @@ table {
                           
                            {% for transfert in transferts %}
                            <!-- {% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
-                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+                           <p>Transfert du {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
                            {% elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 %}
- -->                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
+ -->                           <p>Transfert du {{transfert.article_source.article.chapitre.code_chap}}{{transfert.article_source.article.code_art}} AU {{transfert.article_destination.article.chapitre.code_chap}}{{transfert.article_destination.article.code_art}}</p>
                           <!--  {% endif %} -->
                           {% endfor %}
                           
@@ -61,7 +61,7 @@ table {
                            <td style="vertical-align: top;">
                             
                             {% for transfert in transferts %}
-                            <p style="text-align:right;">{{transfert_.montant_transfert.amount}}</p>
+                            <p style="text-align:right;">{{transfert.montant_transfert.amount}}</p>
                             {% endfor %}
                           </td>
                           
@@ -123,8 +123,8 @@ table {
 						<tbody>
 					  <tr style="height:50px;"> 
 					  
-							<td style=" width: 15%;height:25;"><p>Année&nbsp;&nbsp;&nbsp;&nbsp;{{transfert_.annee_budgi}}</p></td>
-							<td style=" width: 15%;height:25;"><p>N° &nbsp;&nbsp;&nbsp;&nbsp;003</p></td>
+							<td style=" width: 15%;height:25;"><p>Année&nbsp;&nbsp;&nbsp;&nbsp;{{annee_bdg}}</p></td>
+							<td style=" width: 15%;height:25;"><p>N° &nbsp;&nbsp;&nbsp;&nbsp;</p></td>
 							<td style=" width: 40%;height:25;border-top: none;border-bottom: none;vertical-align: bottom;"><br></td>
                            <td style=" width: 15%;height:25;"><p>N° </p></td>	
                            <td style=" width: 15%;height:25;"><p>DU</p></td>					
@@ -158,62 +158,59 @@ table {
 						    <td style=" width: 40%;height:25;text-align:center;"><p>Observation des services</p></td>
 						    
 						</tr>
+						
 						{% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
 						<tr style="height:100px;"> 
-						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td> 
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_article_posteriori}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.montant_transfert}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.nouveau_solde_s1_transfert}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_reste}}</p></td>
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgetaire</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td> 
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde}}</p></td> 
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td> <!-- {{transfert_.montant_transfert}} -->
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde}}</p></td> <!-- transfert_.nouveau_solde_s1_transfert -->
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{transfert_.article_destination.credit_reste}}</p></td>
 						
 						</tr>
 						
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_article_posteriori}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.nouveau_solde_s1_transfert}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.nouveau_solde_s2_transfert}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.credit_reste}}</p></td>
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td> <!-- {{transfert_.nouveau_solde_s1_transfert}} -->
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{transfert_.article_destination.credit_reste}}</p></td>
 						
 						</tr>
                            {% else %}
                         <tr style="height:100px;"> 
 
-						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td>
 				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 							<!-- <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td> -->
-                            <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+                            <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
 
 						<tr style="height:100px;"> 
-						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{transfert_.article_destination.article.code_art}}</p></td>
-				        	<!-- <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.montant_operation}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td>
- -->                        <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.nouveau_solde_s2.amount}}</p></td>
+						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision (50% CB)</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td>
+                            <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.n_solde_s2.amount}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
 						</tr>
 						{% endif %}
-                          
+                         
 						</table>  
 						
 						<div style="text-align:left;">
 						<p>L'intitule: </p>
-						<p>Chapitre:&nbsp;&nbsp;{{transfert_.article_destination.chapitre.libelle_chap_FR}} </p>
-						<p>Article: &nbsp;&nbsp;{{transfert_.article_destination.article.libelle_art_FR}}</p>
+						<p>Chapitre:&nbsp;&nbsp;{{article_destination.chapitre.libelle_chap_FR}}</p>
+						<p>Article: &nbsp;&nbsp;{{article_destination.libelle_art_FR}}</p>
 						<p>Observation du service</p>
 						<!-- <p>Regularisation d'engagement de depence pris en charge dans sa forme a posteriori.......................<br>
 						      .............................................................................................................................</p>
