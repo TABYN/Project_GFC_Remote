@@ -14680,11 +14680,9 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
 
         #  requete recupere tous les transferts de la base de donnees qui ont une annee budgetaire specifique
         # et qui ont pour source l'article associe a la cle 'credit_s2__pk'
-        all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))
+        all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
         credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))
-        credit_s2_alloue= credit_s2_.credit_allouee.amount/2
-        print('credit_s2_alloue')
-        print(credit_s2_alloue)
+        
         # recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
         article_source= credit_s2_.article # recuperer l'objet article_source
         #ancien_solde = credit_s2_.credit_reste.amount
@@ -14695,33 +14693,69 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
             transferts.append(transfert)
             total_transfert+= transfert.montant_transfert.amount
             print(total_transfert) 
-#             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
-#                 transferts.append(transfert)
-#                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
-#                     total_transfert+= transfert.montant_transfert.amount
-#                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
-#                     total_transfert+= transfert.montant_transfert.amount
                
         #nouveau_solde =  credit_s2_.credit_reste.amount-total_transfert
-        ancien_solde = (credit_s2_.credit_reste.amount) + total_transfert
-        print('ancien_solde')
-        print(ancien_solde)
-        nouveau_solde = credit_s2_.credit_reste.amount
-        print('nouveau_solde')
-        print(nouveau_solde)
+        credit_art_post = credit_s2_.credit_article_posteriori()# la methode: self.credit_allouee.amount/2
+        print ('credit_art_post')
+        print (credit_art_post)
+        #ancien_solde = credit_s2_.credit_reste.amount + total_transfert
+        
+       # nouveau_solde = credit_s2_.credit_reste.amount
+        
+        if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
+
+            if total_transfert!=0 :
+                nouveau_solde_S1 = credit_art_post - total_transfert
+                print('nouveau_solde_S1')
+                print(nouveau_solde_S1)
+            elif total_transfert==0:
+                nouveau_solde_S1 = credit_art_post  
+        elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
+
+            ancien_solde_S1=credit_art_post
+            ancien_solde_S1plusS2 = 2*credit_art_post
+            print('ancien_solde_S1plusS2')
+            print(ancien_solde_S1plusS2)
+            nouveau_solde_S2 = ancien_solde_S1plusS2 - total_transfert 
+            print('nouveau_solde_S2')
+            print(nouveau_solde_S2)
+                     
+        elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 and nouveau_solde_S1 is not None:
+
+            print('nouveau_solde_S1')
+            print(nouveau_solde_S1)
+            if nouveau_solde_S1!=credit_art_post:
+                ancien_solde_S1plusS2 = credit_art_post+nouveau_solde_S1
+                print('ancien_solde_S1plusS2')
+                print(ancien_solde_S1plusS2)
+                nouveau_solde_S2 = ancien_solde_S1plusS2 - total_transfert
+                print('nouveau_solde_S2')
+                print(nouveau_solde_S2)
+            elif nouveau_solde_S1==credit_art_post:  #########
+                ancien_solde_S1plusS2 = credit_art_post #########   faire en commentaire
+                print('ancien_solde_S1plusS2')   ##########
+                print(ancien_solde_S1plusS2)   #########
+            nouveau_solde_S2 = ancien_solde_S1plusS2 - total_transfert
+            print('nouveau_solde_S2')
+            print(nouveau_solde_S2)
+        
+            
         transfert_letter = num2words(total_transfert, lang='fr')
         print(transfert_letter)
           
         pieces = {}
         context = {}
+        
         context['article_source'] =article_source
         context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
-        #context['credit_s2_'] = credit_s2_
-        context['ancien_solde']=ancien_solde
-        context['nouveau_solde']=nouveau_solde
+        context['credit_art_post'] = credit_art_post
+        
+        context['ancien_solde_S1plusS2']=ancien_solde_S1plusS2
+        context['ancien_solde_S1']=ancien_solde_S1
+        context['nouveau_solde_S2']=nouveau_solde_S2
  
         #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source.id) + '.pdf'
         self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source) + '.pdf'

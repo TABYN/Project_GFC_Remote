@@ -164,10 +164,10 @@ table {
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgetaire</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.code_art}}</p></td> 
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde}}</p></td> 
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{credit_art_post}}</p></td> 
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td> <!-- {{transfert_.montant_transfert}} -->
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde}}</p></td> <!-- transfert_.nouveau_solde_s1_transfert -->
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{transfert_.article_destination.credit_reste}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde_S1}}</p></td> <!-- transfert_.nouveau_solde_s1_transfert -->
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{nouveau_solde_S1}}</p></td>
 						
 						</tr>
 						
@@ -175,10 +175,10 @@ table {
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.code_art}}</p></td>
-				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde}}</p></td>
-						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td> <!-- {{transfert_.nouveau_solde_s1_transfert}} -->
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{transfert_.article_destination.credit_reste}}</p></td>
+				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{credit_art_post}}</p></td>
+						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td> <!-- {{transfert_.nouveau_solde_s1_transfert}} -->
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{nouveau_solde_S1}}</p></td>
 						
 						</tr>
                            {% else %}
@@ -191,17 +191,17 @@ table {
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 							<!-- <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>{{engagement_.credit_alloue.credit_allouee}}</p></td> -->
-                            <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+                            <td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{ancien_solde_S1}}</p></td>
 						</tr>
 
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision (50% CB)</p></td> 
 							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.chapitre.code_chap}}</p></td>
 				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.code_art}}</p></td>
-                            <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde}}</p></td>
+                            <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde_S1plusS2}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td>
-							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde}}</p></td>
-							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{engagement_.credit_alloue.credit_allouee.amount}}</p></td>
+							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde_S2}}</p></td>
+							<td style=" width: 40%;height:15;vertical-align: top;text-align:center;"><p>??{{ancien_solde_S1}}</p></td>
 						</tr>
 						{% endif %}
                          

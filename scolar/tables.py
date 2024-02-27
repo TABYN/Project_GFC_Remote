@@ -1437,8 +1437,18 @@ class Transfert_post_Table(tables.Table):
         if record.article.chapitre :
             return str(record.article.chapitre)
         
-    edit= '<a href="{% url "Transfert_depense" crd=record.id %}" class="btn btn-info" role="button"> Liste_Depense</a>' # credit_s2_= Credit_S2.objects.get(id=crd) #a href="{% url "Transfert_depense" crd=record.id %}
+#     edit= '{% if not record.id %}\
+#     <p>Erreur: Y a pas des depences pour cet Article</p>\
+#     {% else %}\
+#     <a href="{% url "Transfert_depense" crd=record.id %}" class="btn btn-info" role="button"> Liste_Depense</a>\
+#     {% endif %}'
+#     '{% load icons %}\
+#             {% if not record.article_source %}\
+#                 <a href="{% url "Transfert_depense" crd=record.id %}" class="btn btn-info" role="button"> Liste_Depense</a>\
+#             {% endif %}'
+    edit='<a href="{% url "Transfert_depense" crd=record.id %}" class="btn btn-info" role="button"> Liste_Depense</a>' # credit_s2_= Credit_S2.objects.get(id=crd) #a href="{% url "Transfert_depense" crd=record.id %}
     Depense=tables.TemplateColumn(edit, orderable=False)
+    
     action= '<a href="{% url "Transfert_economie" crd=record.id %}" class="btn btn-info" role="button"> Liste_Economie</a>'
     Economie=tables.TemplateColumn(action, orderable=False)
     
