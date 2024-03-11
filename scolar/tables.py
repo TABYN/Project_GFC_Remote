@@ -1404,15 +1404,9 @@ class TransfertTable(tables.Table):
          '{% endif %}'
     Imprim_Art_Destination=tables.TemplateColumn(action, orderable=False)
 
-#########################
-#     action= '{% if  record.credit_alloue.article.posteriori %}\
-#             <a href="{% url "Transfert_plus_PDFView" transfert_pk=record.id %}" > Imprimer transfert + </a>\
-#             <a href="" > Imprimer transfert - </a>\
-#             {% else %}\
-#             <a href="" > Imprimer transfert + </a>\
-#             <a href="" > Imprimer transfert - </a>\
-#             {% endif %}'
-
+######################### pour creer boutton Valider le Transfert     {% url "Mandat_Priori_PDFView" mandat_pk=record.id %}
+    action= '<a href="" class="btn btn-info" role="button"> Valider</a>'
+    Valider=tables.TemplateColumn(action, orderable=False)
 
     class Meta:
         model= Transfert

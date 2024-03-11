@@ -2407,7 +2407,7 @@ class Mandat(models.Model):
         return "Mandat "+ str(self.num_mandat)#+' '+str(self.fournisseur.nom_fournisseur)
  
 class Transfert(models.Model):
-    annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)
+    annee_budgi=models.ForeignKey(AnneeUniv ,related_name='annee_budgi' , null= True, blank=True, on_delete=models.SET_NULL)# normalement le model est Class Exercice
     num_transfert = models.IntegerField(null = True)
     date_transfert=models.DateField(null=True, blank=True)
     article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL)

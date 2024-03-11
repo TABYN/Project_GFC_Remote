@@ -14640,10 +14640,10 @@ def Transfert_depense(request, crd):
     article_source= credit_s2_.article
 #    art_source_id =credit_s2_.article.id
  #   print(art_source_id) 
-    transfert_=Transfert.objects.filter(article_source_id=crd)
+    transfert_=Transfert.objects.filter(article_source_id=crd)# il faut savoir que: article_source_id == credit_s2_= Credit_S2.objects.get(id=crd)
     print(transfert_)
-    annee_bdg = AnneeUniv.objects.get(encours=True)
-    
+    annee_bdg = AnneeUniv.objects.get(encours=True) # normalement 
+    #annee_bdg = Exercice.objects.get(exe_encours=True)
         
     if transfert_ and request.method == 'POST':
         # Obtenez la chaine de date de la requete POST
@@ -14690,19 +14690,10 @@ def Transfert_depense(request, crd):
                 destination= transfert.article_destination  
          
             return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post, 'mois_debut':mois_debut, 'mois_fin':mois_fin})
-
-            
-#         somme_montant_transfert_post=0
-#         for transfert in transferts:
-#             somme_montant_transfert_post+=transfert.montant_transfert.amount
-#             destination= transfert.article_destination  
-#          
-#         return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})
         else:
-            print('transfert n existe pas')
-            bb= ('Il y a pas de transfert dans cette periode pour Article Source')
+            messages.error(request, "Il y a pas de transfert dans cette periode pour cette Article ")
     
-    return render(request, 'scolar/transfert_post_depense.html',{'bb':bb, 'crd':crd,'credit_s2_': credit_s2_ , 'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
+    return render(request, 'scolar/transfert_post_depense.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
   
   
   ######################   Imprimer la somme des transfert_moin_posteriori ##############  
@@ -14753,7 +14744,7 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         
        # nouveau_solde = credit_s2_.credit_reste.amount                                date_systeme = datetime.now()
         
-        if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 and date_systeme.month >= 1 and date_systeme.month <= 6:
+        if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:#  and date_systeme.month >= 1 and date_systeme.month <= 6
 
             if total_transfert!=0 :
                 nouveau_solde_S1 = credit_art_post - total_transfert
@@ -14761,7 +14752,7 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
                 print(nouveau_solde_S1)
             elif total_transfert==0:
                 nouveau_solde_S1 = credit_art_post  
-        elif nouveau_solde_S1 is None and transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 and date_systeme.month >= 7 and date_systeme.month <= 12:
+        elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12: #  nouveau_solde_S1 is None and #  and date_systeme.month >= 7 and date_systeme.month <= 12
 
             ancien_solde_S1=credit_art_post
             ancien_solde_S1plusS2 = 2*credit_art_post
@@ -14771,7 +14762,7 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
             print('nouveau_solde_S2')
             print(nouveau_solde_S2)
                      
-        elif nouveau_solde_S1 is not None and (transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12):
+        elif (transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12): # nouveau_solde_S1 is not None and 
 
             print('nouveau_solde_S1')
             print(nouveau_solde_S1)
