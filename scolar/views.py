@@ -14726,18 +14726,19 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
 
         #  requete recupere tous les transferts de la base de donnees qui ont une annee budgetaire specifique
         # et qui ont pour source l'article associe a la cle 'credit_s2__pk'
-        date_debut_s1 = datetime.date(2023, 1, 1)
-         
-        date_fin_s1 = datetime.date(2023, 6, 30)  
+        
+        date_debut_s1 = datetime.date(int(annee_bdg.annee_univ), 1, 1)         
+        date_fin_s1 = datetime.date(int(annee_bdg.annee_univ), 6, 30)  
         all_transferts_s1=  Transfert.objects.filter(date_transfert__range=[date_debut_s1, date_fin_s1]).filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
         print('all_transferts_s1')
         print(all_transferts_s1)
 
-        date_debut_s2 = datetime.date(2023, 7, 1)  
-        date_fin_s2 = datetime.date(2023, 12, 31)  
+        date_debut_s2 = datetime.date(int(annee_bdg.annee_univ), 7, 1)  
+        date_fin_s2 = datetime.date(int(annee_bdg.annee_univ), 12, 31)  
         all_transferts_s2=  Transfert.objects.filter(date_transfert__range=[date_debut_s2, date_fin_s2]).filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
         print('all_transferts_s2')
         print(all_transferts_s2)
+        print(date_fin_s2)
 
         
         all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
