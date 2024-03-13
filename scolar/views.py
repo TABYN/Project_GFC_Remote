@@ -14707,6 +14707,9 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
     }
 
     def get_context_data(self,  **kwargs):
+        print('self.kwargs.get(mois_debut)')
+        print(self.kwargs.get('crd'))
+        
         print('self.kwargs.get(credit_s2__pk)')
         print(self.kwargs.get('credit_s2__pk'))
         #date_systeme = datetime.now()
@@ -14717,11 +14720,26 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
 
         #######################
         annee_bdg = AnneeUniv.objects.get(encours=True)
+
         #date_transfert_range_ = Transfert.objects.filter(date_debut=self.kwargs.get('date_debut'), date_fin=self.kwargs.get('date_fin'))
         #transferts = Transfert.objects.filter(date_transfert=date_transfert__range).filter(article_source_id=article_source_).filter(annee_budgi=annee_bdg)
 
         #  requete recupere tous les transferts de la base de donnees qui ont une annee budgetaire specifique
         # et qui ont pour source l'article associe a la cle 'credit_s2__pk'
+        date_debut_s1 = datetime.date(2023, 1, 1)
+         
+        date_fin_s1 = datetime.date(2023, 6, 30)  
+        all_transferts_s1=  Transfert.objects.filter(date_transfert__range=[date_debut_s1, date_fin_s1]).filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
+        print('all_transferts_s1')
+        print(all_transferts_s1)
+
+        date_debut_s2 = datetime.date(2023, 7, 1)  
+        date_fin_s2 = datetime.date(2023, 12, 31)  
+        all_transferts_s2=  Transfert.objects.filter(date_transfert__range=[date_debut_s2, date_fin_s2]).filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
+        print('all_transferts_s2')
+        print(all_transferts_s2)
+
+        
         all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
         credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))
         
