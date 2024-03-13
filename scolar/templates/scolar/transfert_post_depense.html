@@ -89,7 +89,7 @@ table {
 									<div class="card">
 										<div class="card-body">
 											<p class="lead font-italic">Listes des depenses S1</p>
-											{% if  transferts %}
+											
 						                       
 											<hr class="my-4">
 											<table class="table table-borderless">
@@ -113,14 +113,7 @@ table {
 												{% endfor %}
 												</tbody>
 											</table>
-											{% elif not transferts %}
 											
-											<p>Il y a pas de transfert dans cette periode pour Article Source</p>
-											 <p>xxxxxxxxxxxxx</p>
-										    {% else %}
-										    {{bb}}
-										    
-											{% endif %}
 										</div>
 									</div>
 								</div>
@@ -133,7 +126,7 @@ table {
 									<div class="card">
 										<div class="card-body">
 											<p class="lead font-italic">Listes des depenses S2</p>
-											{% if transferts %}
+											
 						                        
 											<hr class="my-4">
 											<table class="table table-borderless">
@@ -157,14 +150,7 @@ table {
 												{% endfor %}
 												</tbody>
 											</table>
-											{% elif not transferts %}
-											xxxxxxxxxxxxxx
-											<p>Il y a pas de transfert dans cette periode pour Article Source</p>
-											 
-											 {% else %}
-											 {{bb}}
-										    
-											{% endif %}
+											
 										</div>
 									</div>
 								</div>
