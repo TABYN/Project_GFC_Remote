@@ -14636,63 +14636,52 @@ class Transfert_post_ListView(TemplateView):
 
 @login_required
 def Transfert_depense(request, crd):
+    # confusion--->ici article_source_id c'est le ID de credit_s2_  pas le Id de l'Article
+    # models.py---->  class Transfert :article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL) 
     credit_s2_= Credit_S2.objects.get(id=crd)
     article_source= credit_s2_.article
-#    art_source_id =credit_s2_.article.id
- #   print(art_source_id) 
+    art_source_id =credit_s2_.article.id
+#   print(art_source_id) 
     transfert_=Transfert.objects.filter(article_source_id=crd)# il faut savoir que: article_source_id == credit_s2_= Credit_S2.objects.get(id=crd)
-    print(transfert_)
-    annee_bdg = AnneeUniv.objects.get(encours=True) # normalement 
-    #annee_bdg = Exercice.objects.get(exe_encours=True)
-        
-    if transfert_ and request.method == 'POST':
-        # Obtenez la chaine de date de la requete POST
-        date_debut_str = request.POST['date_debut']
-        # Divisez la chaine en elements de jour, mois et annee
-        jour_str, mois_str, annee_str = date_debut_str.split('-')
-        # Convertissez chaque element en entier
-        jour = int(jour_str)
-        mois = int(mois_str)
-        annee = int(annee_str)
-        # Creez un objet de type date
-        try:
-            date_debut = datetime.date(jour, mois, annee)
-        except ValueError:
-            print("La date nest pas valide.")
-        # Maintenant, vous pouvez obtenir le mois a partir de l objet de type date
-        mois_debut = date_debut.month
-#        print(mois_debut)
-        
-        #date_fin=request.POST['date_fin']
-        date_fin_str = request.POST['date_fin']
-        # Divisez la chaine en elements de jour, mois et annee
-        jour_str, mois_str, annee_str = date_fin_str.split('-')
-        # Convertissez chaque element en entier
-        jour = int(jour_str)
-        mois = int(mois_str)
-        annee = int(annee_str)
-        # Creez un objet de type date
-        try:
-            date_fin = datetime.date(jour, mois, annee)
-        except ValueError:
-            print("La date nest pas valide.")
-        # Maintenant, vous pouvez obtenir le mois a partir de l objet de type date
-        mois_fin = date_debut.month
-
-        ####
-        transferts= Transfert.objects.filter(date_transfert__range=[date_debut, date_fin]).filter(article_source_id=crd).filter(annee_budgi=annee_bdg)
-        # confusion--->ici article_source_id c'est le ID de credit_s2_  pas le Id de l'Article
-        # models.py---->  class Transfert :article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL) 
-        if transferts:
-            somme_montant_transfert_post=0
-            for transfert in transferts:
-                somme_montant_transfert_post+=transfert.montant_transfert.amount
-                destination= transfert.article_destination  
-         
-            return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post, 'mois_debut':mois_debut, 'mois_fin':mois_fin})
-        else:
-            messages.error(request, "Il y a pas de transfert dans cette periode pour cette Article ")
     
+    annee_bdg = AnneeUniv.objects.get(encours=True) # normalement  ==> annee_bdg = Exercice.objects.get(exe_encours=True)
+    #recuperer les transferts du 1er semestre
+    date_debut_s1 = datetime.date(int(annee_bdg.annee_univ), 1, 1)         
+    date_fin_s1 = datetime.date(int(annee_bdg.annee_univ), 6, 30)  
+    all_transferts_s1=  Transfert.objects.filter(date_transfert__range=[date_debut_s1, date_fin_s1]).filter(annee_budgi=annee_bdg).filter(article_source_id=crd)#.exclude(credit_s2__isnull=True)
+    #recuperer les transferts du 2eme semestre
+    date_debut_s2 = datetime.date(int(annee_bdg.annee_univ), 7, 1)  
+    date_fin_s2 = datetime.date(int(annee_bdg.annee_univ), 12, 31)  
+    all_transferts_s2=  Transfert.objects.filter(date_transfert__range=[date_debut_s2, date_fin_s2]).filter(annee_budgi=annee_bdg).filter(article_source_id=crd)#.exclude(credit_s2__isnull=True)
+        
+    if request.method == 'POST':
+        session = request.POST['session']
+        if session == 's1' or session == 'S1':
+            transferts = all_transferts_s1
+            if transferts:
+                somme_montant_transfert_post=0
+                for transfert in transferts:
+                    somme_montant_transfert_post+=transfert.montant_transfert.amount
+                    destination= transfert.article_destination  
+         
+                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+            else:
+                messages.error(request, "Il y a pas de transfert dans le 1er Semestre pour cette Article ")
+        elif session == 's2' or session == 'S2':
+            transferts = all_transferts_s2 
+            if transferts:
+                somme_montant_transfert_post=0
+                for transfert in transferts:
+                    somme_montant_transfert_post+=transfert.montant_transfert.amount
+                    destination= transfert.article_destination  
+         
+                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+            else:
+                messages.error(request, "Il y a pas de transfert dans le 2eme Semestre pour cette Article")
+
+        
+        else:
+            messages.error(request, " Saisir soit :  S1, s1, S2, s2  ")
     return render(request, 'scolar/transfert_post_depense.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
   
   

@@ -50,23 +50,14 @@ table {
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group row">
-										<label class="col-sm-3 col-form-label" for="date_debut">Date Debut</label>
+										<label class="col-sm-6 col-form-label" for="session">Semestre   (choisir S1 ou S2)</label>
 										<div class="col-sm-9">
-											<input type="date" class="form-control" name="date_debut" required />
+											<input type="string" class="form-control" name="session" required />
 										</div>
 									</div>
 								</div>
 								
-								<div class="col-md-6">
-								  <div class=class="form-group row">
-									<div class="form-group row">
-										<label class="col-sm-3 col-form-label" for="date_fin">Date Fin</label>
-										<div class="col-sm-9">
-											<input type="date" class="form-control" name="date_fin" required/>
-										</div>
-									</div>
-								  </div>
-							    </div>
+								
 							</div>
 							<br><br>
 							
@@ -82,7 +73,7 @@ table {
 							</div>
 							
 				</form>
-				{% if mois_debut >= 1 and mois_fin <= 6 %}
+				{% if session == 's1' or session == 'S1'%}
 						<div class="content-wrapper">
 							<div class="row">
 								<div class="col-md-12 grid-margin stretch-card">
@@ -119,7 +110,7 @@ table {
 								</div>
 							</div>
 						</div>
-						{% elif mois_debut >= 7 and mois_fin <= 12 %}
+						{% elif session == 's2' or session == 'S2'%}
 						<div class="content-wrapper">
 							<div class="row">
 								<div class="col-md-12 grid-margin stretch-card">
@@ -184,7 +175,8 @@ table {
 									</a>    
 								</div>
 								<div class="col-md-4">
-									<a href="{% url 'Transfert_moins_posteriori_PDFView' credit_s2_.id  %}" class="btn btn-primary btn-block">
+									<a href="{% url 'Transfert_moins_posteriori_PDFView' credit_s2_.id  %}" class="btn btn-primary btn-block"> 
+									                     <!-- on peut remplacer (credit_s2_.id) par (crd) -->
 										<i class="fa fa-print fa-lg"></i> Imprimer
 									</a>
 								</div>
