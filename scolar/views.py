@@ -14653,36 +14653,36 @@ def Transfert_depense(request, crd):
     date_debut_s2 = datetime.date(int(annee_bdg.annee_univ), 7, 1)  
     date_fin_s2 = datetime.date(int(annee_bdg.annee_univ), 12, 31)  
     all_transferts_s2=  Transfert.objects.filter(date_transfert__range=[date_debut_s2, date_fin_s2]).filter(annee_budgi=annee_bdg).filter(article_source_id=crd)#.exclude(credit_s2__isnull=True)
-        
+     
+    somme_montant_transfert_post=0
     if request.method == 'POST':
         session = request.POST['session']
         if session == 's1' or session == 'S1':
             transferts = all_transferts_s1
             if transferts:
-                somme_montant_transfert_post=0
+                
                 for transfert in transferts:
                     somme_montant_transfert_post+=transfert.montant_transfert.amount
                     destination= transfert.article_destination  
-         
-                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 1er Semestre pour cette Article ")
         elif session == 's2' or session == 'S2':
             transferts = all_transferts_s2 
             if transferts:
-                somme_montant_transfert_post=0
+                
                 for transfert in transferts:
                     somme_montant_transfert_post+=transfert.montant_transfert.amount
                     destination= transfert.article_destination  
-         
-                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 2eme Semestre pour cette Article")
 
         
         else:
             messages.error(request, " Saisir soit :  S1, s1, S2, s2  ")
-    return render(request, 'scolar/transfert_post_depense.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_source': article_source, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
+        
+    return render(request, 'scolar/transfert_post_depense.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_source': article_source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})#, 'date_debut':date_debut, 'date_fin':date_fin
   
   
   ######################   Imprimer la somme des transfert_moin_posteriori ##############  
@@ -14834,38 +14834,40 @@ def Transfert_economie(request, crd): # c est le meme code que (def Transfert_de
     date_fin_s2 = datetime.date(int(annee_bdg.annee_univ), 12, 31)  
     all_transferts_s2=  Transfert.objects.filter(date_transfert__range=[date_debut_s2, date_fin_s2]).filter(annee_budgi=annee_bdg).filter(article_destination_id=crd)#.exclude(credit_s2__isnull=True)
     
-    
+    somme_montant_transfert_post=0
+
     if request.method == 'POST':
+        
         session = request.POST['session']
         if session == 's1' or session == 'S1':
             transferts = all_transferts_s1
             if transferts:
-                somme_montant_transfert_post=0
+                
                 for transfert in transferts:
                     somme_montant_transfert_post+=transfert.montant_transfert.amount
                     #destination= transfert.article_destination  
                     source= transfert.article_source
-         
-                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                print('somme_montant_transfert_post')
+                print(somme_montant_transfert_post)
+                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 1er Semestre pour cette Article ")
         elif session == 's2' or session == 'S2':
             transferts = all_transferts_s2 
             if transferts:
-                somme_montant_transfert_post=0
+                
                 for transfert in transferts:
                     somme_montant_transfert_post+=transfert.montant_transfert.amount
                     #destination= transfert.article_destination
                     source= transfert.article_source  
-         
-                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 2eme Semestre pour cette Article")
 
         
         else:
             messages.error(request, " Saisir soit :  S1, s1, S2, s2  ")
-    return render(request, 'scolar/transfert_post_economie.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_destination': article_destination, 'annee_bdg':annee_bdg})#, 'date_debut':date_debut, 'date_fin':date_fin
+    return render(request, 'scolar/transfert_post_economie.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_destination': article_destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})#, 'date_debut':date_debut, 'date_fin':date_fin
                         
 class Transfert_plus_posteriori_PDFView(PDFTemplateView):
     template_name= 'scolar/transfert_plus.html'
