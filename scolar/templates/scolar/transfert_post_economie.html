@@ -50,40 +50,38 @@ table {
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group row">
-										<label class="col-sm-3 col-form-label" for="date_debut">Date Debut</label>
+										<label class="col-sm-6 col-form-label" for="session">Semestre   (choisir S1 ou S2)</label>
 										<div class="col-sm-9">
-											<input type="date" class="form-control" name="date_debut" required />
+											<input type="string" class="form-control" name="session" required />
 										</div>
 									</div>
 								</div>
 								
-								<div class="col-md-6">
-								  <div class=class="form-group row">
-									<div class="form-group row">
-										<label class="col-sm-3 col-form-label" for="date_fin">Date Fin</label>
-										<div class="col-sm-9">
-											<input type="date" class="form-control" name="date_fin" required/>
-										</div>
-									</div>
-								  </div>
-							    </div>
+								
 							</div>
 							<br><br>
+							
+
+
 							
 							<div class="row">
 								
 								<div class="col-md-4">
 									<button type="submit" class="btn btn-primary btn-block" >
-										<i class="fa fa-database"></i> Afficher</button>
+										<i class="fa fa-database"></i> Afficher </button>
 								</div>
 							</div>
+							
 				</form>
+				{% if session == 's1' or session == 'S1'%}
 						<div class="content-wrapper">
 							<div class="row">
 								<div class="col-md-12 grid-margin stretch-card">
 									<div class="card">
 										<div class="card-body">
-											<p class="lead font-italic">Listes des economies </p>
+											<p class="lead font-italic">Listes des Economies S1</p>
+											
+						                       
 											<hr class="my-4">
 											<table class="table table-borderless">
 												<thead class="border-bottom font-weight-bold">
@@ -101,16 +99,57 @@ table {
 													<td>{{transfert.num_transfert}}</td>
 													<td>{{transfert.date_transfert}}</td>
 													<td>{{transfert.montant_transfert}}</td>
-													<td>{{transfert.article_source.article}}</td> <!-- {{transfert.article_destination.id}} : -->
+													<td>{{transfert.article_source.article}}</td> 
 													
 												{% endfor %}
 												</tbody>
 											</table>
+											
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
+						{% elif session == 's2' or session == 'S2'%}
+						<div class="content-wrapper">
+							<div class="row">
+								<div class="col-md-12 grid-margin stretch-card">
+									<div class="card">
+										<div class="card-body">
+											<p class="lead font-italic">Listes des Economies S2</p>
+											
+						                        
+											<hr class="my-4">
+											<table class="table table-borderless">
+												<thead class="border-bottom font-weight-bold">
+												<tr>
+													<th>Num_Transfert</th>
+													<th>Date_Transfert</th>
+													<th>Montant_Transfert</th>
+													<th>Article_Source</th>
+												</tr>
+												</thead>
+												<tbody>
+												{% for transfert in transferts %}
+												
+												<tr>
+													<td>{{transfert.num_transfert}}</td>
+													<td>{{transfert.date_transfert}}</td>
+													<td>{{transfert.montant_transfert}}</td>
+													<td>{{transfert.article_source.article}}</td> 
+													
+												{% endfor %}
+												</tbody>
+											</table>
+											
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						 
+						{% endif %}
+						
 					</div>
 				</div>
 			</div>
@@ -122,7 +161,7 @@ table {
 			<div class="col-md-12 grid-margin stretch-card">
 				<div class="card">
 					<div class="card-body">
-					<h4>Total des economies: {{somme_montant_transfert_post}}</h4>
+					<h4>Total des Economies : {{somme_montant_transfert_post}}</h4>
 					</div>
 					</div>
 					</div>
@@ -136,12 +175,14 @@ table {
 									</a>    
 								</div>
 								<div class="col-md-4">
-									<a href="{% url 'Transfert_plus_posteriori_PDFView' credit_s2_.id  %}" class="btn btn-primary btn-block">
+									<a href="{% url 'Transfert_plus_posteriori_PDFView' credit_s2_.id  %}" class="btn btn-primary btn-block"> 
+									                     <!-- on peut remplacer (credit_s2_.id) par (crd) -->
 										<i class="fa fa-print fa-lg"></i> Imprimer
 									</a>
 								</div>
 								
 							</div>
+ 
  							
  
 </html>
