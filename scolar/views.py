@@ -14656,25 +14656,25 @@ def Transfert_depense(request, crd):
      
     somme_montant_transfert_post=0
     if request.method == 'POST':
-        session = request.POST['session']
-        if session == 's1' or session == 'S1':
+        semestre = request.POST['semestre']
+        if semestre == 's1' or semestre == 'S1':
             transferts = all_transferts_s1
             if transferts:
                 
                 for transfert in transferts:
                     somme_montant_transfert_post+=transfert.montant_transfert.amount
                     destination= transfert.article_destination  
-                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'semestre':semestre, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 1er Semestre pour cette Article ")
-        elif session == 's2' or session == 'S2':
+        elif semestre == 's2' or semestre == 'S2':
             transferts = all_transferts_s2 
             if transferts:
                 
                 for transfert in transferts:
                     somme_montant_transfert_post+=transfert.montant_transfert.amount
                     destination= transfert.article_destination  
-                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                return render(request, 'scolar/transfert_post_depense.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_source': article_source, 'destination':destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'semestre':semestre, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 2eme Semestre pour cette Article")
 
@@ -14696,8 +14696,8 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
     }
 
     def get_context_data(self,  **kwargs):
-        print('self.kwargs.get(mois_debut)')
-        print(self.kwargs.get('crd'))
+        semestr = kwargs.get('semestre') # Accs  la variable de semestre
+        print('semestr:', semestr)
         
         print('self.kwargs.get(credit_s2__pk)')
         print(self.kwargs.get('credit_s2__pk'))
@@ -14705,8 +14705,6 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         date_systeme=datetime.date.today()
         print('date_systeme')
         print(date_systeme)
-
-
         #######################
         annee_bdg = AnneeUniv.objects.get(encours=True)
 
@@ -14727,11 +14725,18 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         all_transferts_s2=  Transfert.objects.filter(date_transfert__range=[date_debut_s2, date_fin_s2]).filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
         print('all_transferts_s2')
         print(all_transferts_s2)
-        print(date_fin_s2)
 
+        if semestr == 's1' or semestr == 'S1':
+            all_transferts = all_transferts_s1
+                        
+        elif semestr == 's2' or semestr == 'S2':
+            all_transferts = all_transferts_s2  
+            
+        else:
+            messages.error(request, " Saisir soit :  S1, s1, S2, s2  ")      
         
-        all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
-        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))
+        #all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_source=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
+        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))# recuperer l'objet (credit_s2)
         
         # recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
         article_source= credit_s2_.article # recuperer l'objet article_source
@@ -14748,50 +14753,22 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         credit_art_post = credit_s2_.credit_article_posteriori()# la methode: self.credit_allouee.amount/2
         print ('credit_art_post')
         print (credit_art_post)
-        #ancien_solde = credit_s2_.credit_reste.amount + total_transfert
         
-       # nouveau_solde = credit_s2_.credit_reste.amount                                date_systeme = datetime.now()
-        
-        if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:#  and date_systeme.month >= 1 and date_systeme.month <= 6
+        nouveau_solde_S1 = credit_art_post
+        if semestr == 's1' or semestr == 'S1': 
+            nouveau_solde_S1 = credit_art_post - total_transfert
+        elif semestr == 's2' or semestr == 'S2': 
 
-            if total_transfert!=0 :
-                nouveau_solde_S1 = credit_art_post - total_transfert
-                print('nouveau_solde_S1')
-                print(nouveau_solde_S1)
-            elif total_transfert==0:
-                nouveau_solde_S1 = credit_art_post  
-        elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12: #  nouveau_solde_S1 is None and #  and date_systeme.month >= 7 and date_systeme.month <= 12
-
-            ancien_solde_S1=credit_art_post
-            ancien_solde_S1plusS2 = 2*credit_art_post
+            #ancien_solde_S1=credit_art_post
+            ancien_solde_S1plusS2 = credit_art_post+nouveau_solde_S1
             print('ancien_solde_S1plusS2')
             print(ancien_solde_S1plusS2)
             nouveau_solde_S2 = ancien_solde_S1plusS2 - total_transfert 
             print('nouveau_solde_S2')
             print(nouveau_solde_S2)
-                     
-        elif (transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12): # nouveau_solde_S1 is not None and 
-
-            print('nouveau_solde_S1')
-            print(nouveau_solde_S1)
-            if nouveau_solde_S1!=credit_art_post:
-                ancien_solde_S1plusS2 = credit_art_post+nouveau_solde_S1
-                print('ancien_solde_S1plusS2')
-                print(ancien_solde_S1plusS2)
-                nouveau_solde_S2 = ancien_solde_S1plusS2 - total_transfert
-                print('nouveau_solde_S2')
-                print(nouveau_solde_S2)
-            elif nouveau_solde_S1==credit_art_post:  #########
-                ancien_solde_S1plusS2 = credit_art_post #########   faire en commentaire
-                print('ancien_solde_S1plusS2')   ##########
-                print(ancien_solde_S1plusS2)   #########
-            nouveau_solde_S2 = ancien_solde_S1plusS2 - total_transfert
-            print('nouveau_solde_S2')
-            print(nouveau_solde_S2)
-#         else:
-#             print('atikkkkkkkkkkkkkkkkkkkkkkk')
-#             messages.info(request,
-#                                   "Merci de renseigner le semestre pour lequel vous voulez importer les activitأ©s pأ©dagogiques.")
+        else:
+            messages.error(request, " Erreur; actualiser le site  ")
+                         
             
         transfert_letter = num2words(total_transfert, lang='fr')
         print(transfert_letter)
@@ -14805,9 +14782,7 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
         context['credit_art_post'] = credit_art_post
-        
         context['ancien_solde_S1plusS2']=ancien_solde_S1plusS2
-        context['ancien_solde_S1']=ancien_solde_S1
         context['nouveau_solde_S2']=nouveau_solde_S2
  
         #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source.id) + '.pdf'
@@ -14838,8 +14813,8 @@ def Transfert_economie(request, crd): # c est le meme code que (def Transfert_de
 
     if request.method == 'POST':
         
-        session = request.POST['session']
-        if session == 's1' or session == 'S1':
+        semestre = request.POST['semestre']
+        if semestre == 's1' or semestre == 'S1':
             transferts = all_transferts_s1
             if transferts:
                 
@@ -14849,10 +14824,10 @@ def Transfert_economie(request, crd): # c est le meme code que (def Transfert_de
                     source= transfert.article_source
                 print('somme_montant_transfert_post')
                 print(somme_montant_transfert_post)
-                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'semestre':semestre, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 1er Semestre pour cette Article ")
-        elif session == 's2' or session == 'S2':
+        elif semestre == 's2' or semestre == 'S2':
             transferts = all_transferts_s2 
             if transferts:
                 
@@ -14860,7 +14835,7 @@ def Transfert_economie(request, crd): # c est le meme code que (def Transfert_de
                     somme_montant_transfert_post+=transfert.montant_transfert.amount
                     #destination= transfert.article_destination
                     source= transfert.article_source  
-                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'session':session, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
+                return render(request, 'scolar/transfert_post_economie.html', {'crd':crd, 'credit_s2_': credit_s2_ ,'transferts': transferts, 'article_destination': article_destination, 'source':source, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post,'semestre':semestre, 'somme_montant_transfert_post':somme_montant_transfert_post})#  'mois_debut':mois_debut, 'mois_fin':mois_fin
             else:
                 messages.error(request, "Il y a pas de transfert dans le 2eme Semestre pour cette Article")
 
@@ -14870,27 +14845,59 @@ def Transfert_economie(request, crd): # c est le meme code que (def Transfert_de
     return render(request, 'scolar/transfert_post_economie.html',{'crd':crd,'credit_s2_': credit_s2_ , 'article_destination': article_destination, 'annee_bdg':annee_bdg, 'somme_montant_transfert_post':somme_montant_transfert_post})#, 'date_debut':date_debut, 'date_fin':date_fin
                         
 class Transfert_plus_posteriori_PDFView(PDFTemplateView):
-    template_name= 'scolar/transfert_plus.html'
-    titre = 'Transfert de credit (+)'
+    template_name= 'scolar/transfert_plus_posteriori.html'
+    titre = 'Les Economies d un article a posteriori'
     cmd_options = {
         'orientation': 'Landscape',
         'page-size': 'A3',
     }
 
     def get_context_data(self,  **kwargs):
+        semestr = kwargs.get('semestre') # Accs  la variable de semestre
+        print('semestr:', semestr)
+        
         print('self.kwargs.get(credit_s2__pk)')
         print(self.kwargs.get('credit_s2__pk'))
+        #date_systeme = datetime.now()
+        date_systeme=datetime.date.today()
+        print('date_systeme')
+        print(date_systeme)
         #######################
         annee_bdg = AnneeUniv.objects.get(encours=True)
+
         #date_transfert_range_ = Transfert.objects.filter(date_debut=self.kwargs.get('date_debut'), date_fin=self.kwargs.get('date_fin'))
         #transferts = Transfert.objects.filter(date_transfert=date_transfert__range).filter(article_destination_id=article_destination_).filter(annee_budgi=annee_bdg)
 
         #  requete recupere tous les transferts de la base de donnees qui ont une annee budgetaire specifique
         # et qui ont pour destination l'article associe a la cle 'credit_s2__pk'
-        all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_destination=self.kwargs.get('credit_s2__pk'))
-        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))# recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
+        
+        date_debut_s1 = datetime.date(int(annee_bdg.annee_univ), 1, 1)         
+        date_fin_s1 = datetime.date(int(annee_bdg.annee_univ), 6, 30)  
+        all_transferts_s1=  Transfert.objects.filter(date_transfert__range=[date_debut_s1, date_fin_s1]).filter(annee_budgi=annee_bdg).filter(article_destination=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
+        print('all_transferts_s1')
+        print(all_transferts_s1)
+
+        date_debut_s2 = datetime.date(int(annee_bdg.annee_univ), 7, 1)  
+        date_fin_s2 = datetime.date(int(annee_bdg.annee_univ), 12, 31)  
+        all_transferts_s2=  Transfert.objects.filter(date_transfert__range=[date_debut_s2, date_fin_s2]).filter(annee_budgi=annee_bdg).filter(article_destination=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
+        print('all_transferts_s2')
+        print(all_transferts_s2)
+
+        if semestr == 's1' or semestr == 'S1':
+            all_transferts = all_transferts_s1
+                        
+        elif semestr == 's2' or semestr == 'S2':
+            all_transferts = all_transferts_s2  
+            
+        else:
+            messages.error(request, " Saisir soit :  S1, s1, S2, s2  ")      
+        
+        #all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_destination=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
+        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))# recuperer l'objet (credit_s2)
+        
+        # recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
         article_destination= credit_s2_.article # recuperer l'objet article_destination
-        ancien_solde = credit_s2_.credit_reste.amount
+        #ancien_solde = credit_s2_.credit_reste.amount
 
         transferts=[]
         total_transfert=0
@@ -14898,29 +14905,46 @@ class Transfert_plus_posteriori_PDFView(PDFTemplateView):
             transferts.append(transfert)
             total_transfert+= transfert.montant_transfert.amount
             print(total_transfert) 
-#             if transfert.article_destination.article.posteriori == True and transfert.article_destination.article == article:
-#                 transferts.append(transfert)
-#                 if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6:
-#                     total_transfert+= transfert.montant_transfert.amount
-#                 elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12:
-#                     total_transfert+= transfert.montant_transfert.amount
                
-        nouveau_solde =  credit_s2_.credit_reste.amount+total_transfert
+        #nouveau_solde =  credit_s2_.credit_reste.amount-total_transfert
+        credit_art_post = credit_s2_.credit_article_posteriori()# la methode: self.credit_allouee.amount/2
+        print ('credit_art_post')
+        print (credit_art_post)
+        
+        nouveau_solde_S1 = credit_art_post
+        if semestr == 's1' or semestr == 'S1': 
+            nouveau_solde_S1 = credit_art_post - total_transfert
+        elif semestr == 's2' or semestr == 'S2': 
+
+            #ancien_solde_S1=credit_art_post
+            ancien_solde_S1plusS2 = credit_art_post+nouveau_solde_S1
+            print('ancien_solde_S1plusS2')
+            print(ancien_solde_S1plusS2)
+            nouveau_solde_S2 = ancien_solde_S1plusS2 + total_transfert 
+            print('nouveau_solde_S2')
+            print(nouveau_solde_S2)
+        else:
+            messages.error(request, " Erreur; actualiser le site  ")
+                         
+            
         transfert_letter = num2words(total_transfert, lang='fr')
         print(transfert_letter)
           
         pieces = {}
         context = {}
+        
         context['article_destination'] =article_destination
         context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
-        #context['credit_s2_'] = credit_s2_
-        context['ancien_solde']=ancien_solde
-        context['nouveau_solde']=nouveau_solde
+        context['credit_art_post'] = credit_art_post
+        context['ancien_solde_S1plusS2']=ancien_solde_S1plusS2
+        context['nouveau_solde_S2']=nouveau_solde_S2
  
         #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_destination.id) + '.pdf'
         self.filename ='transfert_fiche_modification_de_la_provision'+str(article_destination) + '.pdf'
         return context
+    
+
             

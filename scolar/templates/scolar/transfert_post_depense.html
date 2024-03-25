@@ -29,6 +29,7 @@ table {
 						
 						<br><br>
 				<form class="forms-sample">
+				      {% csrf_token %}
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group row">
@@ -50,9 +51,9 @@ table {
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group row">
-										<label class="col-sm-6 col-form-label" for="session">Semestre   (choisir S1 ou S2)</label>
+										<label class="col-sm-6 col-form-label" for="semestre">Semestre   (choisir S1 ou S2)</label>
 										<div class="col-sm-9">
-											<input type="string" class="form-control" name="session" required />
+											<input type="string" class="form-control" name="semestre" required />
 										</div>
 									</div>
 								</div>
@@ -73,7 +74,7 @@ table {
 							</div>
 							
 				</form>
-				{% if session == 's1' or session == 'S1'%}
+				{% if semestre == 's1' or semestre == 'S1'%}
 						<div class="content-wrapper">
 							<div class="row">
 								<div class="col-md-12 grid-margin stretch-card">
@@ -110,7 +111,7 @@ table {
 								</div>
 							</div>
 						</div>
-						{% elif session == 's2' or session == 'S2'%}
+						{% elif semestre == 's2' or semestre == 'S2'%}
 						<div class="content-wrapper">
 							<div class="row">
 								<div class="col-md-12 grid-margin stretch-card">
@@ -177,7 +178,7 @@ table {
 								<div class="col-md-4">
 								{% if somme_montant_transfert_post != 0  %}
 
-									<a href="{% url 'Transfert_moins_posteriori_PDFView' credit_s2_.id  %}" class="btn btn-primary btn-block"> 
+									<a href="{% url 'Transfert_moins_posteriori_PDFView' credit_s2_.id semestre %}" class="btn btn-primary btn-block"> 
 									                     <!-- on peut remplacer (credit_s2_.id) par (crd) -->
 										<i class="fa fa-print fa-lg"></i> Imprimer
 									</a>
