@@ -2433,4 +2433,8 @@ class Transfert(models.Model):
         super(Transfert, self).save(*args, **kwargs)
         #super().save(*args, **kwargs)
         
+class Transfert_posteriori(models.Model):
+    transfertpost = models.OneToOneField(Transfert, on_delete=models.SET_NULL, null=True, blank=True)
+    solde_s1 = MoneyField(decimal_places=2, max_digits=9)
+    
         

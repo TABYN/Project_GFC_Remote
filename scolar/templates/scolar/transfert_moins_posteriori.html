@@ -47,11 +47,7 @@ table {
                           
                           
                            {% for transfert in transferts %}
-                           <!-- {% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
-                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
-                           {% elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 %}
- -->                           <p>Transfert du {{transfert.article_source.article.chapitre.code_chap}}{{transfert.article_source.article.code_art}} AU {{transfert.article_destination.article.chapitre.code_chap}}{{transfert.article_destination.article.code_art}}</p>
-                          <!--  {% endif %} -->
+                          <p>Transfert du {{transfert.article_source.article.chapitre.code_chap}}{{transfert.article_source.article.code_art}} AU {{transfert.article_destination.article.chapitre.code_chap}}{{transfert.article_destination.article.code_art}}</p>
                           {% endfor %}
                           
                           <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -142,7 +138,7 @@ table {
 						  
 						
 						<pre>
-						Objet : <label for="caseDepense">Dépense</label> <input type="checkbox" id="caseDepense" name="caseDepense">
+						Objet : <label for="caseDepense">Dépense</label> <input type="checkbox" id="caseDepense" name="caseDepense" checked  value="X">
 						      : <label for="caseEconomie">Economie</label> <input type="checkbox" id="caseEconomie" name="caseEconomie">
 						</pre>
 						

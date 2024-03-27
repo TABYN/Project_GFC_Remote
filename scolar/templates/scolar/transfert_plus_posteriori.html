@@ -47,11 +47,8 @@ table {
                           
                           
                            {% for transfert in transferts %}
-                           <!-- {% if transfert.date_transfert.month >= 1 and transfert.date_transfert.month <= 6 %}
-                           <p>Transfert du {{transfert_.article_source.article.chapitre.code_chap}}{{transfert_.article_source.article.code_art}} vers {{transfert_.article_destination.article.chapitre.code_chap}}{{transfert_.article_destination.article.code_art}}</p>
-                           {% elif transfert.date_transfert.month >= 7 and transfert.date_transfert.month <= 12 %}
- -->                           <p>Transfert du {{transfert.article_source.article.chapitre.code_chap}}{{transfert.article_source.article.code_art}} AU {{transfert.article_destination.article.chapitre.code_chap}}{{transfert.article_destination.article.code_art}}</p>
-                          <!--  {% endif %} -->
+                           <p>Transfert du {{transfert.article_source.article.chapitre.code_chap}}{{transfert.article_source.article.code_art}} AU {{transfert.article_destination.article.chapitre.code_chap}}{{transfert.article_destination.article.code_art}}</p>
+                          
                           {% endfor %}
                           
                           <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -143,7 +140,7 @@ table {
 						
 						<pre>
 						Objet : <label for="caseDepense">Dépense</label> <input type="checkbox" id="caseDepense" name="caseDepense">
-						      : <label for="caseEconomie">Economie</label> <input type="checkbox" id="caseEconomie" name="caseEconomie">
+						      : <label for="caseEconomie">Economie</label> <input type="checkbox" id="caseEconomie" name="caseEconomie"  checked  value="X">
 						</pre>
 						
 						
@@ -162,8 +159,8 @@ table {
 						{% if semestr == 's1' or semestr == 'S1' %}
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgetaire</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.code_art}}</p></td> 
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td> 
 				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{credit_art_post}}</p></td> 
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td> <!-- {{transfert_.montant_transfert}} -->
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde_S1}}</p></td> <!-- transfert_.nouveau_solde_s1_transfert -->
@@ -173,8 +170,8 @@ table {
 						
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.code_art}}</p></td>
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td>
 				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{credit_art_post}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td> <!-- {{transfert_.nouveau_solde_s1_transfert}} -->
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
@@ -185,8 +182,8 @@ table {
                         <tr style="height:100px;"> 
 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Credit budgétaire</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.code_art}}</p></td>
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td>
 				        	<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{0.00}}</p></td>
@@ -196,8 +193,8 @@ table {
 
 						<tr style="height:100px;"> 
 						  	<td style=" width: 15%;height:15;text-align:center;"><p>Provision (50% CB)</p></td> 
-							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.chapitre.code_chap}}</p></td>
-				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_source.code_art}}</p></td>
+							<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.chapitre.code_chap}}</p></td>
+				        	<td style=" width: 10%;height:15;vertical-align: top;text-align:center;"><p>{{article_destination.code_art}}</p></td>
                             <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{ancien_solde_S1plusS2}}</p></td>
 						    <td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{total_transfert}}</p></td>
 							<td style=" width: 15%;height:15;vertical-align: top;text-align:center;"><p>{{nouveau_solde_S2}}</p></td>
@@ -209,8 +206,8 @@ table {
 						
 						<div style="text-align:left;">
 						<p>L'intitule: </p>
-						<p>Chapitre:&nbsp;&nbsp;{{article_source.chapitre.libelle_chap_FR}}</p>
-						<p>Article: &nbsp;&nbsp;{{article_source.libelle_art_FR}}</p>
+						<p>Chapitre:&nbsp;&nbsp;{{article_destination.chapitre.libelle_chap_FR}}</p>
+						<p>Article: &nbsp;&nbsp;{{article_destination.libelle_art_FR}}</p>
 						<p>Observation du service</p>
 						<!-- <p>Regularisation d'engagement de depence pris en charge dans sa forme a posteriori.......................<br>
 						      .............................................................................................................................</p>

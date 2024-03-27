@@ -179,7 +179,7 @@ table {
 								<div class="col-md-4">
 								{% if somme_montant_transfert_post != 0  %}
 
-									<a href="{% url 'Transfert_moins_posteriori_PDFView' credit_s2_.id semestre %}" class="btn btn-primary btn-block"> 
+									<a href="{% url 'Transfert_plus_posteriori_PDFView' credit_s2_.id semestre %}" class="btn btn-primary btn-block"> 
 									                     <!-- on peut remplacer (credit_s2_.id) par (crd) -->
 										<i class="fa fa-print fa-lg"></i> Imprimer
 									</a>

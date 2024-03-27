@@ -14636,9 +14636,16 @@ class Transfert_post_ListView(TemplateView):
 
 @login_required
 def Transfert_depense(request, crd):
+
     # confusion--->ici article_source_id c'est le ID de credit_s2_  pas le Id de l'Article
     # models.py---->  class Transfert :article_source=models.ForeignKey(Credit_S2 ,related_name='source' , null= True, blank=True, on_delete=models.SET_NULL) 
     credit_s2_= Credit_S2.objects.get(id=crd)
+ ###############   #savgarder 
+#    transfert_posteriori_instance = Transfert_posteriori.objects.create(solde_s1=credit_s2_.credit_article_posteriori())
+ #   transfert_posteriori_instance.save()
+###################################
+    
+    
     article_source= credit_s2_.article
     art_source_id =credit_s2_.article.id
 #   print(art_source_id) 
@@ -14747,18 +14754,36 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         for transfert in all_transferts:
             transferts.append(transfert)
             total_transfert+= transfert.montant_transfert.amount
-            print(total_transfert) 
-               
+            print(total_transfert)
+            print('transfert', transfert) 
+        print('transferts', transferts)       
         #nouveau_solde =  credit_s2_.credit_reste.amount-total_transfert
         credit_art_post = credit_s2_.credit_article_posteriori()# la methode: self.credit_allouee.amount/2
         print ('credit_art_post')
         print (credit_art_post)
         
-        nouveau_solde_S1 = credit_art_post
-        if semestr == 's1' or semestr == 'S1': 
-            nouveau_solde_S1 = credit_art_post - total_transfert
-        elif semestr == 's2' or semestr == 'S2': 
+        context = {}
+        #nouveau_solde_S1 = credit_art_post #cest pas sa place
+        if semestr == 's1' or semestr == 'S1':
+             
+            if total_transfert!=0 :
+                nouveau_solde_S1 = credit_art_post - total_transfert
+                # Creer une instance de Transfert_posteriori et sauvegarder le nouveau_solde_S1
+                #transfert_posteriori_instance = Transfert_posteriori.objects.create(solde_s1=nouveau_solde_S1)
+                # Enregistrez l instance dans la base de donnees
+                #transfert_posteriori_instance.save()
 
+                print('nouveau_solde_S1')
+                print(nouveau_solde_S1)
+            elif total_transfert==0:
+                nouveau_solde_S1 = credit_art_post
+                #transfert_posteriori_instance = Transfert_posteriori.objects.create(solde_s1=nouveau_solde_S1)
+                #transfert_posteriori_instance.save()
+  
+            context['nouveau_solde_S1'] = nouveau_solde_S1
+            #nouveau_solde_S1 = credit_art_post - total_transfert
+            #il faut sauvgarder la valeur de (nouveau_solde_s1)soit: 1/ ajouter un champ dans la table Transfert soit: 2/ creer une table filsqui contien cette valeur  
+        elif semestr == 's2' or semestr == 'S2':
             #ancien_solde_S1=credit_art_post
             ancien_solde_S1plusS2 = credit_art_post+nouveau_solde_S1
             print('ancien_solde_S1plusS2')
@@ -14766,6 +14791,9 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
             nouveau_solde_S2 = ancien_solde_S1plusS2 - total_transfert 
             print('nouveau_solde_S2')
             print(nouveau_solde_S2)
+            context['ancien_solde_S1plusS2'] = ancien_solde_S1plusS2
+            context['nouveau_solde_S2'] = nouveau_solde_S2
+
         else:
             messages.error(request, " Erreur; actualiser le site  ")
                          
@@ -14774,16 +14802,15 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
         print(transfert_letter)
           
         pieces = {}
-        context = {}
         
+        context['semestr'] = semestr 
         context['article_source'] =article_source
         context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
         context['credit_art_post'] = credit_art_post
-        context['ancien_solde_S1plusS2']=ancien_solde_S1plusS2
-        context['nouveau_solde_S2']=nouveau_solde_S2
+        
  
         #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source.id) + '.pdf'
         self.filename ='transfert_fiche_modification_de_la_provision'+str(article_source) + '.pdf'
@@ -14795,6 +14822,11 @@ class Transfert_moins_posteriori_PDFView(PDFTemplateView):
 @login_required
 def Transfert_economie(request, crd): # c est le meme code que (def Transfert_depense(request, crd):)sof qu'il faut remplacer article_source par article destination
     credit_s2_= Credit_S2.objects.get(id=crd)
+     ###############   #savgarder 
+#    transfert_posteriori_instance = Transfert_posteriori.objects.create(solde_s1=credit_s2_.credit_article_posteriori())
+ #   transfert_posteriori_instance.save()
+###################################
+
     article_destination= credit_s2_.article
     art_destination_id =credit_s2_.article.id
  #   print(art_destination_id) 
@@ -14893,9 +14925,7 @@ class Transfert_plus_posteriori_PDFView(PDFTemplateView):
             messages.error(request, " Saisir soit :  S1, s1, S2, s2  ")      
         
         #all_transferts = Transfert.objects.filter(annee_budgi=annee_bdg).filter(article_destination=self.kwargs.get('credit_s2__pk'))#.exclude(credit_s2__isnull=True)
-        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))# recuperer l'objet (credit_s2)
-        
-        # recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
+        credit_s2_= Credit_S2.objects.get(id=self.kwargs.get('credit_s2__pk'))# # recuperer  l'objet credit_s2 qui a la cle 'credit_s2__pk'
         article_destination= credit_s2_.article # recuperer l'objet article_destination
         #ancien_solde = credit_s2_.credit_reste.amount
 
@@ -14904,6 +14934,7 @@ class Transfert_plus_posteriori_PDFView(PDFTemplateView):
         for transfert in all_transferts:
             transferts.append(transfert)
             total_transfert+= transfert.montant_transfert.amount
+            article_source = transfert.article_source.article
             print(total_transfert) 
                
         #nouveau_solde =  credit_s2_.credit_reste.amount-total_transfert
@@ -14911,36 +14942,52 @@ class Transfert_plus_posteriori_PDFView(PDFTemplateView):
         print ('credit_art_post')
         print (credit_art_post)
         
-        nouveau_solde_S1 = credit_art_post
+        context = {}
+        
+        #nouveau_solde_S1 = credit_art_post
         if semestr == 's1' or semestr == 'S1': 
-            nouveau_solde_S1 = credit_art_post - total_transfert
+            if total_transfert!=0 :
+                nouveau_solde_S1 = credit_art_post + total_transfert
+                # Creer une instance de Transfert_posteriori et sauvegarder le nouveau_solde_S1
+                #transfert_posteriori_instance = Transfert_posteriori.objects.create(solde_s1=nouveau_solde_S1)
+                # Enregistrez l instance dans la base de donnees
+                #transfert_posteriori_instance.save()
+            elif total_transfert==0:
+                nouveau_solde_S1 = credit_art_post
+                #sauvegarder nouveau_solde_S1 dans la table Transfert_posteriori
+                #transfert_posteriori_instance = Transfert_posteriori.objects.create(solde_s1=nouveau_solde_S1)
+                #transfert_posteriori_instance.save()
+  
+            context['nouveau_solde_S1'] = nouveau_solde_S1
+            #nouveau_solde_S1 = credit_art_post - total_transfert
+            #il faut sauvgarder la valeur de (nouveau_solde_s1)soit: 1/ ajouter un champ dans la table Transfert soit: 2/ creer une table filsqui contien cette valeur  
+    
         elif semestr == 's2' or semestr == 'S2': 
-
             #ancien_solde_S1=credit_art_post
-            ancien_solde_S1plusS2 = credit_art_post+nouveau_solde_S1
+            ancien_solde_S1plusS2 = credit_art_post+nouveau_solde_S1# il faut recuperer nouveau_solde_S1 dela table Transfert_posteriori.objects.get(solde_s1=nouveau_solde_S1)
             print('ancien_solde_S1plusS2')
             print(ancien_solde_S1plusS2)
             nouveau_solde_S2 = ancien_solde_S1plusS2 + total_transfert 
             print('nouveau_solde_S2')
             print(nouveau_solde_S2)
+            context['ancien_solde_S1plusS2'] = ancien_solde_S1plusS2
+            context['nouveau_solde_S2'] = nouveau_solde_S2
         else:
             messages.error(request, " Erreur; actualiser le site  ")
-                         
-            
+                                   
         transfert_letter = num2words(total_transfert, lang='fr')
         print(transfert_letter)
           
-        pieces = {}
-        context = {}
-        
-        context['article_destination'] =article_destination
+        #pieces = {}
+        context['article_destination'] = article_destination
+        context['semestr'] = semestr 
+        #context['article_source'] =article_source
         context['annee_bdg'] =annee_bdg
         context['transferts'] = transferts
         context['total_transfert'] = total_transfert
         context['transfert_letter'] = transfert_letter
         context['credit_art_post'] = credit_art_post
-        context['ancien_solde_S1plusS2']=ancien_solde_S1plusS2
-        context['nouveau_solde_S2']=nouveau_solde_S2
+
  
         #self.filename ='transfert_fiche_modification_de_la_provision'+str(article_destination.id) + '.pdf'
         self.filename ='transfert_fiche_modification_de_la_provision'+str(article_destination) + '.pdf'
